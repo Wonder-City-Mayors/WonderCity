@@ -1,0 +1,10 @@
+frontend:
+html
+css bootstrap
+javascript jquery
+backend:
+python + django
+Альтернативы backend:
+node.js
+vue.js
+php laravel
