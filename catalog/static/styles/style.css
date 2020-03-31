@@ -1,0 +1,56 @@
+body {
+}
+
+header {
+  color: white;
+  font: 2vw calibri;
+}
+
+main {
+  color: black;
+  font: 16px calibri;
+}
+
+p {
+  text-align: justify;
+  /* It is IMPORTANT to mention that if you (or I) want to make other text-align options for
+  a particular paragraph, you always can do it by assigning a class or id for paragraph. You can 
+  also write some styles directly into the HTML tag, however this is not recommended as ids are 
+  intended to be assigned only to a particular element, replacing direct style assignments. */
+}
+
+.header-div {
+  margin: 0 10vw;
+  height: 10vh;
+  width: 80vw;
+  background: #607d8b;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  position: fixed;
+  left: 0;
+  top: 0;
+}
+
+.header-part-div {
+  display: inline-block;
+  margin: none;
+  width: 24%;
+  height: 100%;
+  background: none;
+}
+
+.header-part-major-div {
+  background: rgba(255, 0, 0, .4);
+  border-bottom-left-radius: 10px;
+}
+
+.header-span {
+  text-align: center;
+  display: inline-block;
+}
+
+.main-container-div {
+  color: black;
+  font: 12pt calibri;
+  margin: 10vh 12.5vw;
+}
