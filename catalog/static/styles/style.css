@@ -1,4 +1,6 @@
 body {
+  color: black;
+  font: 16px calibri;
 }
 
 header {
@@ -7,8 +9,11 @@ header {
 }
 
 main {
-  color: black;
-  font: 16px calibri;
+  display: none;
+}
+
+footer {
+  color: white;
 }
 
 p {
@@ -17,6 +22,16 @@ p {
   a particular paragraph, you always can do it by assigning a class or id for paragraph. You can 
   also write some styles directly into the HTML tag, however this is not recommended as ids are 
   intended to be assigned only to a particular element, replacing direct style assignments. */
+}
+
+.header-container {
+  margin: 0 10vw;
+  height: 10vh;
+  width: 80vw;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 14;
 }
 
 .header-div {
@@ -49,8 +64,34 @@ p {
   display: inline-block;
 }
 
+.header-link:link {
+  color: white;
+}
+
+.header-link:visited {
+  color: white;
+}
+
+.header-link:hover {
+  color: white;
+}
+
+.header-link:active {
+  color: white;
+}
+
 .main-container-div {
   color: black;
   font: 12pt calibri;
   margin: 10vh 12.5vw;
+}
+
+.footer-container-div {
+  margin: 0 10vw;
+  padding: 10px 10px 0 10px;
+  width: 80vw;
+  background: #607d8b;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  font: 12pt calibri;
 }

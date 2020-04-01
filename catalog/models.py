@@ -66,7 +66,6 @@ class TrackingGadgetInstance(models.Model):
     def __str__(self):
         return f'{self.id} | {self.readings} | ({self.manufacturer} {self.type}, {self.house.address}, {self.house.district.name} район, {self.house.district.city.name})'
 
-print("Welcome, Kimp13. Or should I call you master?")
 
 
 

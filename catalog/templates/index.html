@@ -1,64 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    {% block title %}<title>WonderCity</title>{% endblock %}
-    <!--All metas are stored here, fellow programmer-->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--Main style file-->
-	{% load static %}
-    <link rel="stylesheet" href="{% static 'styles/style.css' %}">
-    <!--JQuery-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <!--Main script file-->
-    <script src="{% static 'scripts/index.js' %}" defer></script>
-  </head>  
-  <body>
-    <header>
-	{% block menu %}
-      <nav>
-        <div class="header-div">
-          <div class="header-part-div header-part-major-div">
-            <span class="header-span">
-              Main
-            </span>
-          </div>
-          
-          <div class="header-part-div">
-            <span class="header-span">
-              About
-            </span>
-          </div>
-          
-          <div class="header-part-div">
-            <span class="header-span">
-              FAQ
-            </span>
-          </div>
-          
-          <div class="header-part-div">
-            <span class="header-span">
-              Authorization
-            </span>
-          </div>
-        </div>
-      </nav>
-	{% endblock %}
-    </header>
-    
-    <main>
-      <div class="main-container-div">
-        <p class="container-paragraph">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Purus in massa tempor nec. Diam phasellus vestibulum lorem sed risus. Velit egestas dui id ornare. Volutpat maecenas volutpat blandit aliquam etiam. Ultrices vitae auctor eu augue ut. Sed turpis tincidunt id aliquet risus feugiat. Varius sit amet mattis vulputate enim nulla aliquet. Eget mauris pharetra et ultrices. Molestie nunc non blandit massa enim nec dui. Sollicitudin aliquam ultrices sagittis orci a. Morbi quis commodo odio aenean sed adipiscing. Mauris ultrices eros in cursus turpis massa tincidunt. Mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Adipiscing elit pellentesque habitant morbi tristique senectus et. Elit pellentesque habitant morbi tristique senectus et netus et. Tincidunt dui ut ornare lectus sit. Fermentum iaculis eu non diam phasellus vestibulum lorem sed. Sed felis eget velit aliquet. Vestibulum sed arcu non odio euismod lacinia at quis risus. Nulla pellentesque dignissim enim sit amet venenatis. Viverra nibh cras pulvinar mattis nunc sed. Integer eget aliquet nibh praesent tristique magna sit amet. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam. Diam quis enim lobortis scelerisque fermentum. Lorem ipsum dolor sit amet consectetur adipiscing elit ut aliquam. Justo eget magna fermentum iaculis eu non. Nisl rhoncus mattis rhoncus urna neque viverra justo. Sed viverra ipsum nunc aliquet bibendum enim facilisis gravida neque. Lorem sed risus ultricies tristique nulla aliquet enim. Etiam erat velit scelerisque in dictum non consectetur. Pretium vulputate sapien nec sagittis aliquam malesuada. Aliquam etiam erat velit scelerisque in dictum non. In hac habitasse platea dictumst vestibulum rhoncus. Et malesuada fames ac turpis egestas integer eget. Arcu dui vivamus arcu felis bibendum ut tristique et. Consequat semper viverra nam libero justo laoreet sit amet. Sit amet volutpat consequat mauris nunc congue. Iaculis at erat pellentesque adipiscing commodo elit. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare massa. Nisl condimentum id venenatis a condimentum vitae. Vitae congue eu consequat ac felis. Phasellus faucibus scelerisque eleifend donec pretium. Dictum fusce ut placerat orci. In metus vulputate eu scelerisque felis imperdiet proin. Vestibulum lectus mauris ultrices eros in cursus turpis. Donec ac odio tempor orci dapibus ultrices. Quis risus sed vulputate odio ut enim. Consequat mauris nunc congue nisi. Sit amet justo donec enim diam vulputate ut pharetra sit. Id porta nibh venenatis cras sed. Nunc vel risus commodo viverra maecenas accumsan. Accumsan sit amet nulla facilisi morbi. Vel orci porta non pulvinar neque. Arcu dictum varius duis at consectetur lorem donec. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Purus in massa tempor nec. Diam phasellus vestibulum lorem sed risus. Velit egestas dui id ornare. Volutpat maecenas volutpat blandit aliquam etiam. Ultrices vitae auctor eu augue ut. Sed turpis tincidunt id aliquet risus feugiat. Varius sit amet mattis vulputate enim nulla aliquet. Eget mauris pharetra et ultrices. Molestie nunc non blandit massa enim nec dui. Sollicitudin aliquam ultrices sagittis orci a. Morbi quis commodo odio aenean sed adipiscing. Mauris ultrices eros in cursus turpis massa tincidunt. Mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Adipiscing elit pellentesque habitant morbi tristique senectus et. Elit pellentesque habitant morbi tristique senectus et netus et. Tincidunt dui ut ornare lectus sit. Fermentum iaculis eu non diam phasellus vestibulum lorem sed. Sed felis eget velit aliquet. Vestibulum sed arcu non odio euismod lacinia at quis risus. Nulla pellentesque dignissim enim sit amet venenatis. Viverra nibh cras pulvinar mattis nunc sed. Integer eget aliquet nibh praesent tristique magna sit amet. Fringilla est ullamcorper eget nulla facilisi etiam dignissim diam. Diam quis enim lobortis scelerisque fermentum. Lorem ipsum dolor sit amet consectetur adipiscing elit ut aliquam. Justo eget magna fermentum iaculis eu non. Nisl rhoncus mattis rhoncus urna neque viverra justo. Sed viverra ipsum nunc aliquet bibendum enim facilisis gravida neque. Lorem sed risus ultricies tristique nulla aliquet enim. Etiam erat velit scelerisque in dictum non consectetur. Pretium vulputate sapien nec sagittis aliquam malesuada. Aliquam etiam erat velit scelerisque in dictum non. In hac habitasse platea dictumst vestibulum rhoncus. Et malesuada fames ac turpis egestas integer eget. Arcu dui vivamus arcu felis bibendum ut tristique et. Consequat semper viverra nam libero justo laoreet sit amet. Sit amet volutpat consequat mauris nunc congue. Iaculis at erat pellentesque adipiscing commodo elit. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare massa. Nisl condimentum id venenatis a condimentum vitae. Vitae congue eu consequat ac felis. Phasellus faucibus scelerisque eleifend donec pretium. Dictum fusce ut placerat orci. In metus vulputate eu scelerisque felis imperdiet proin. Vestibulum lectus mauris ultrices eros in cursus turpis. Donec ac odio tempor orci dapibus ultrices. Quis risus sed vulputate odio ut enim. Consequat mauris nunc congue nisi. Sit amet justo donec enim diam vulputate ut pharetra sit. Id porta nibh venenatis cras sed. Nunc vel risus commodo viverra maecenas accumsan. Accumsan sit amet nulla facilisi morbi. Vel orci porta non pulvinar neque. Arcu dictum varius duis at consectetur lorem donec.
-        </p>
-      </div>
-    </main>
-    
-    <footer>
-	{% block content %}
-	
-	{% endblock %}
-    </footer>
-  </body>
-</html>
+{% extends "base-generic.html" %}
+
+{% block content %}
+	<h1>
+		Добро пожаловать!
+	</h1>
+	В системе WonderCity задействованы
+	<ul>
+		<li>{{ num_cities }} {{ string_cities }}</li>
+		<li>{{ num_districts }} {{ string_districts }} (из них {{ num_districts_in_Izhevsk }} {{ string_districts_in_Izhevsk }} в родном городе команды SQBit).</li>
+	</ul>
+{% endblock %}
