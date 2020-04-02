@@ -47,3 +47,10 @@ def faq(request):
     }
 	
     return render(request, 'faq.html', context = context)
+	
+def profile(request):
+
+	context = {
+	}
+	
+	return render(request, 'profile.html', context = context);
