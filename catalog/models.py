@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 
 class City(models.Model):
     # Fields
@@ -47,9 +48,9 @@ class House(models.Model):
 class TrackingGadgetInstance(models.Model):
     # Fields
     TYPE_CHOICES = (
-        ('электричество', 'Электрический'),
-        ('вода', 'Водный'),
-        ('газ', 'Газовый'),
+        ('электрический', 'Электрический'),
+        ('водный', 'Водный'),
+        ('газовый', 'Газовый'),
     )
     manufacturer = models.CharField(max_length = 20, verbose_name = "Производитель")
     type = models.CharField(max_length = 13, choices = TYPE_CHOICES, verbose_name = "Тип", default = None)
@@ -61,7 +62,7 @@ class TrackingGadgetInstance(models.Model):
         ordering = ['id']
     # Methods
     def get_absolute_url(self):
-        return reverse('model-detail-view', args=[str(self.id)])
+        return str(self.id)
     
     def __str__(self):
         return f'{self.id} | {self.readings} | ({self.manufacturer} {self.type}, {self.house.address}, {self.house.district.name} район, {self.house.district.city.name})'

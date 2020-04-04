@@ -1,6 +1,7 @@
-body {
+html, body {
   color: black;
   font: 16px calibri;
+  height: 100%;
 }
 
 header {
@@ -18,13 +19,9 @@ footer {
 
 p {
   text-align: justify;
-  /* It is IMPORTANT to mention that if you (or I) want to make other text-align options for
-  a particular paragraph, you always can do it by assigning a class or id for paragraph. You can 
-  also write some styles directly into the HTML tag, however this is not recommended as ids are 
-  intended to be assigned only to a particular element, replacing direct style assignments. */
 }
 
-.header-container {
+div.header-container {
   margin: 0 10vw;
   height: 10vh;
   width: 80vw;
@@ -34,7 +31,7 @@ p {
   z-index: 14;
 }
 
-.header-div {
+div.header {
   margin: 0 10vw;
   height: 10vh;
   width: 80vw;
@@ -46,7 +43,7 @@ p {
   top: 0;
 }
 
-.header-part-div {
+div.header-part {
   display: inline-block;
   margin: none;
   width: 24%;
@@ -54,7 +51,7 @@ p {
   background: none;
 }
 
-.header-major-part-div {
+div.header-major-part {
   background: rgba(255, 0, 0, .4);
   border-bottom-left-radius: 1vw;
 }
@@ -64,38 +61,33 @@ p {
   display: inline-block;
 }
 
-.header-link {
+a {
   text-decoration: none;
 }
 
-.header-link:link {
+a.header-link:link {
   color: white;
 }
 
-.header-link:visited {
+a.header-link:visited {
   color: white;
 }
 
-.header-link:hover {
+a.header-link:hover {
   color: white;
 }
 
-.header-link:active {
+a.header-link:active {
   color: white;
 }
 
-.main-container-div {
+div.main-container {
   color: black;
   font: 12pt calibri;
-  margin: 10vh 12.5vw;
+  margin: 10vh 12.5vw 0 12.5vw;
 }
 
-.footer-container-div {
-  margin: 0 10vw;
-  padding: 10px 10px 0 10px;
-  width: 80vw;
+div.footer-container {
   background: #607d8b;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
   font: 12pt calibri;
 }

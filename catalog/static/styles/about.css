@@ -1,0 +1,12 @@
+div.person-container {
+	display: flex;            
+	justify-content: space-between; 
+}
+
+div.person > img {
+	width: inherit;
+}
+
+p.muted {
+	color: rgba(0, 0, 0, .6);
+}
