@@ -1,29 +1,30 @@
-html, body {
+body {
   color: black;
   font: 16px calibri;
-  height: 100%;
 }
 
 header {
+  font-size: 0;
   color: white;
-  font: 2vw calibri;
 }
 
-main {
+main, footer {
   display: none;
-}
-
-footer {
-  color: white;
 }
 
 p {
   text-align: justify;
 }
 
+ul, li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 div.header-container {
   margin: 0 10vw;
-  height: 10vh;
+  height: 7vh;
   width: 80vw;
   position: fixed;
   left: 0;
@@ -32,28 +33,47 @@ div.header-container {
 }
 
 div.header {
-  margin: 0 10vw;
-  height: 10vh;
-  width: 80vw;
-  background: #607d8b;
-  border-bottom-left-radius: 1vw;
-  border-bottom-right-radius: 1vw;
+  margin: inherit;
+  padding: none;
+  height: inherit;
+  width: inherit;
   position: fixed;
-  left: 0;
-  top: 0;
+  left: inherit;
+  top: inherit;
 }
 
 div.header-part {
   display: inline-block;
+  vertical-align: top;
   margin: none;
-  width: 24%;
+  width: 20vw;
   height: 100%;
-  background: none;
+  background: #607d8b;
+  font: 1.5vw calibri;
 }
 
 div.header-major-part {
   background: rgba(255, 0, 0, .4);
   border-bottom-left-radius: 1vw;
+  width: 100%;
+  height: 100%;
+}
+
+ul.dropdown-container {
+	display: inline-block;
+	height: inherit;
+}
+
+ul.dropdown-container li {
+	height: 7vh;
+}
+
+ul.dropdown {
+	position: relative;
+}
+
+ul.dropdown li {
+	position: relative;
 }
 
 .header-span {
@@ -81,13 +101,30 @@ a.header-link:active {
   color: white;
 }
 
+a.header-small {
+  font-size: 0.6em;	
+}
+
 div.main-container {
   color: black;
   font: 12pt calibri;
-  margin: 10vh 12.5vw 0 12.5vw;
+  margin: 7vh 12.5vw 0 12.5vw;
 }
 
 div.footer-container {
-  background: #607d8b;
-  font: 12pt calibri;
+  margin: 0 10vw;
+  width: 80vw;
+}
+
+#first {
+	border-bottom-left-radius: 1vw;
+}
+
+#last-up {
+	border-bottom-right-radius: 1vw;
+}
+
+#last-dropped {
+	border-bottom-left-radius: 1vw;
+	border-bottom-right-radius: 1vw;
 }

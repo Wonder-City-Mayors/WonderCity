@@ -1,72 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    {% block title %}{% endblock%}
-    <!--All metas are stored here, fellow programmer-->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--Main style file-->
-	{% block static %}
-	{% endblock %}
-	{% load static %}
-    <link rel="stylesheet" href="{% static 'styles/style.css' %}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="{% static 'scripts/script.js' %}" defer></script>
-  </head>  
-  <body>
-    <header>
-      <nav>
-	    <div class="header-container">
-        <div class="header">
-          <div class="header-part header-major-part">
-		    <span class="header-span">
-			  <a class="header-link">
-                Главная
-			  </a>
-			</span>
-          </div>
-          
-          <div class="header-part">
-            <span class="header-span">
-			  <a class="header-link">
-                О компании
-			  </a>
-			</span>
-          </div>
-          
-          <div class="header-part">
-            <span class="header-span">
-			  <a class="header-link">
-                ЧАВО
-			  </a>
-			</span>
-          </div>
-          
-          <div class="header-part">
-            <span class="header-span">
-			  <a class="header-link">
-                Авторизация
-			  </a>
-			</span>
-          </div>
-        </div>
-		</div>
-      </nav>
-    </header>
-    
-    <main>
-      <div class="main-container">
-        {% block content %}
+	<head>
+		{% block title %}{% endblock%}
+		<!--All metas are stored here, fellow programmer-->
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!--Main style file-->
+		{% block static %}
 		{% endblock %}
-		<hr>
-      </div>
-    </main>
+		{% load static %}
+		<link rel="stylesheet" href="{% static 'styles/style.css' %}">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="{% static 'scripts/script.js' %}" defer></script>
+	</head>  
+	<body>
+		<header>
+			<nav>
+				<div class="header-container">
+					<div class="header">
+						<div class="header-part" id="first">
+							<div class="header-major-part">
+								<span class="header-span">
+									<a class="header-link">
+										Главная
+									</a>
+								</span>
+							</div>
+						</div>
+						
+						<div class="header-part">
+							<span class="header-span">
+								<a class="header-link">
+									О SQBit
+								</a>
+							</span>
+						</div>
+						
+						<div class="header-part">
+							<span class="header-span">
+								<a class="header-link">
+									ЧАВО
+								</a>
+							</span>
+						</div>
+						
+						<ul class="dropdown-container">
+							<li>
+								<div class="header-part" id="last-up">
+									<span class="header-span dropdown">
+										{% if user.is_authenticated %}
+											<a class="header-link">
+												{{user.get_username}}
+											</a>
+										{% else %}
+											<a class="header-link">Вход</a>
+										{% endif %}
+									</span>
+								</div>
+								
+								<ul class="dropdown">
+									{% if user.is_authenticated %}
+									{% else %}
+										<li>
+											<div class="header-part" id="last-dropped">
+												<span class="header-span">
+													<a class="header-link">Регистрация</a>
+												</span>
+											</div>
+										</li>
+									{% endif %}
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+		</header>
     
-    <footer>
-	  <div class="footer-container">
-	    
-	  </div>
-    </footer>
-  </body>
+		<main>
+			<div class="main-container">
+				{% block content %}
+				{% endblock %}
+			</div>
+		</main>
+    
+		<footer>
+			<div class="footer-container">
+				<hr>
+				<h4>Футер, милый мой футер. Вот он какой, такой простой футер.
+			</div>
+		</footer>
+	</body>
 </html>

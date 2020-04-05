@@ -1,6 +1,8 @@
 from django.shortcuts import render
+from django.http import Http404
 from django.views import generic
 from catalog.models import City, District, House, TrackingGadgetInstance
+from django.contrib.auth.models import User
 
 class TrackerListView(generic.ListView):
     model = TrackingGadgetInstance
@@ -9,27 +11,32 @@ class TrackerListView(generic.ListView):
     
     def get_queryset(self):
 	    return TrackingGadgetInstance.objects.all()
-		
-def trackerInstanceView(request, primary_key):
+
+def profileView(request, login):
     try:
-        tracker = TrackingGadgetInstance.objects.get(pk = primary_key)
+        userOnPage = User.objects.get(username = login)
+    except User.DoesNotExist:
+        raise Http404('User does not exist')
+
+    return render(request, 'profile.html', context = {'userOnPage': userOnPage})
+
+def authorization(request):
+    context = {}
+    return render(request, 'profile.html', context = context)
+	
+#страница с определённым счётчиком
+def trackerInstanceView(request, id):
+    try:
+        tracker = TrackingGadgetInstance.objects.get(id = id)
     except TrackingGadgetInstance.DoesNotExist:
         raise Http404('Tracker does not exist')
-		
+
     return render(request, 'catalog/trackinggadgetinstance.html', context = {'tracker': tracker})
 		
 def index(request):
-    visitsCount = request.session.get('visitsCount', 1)
-    request.session['visitsCount'] = visitsCount + 1
     num_cities = City.objects.all().count()
     num_districts = District.objects.count()
     num_districts_in_Izhevsk = District.objects.filter(city__name__exact = 'Ижевск').count()
-    if visitsCount == 1:
-        stringVisits = 'впервые'
-    elif 2 <= visitsCount % 10 <= 4 and not (12 <= visitsCount <= 14):
-        stringVisits = ' раза'
-    else:
-        stringVisits = ' раз'
     if num_cities % 10 == 0 or num_cities % 10 >= 5 or 11 <= num_cities <= 14:
         string_cities = 'городов'
     elif num_cities % 10 == 1:
@@ -55,8 +62,6 @@ def index(request):
         'string_districts': string_districts,
         'num_districts_in_Izhevsk': num_districts_in_Izhevsk,
         'string_districts_in_Izhevsk': string_districts_in_Izhevsk,
-        'visitsCount': visitsCount,
-        'stringVisits': stringVisits,
     }
 	
     return render(request, 'index.html', context = context)
@@ -74,10 +79,3 @@ def faq(request):
     }
 	
     return render(request, 'faq.html', context = context)
-	
-def profile(request):
-
-	context = {
-	}
-	
-	return render(request, 'profile.html', context = context);

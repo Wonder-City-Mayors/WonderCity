@@ -1,16 +1,13 @@
 {% extends "base-generic.html" %}
 
 {% block title %}
-<title>WonderCity</title>
+<title>{{userOnPage.username}}'s profile</title>
 {% endblock %}
 
 {% block content %}
-	<h1>
-		Добро пожаловать!
-	</h1>
-	В системе WonderCity задействованы
-	<ul>
-		<li>{{ num_cities }} {{ string_cities }}</li>
-		<li>{{ num_districts }} {{ string_districts }} (из них {{ num_districts_in_Izhevsk }} {{ string_districts_in_Izhevsk }} в родном городе команды SQBit).</li>
-	</ul>
+	{% if user.is_authenticated and user.get_username == userOnPage.username %}
+	<a href="http://127.0.0.1:8000/authorization/logout/">Выйти</a>
+	{% else %}
+	Это не твоё болото, уходи.
+	{% endif %}
 {% endblock %}
