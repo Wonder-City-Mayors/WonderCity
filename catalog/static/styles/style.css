@@ -16,7 +16,19 @@ p {
   text-align: justify;
 }
 
-ul, li {
+p.centered {
+	text-align: center;
+}
+
+p.disadvantaged {
+	font-size: 4px;
+}
+
+p.muted {
+	color: rgba(0, 0, 0, .6);
+}
+
+header ul, header li {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -29,7 +41,7 @@ div.header-container {
   position: fixed;
   left: 0;
   top: 0;
-  z-index: 14;
+  z-index: 10;
 }
 
 div.header {
@@ -103,6 +115,32 @@ a.header-link:active {
 
 a.header-small {
   font-size: 0.6em;	
+}
+
+div.authorization-container {
+	position: fixed;
+	z-index: 15;
+	background: rgba(128, 128, 128, .5);
+	display: none;
+	top: 0; right: 0; bottom: 0; left: 0;
+}
+
+div.login-container, div.signup-container {
+	display: none;
+	z-index: 20;
+	position: fixed;
+	top: 10vh;
+	left: 30vw;
+	width: 40vw;
+	background: rgb(244, 244, 244);
+	border: 0.1vw solid grey;
+	border-radius: 1vw;
+}
+
+div.login-container {
+}
+
+div.signup-container {
 }
 
 div.main-container {

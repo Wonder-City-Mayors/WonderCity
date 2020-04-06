@@ -12,19 +12,39 @@ let goToTheTopOfThePage = () => {
 
 let makeDropdownMenu = (auth) => {
   if (auth) {
-	console.log('hello, blyat');
+	menuLinks[3].href = hostname + '/profile/' + menuLinks[3].innerHTML;
+	menuLinks[4].href = hostname + '/authorization/logout/';
   }
   else {
-	menuLinks[3].href = hostname + '/authorization/login/';
-	menuLinks[4].href = hostname + '/authorization/registration/';
-  }
+	console.log('User is not found');
+	$('#login').click(function() {
+		$('.authorization-container').fadeIn(600);
+		$('.login-container').fadeIn(600);
+	});
+	$('#signup').click(function() {
+		$('.authorization-container').fadeIn(600);
+		$('.signup-container').fadeIn(600);
+	});
+	$('.authorization-container').click(function(event) {
+		$('.authorization-container').fadeOut(300);
+		$('.signup-container, .login-container').fadeOut(300);
+	});
+	$('#login, #signup').hover(
+		function() {
+			$(this).css('cursor', 'pointer');
+		},
+		function() {
+			$(this).css('cursor', 'default');
+		}
+	);
+  } 
 };
 
 let resizeMargins = () => {
   const viewportWidth = document.documentElement.clientWidth;
   const viewportHeight = document.documentElement.clientHeight;
   for (let span of document.getElementsByClassName('header-span')) {
-  span.style.margin = `${0.035 * viewportHeight - 0.5 * span.clientHeight}px 0 0 ${0.096 * viewportWidth - 0.5 * span.clientWidth}px`;
+  $(span).css('margin', `${0.035 * viewportHeight - 0.5 * span.clientHeight}px 0 0 ${0.096 * viewportWidth - 0.5 * span.clientWidth}px`);
   }
 };
 
@@ -34,9 +54,8 @@ const menuLinks = document.getElementsByClassName('header-link');
 let isUserAuthenticated;
 let animationInterval;
 
-resizeMargins();
-
 $(document).ready(function(){
+	resizeMargins();
 	$('ul.dropdown').css('display', 'none');
 	$('main').slideDown(600);
 	$('footer').slideDown(600);
@@ -47,7 +66,7 @@ $(document).ready(function(){
 		$('footer').slideUp(600);
 		$('main').slideUp(600, redirectPage);	
 	});
-	$('a.header-link').hover(
+	$('span.header-span').hover(
 		function() {
 			$(this).stop();
 			$(this).animate({
@@ -86,7 +105,7 @@ $(document).ready(function(){
 	menuLinks[0].href = hostname + '';  
 	menuLinks[1].href = hostname + '/about/';
 	menuLinks[2].href = hostname + '/faq/';
-	if (menuLinks[3].innerHTML == 'Вход') {
+	if (menuLinks[3] == undefined) {
 		isUserAuthenticated = false;
 	}
 	else {
