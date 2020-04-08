@@ -16,7 +16,6 @@ let makeDropdownMenu = (auth) => {
 	menuLinks[4].href = hostname + '/authorization/logout/';
   }
   else {
-	console.log('User is not found');
 	$('#login').click(function() {
 		$('.authorization-container').fadeIn(600);
 		$('.login-container').fadeIn(600);
@@ -102,6 +101,27 @@ $(document).ready(function(){
 			});
 		}
 	);
+	$('.login-form').submit(function(event) {
+		event.preventDefault();
+		$.post(window.location.href, $(this).serialize(), function(data) {
+			console.log(data);
+			if (data == 'success') {
+				location.reload(true);
+			}
+			else {
+				$('#id_username, #id_password').animate({
+					borderColor: 'red',
+				}, 300);
+				$('#message').slideDown(300);
+				$('#id_username, #id_password').on('input', function() {
+					$('#message').slideUp(600);
+					$('#id_username, #id_password').animate({
+						borderColor: 'grey',
+					}, 300);
+				});
+			}
+		});
+	});
 	menuLinks[0].href = hostname + '';  
 	menuLinks[1].href = hostname + '/about/';
 	menuLinks[2].href = hostname + '/faq/';

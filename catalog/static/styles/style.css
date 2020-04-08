@@ -20,12 +20,24 @@ p.centered {
 	text-align: center;
 }
 
+p.right {
+	text-align: right;
+}
+
 p.disadvantaged {
 	font-size: 4px;
 }
 
 p.muted {
 	color: rgba(0, 0, 0, .6);
+}
+
+input.wide {
+	padding: 0.5vw;
+	width: 100%;
+	box-sizing: border-box;
+	border-radius: 1vw;
+	border: 1px solid grey;
 }
 
 header ul, header li {
@@ -131,7 +143,8 @@ div.login-container, div.signup-container {
 	position: fixed;
 	top: 10vh;
 	left: 30vw;
-	width: 40vw;
+	width: 30vw;
+	padding: 0 5vw;
 	background: rgb(244, 244, 244);
 	border: 0.1vw solid grey;
 	border-radius: 1vw;
@@ -165,4 +178,9 @@ div.footer-container {
 #last-dropped {
 	border-bottom-left-radius: 1vw;
 	border-bottom-right-radius: 1vw;
+}
+
+#message {
+	color: red;
+	display: none;
 }

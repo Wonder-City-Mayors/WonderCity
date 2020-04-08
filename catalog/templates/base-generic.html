@@ -11,7 +11,9 @@
 		{% endblock %}
 		{% load static %}
 		<link rel="stylesheet" href="{% static 'styles/style.css' %}">
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="{% static 'jquery-ui-1.12.1/jquery-ui.min.css' %}">
+		<script src="{% static 'scripts/jquery-3.4.1.min.js' %}" defer></script>
+		<script src="{% static 'jquery-ui-1.12.1/jquery-ui.min.js' %}" defer></script>
 		<script src="{% static 'scripts/script.js' %}" defer></script>
 	</head>  
 	<body>
@@ -88,9 +90,25 @@
 				<div class="authorization-container">
 				</div>
 				<div class="login-container">
+					<h3>
 						<p class="centered">
 							Вход
 						</p>
+					</h3>
+					<form method="post" action="" class="login-form">
+						{% csrf_token %}
+						<p class="centered">
+							<input class="wide" type="text" name="username" placeholder="Логин" maxlength="32" id="id_username" required>
+						</p>
+						<p class="centered">
+							<input class="wide" type="password" name="password" placeholder="Пароль" minlength="8" maxlength="128" id="id_password" autocomplete="on" required>
+						</p>
+						<p class="right">
+							<input type="submit" value="Вход" />
+						</p>
+						<input type="hidden" name="next" value="{{ next }}" />
+					</form>
+					<p class="centered" id="message">Неправильный логин или пароль!</p>
 				</div>
 				<div class="signup-container">
 						<p class="centered">
