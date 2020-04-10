@@ -33,11 +33,35 @@ p.muted {
 }
 
 input.wide {
+	text-align: center;
 	padding: 0.5vw;
 	width: 100%;
 	box-sizing: border-box;
-	border-radius: 1vw;
-	border: 1px solid grey;
+	background: inherit;
+	border: none;
+	border-bottom: 1px solid grey;
+}
+
+input.wide:focus {
+	outline: none;
+}
+
+input.red-placeholder::placeholder {
+	transition: all .3s ease-in-out;
+	color: red; 
+}
+
+input.wide::placeholder {
+	text-align: center;
+	transition: all .3s ease-in-out;
+}
+
+input.submit {
+	border: none;
+	border-bottom: 1px solid grey;
+	color: grey;
+	background: inherit;
+	box-sizing: border-box;
 }
 
 header ul, header li {
@@ -146,14 +170,11 @@ div.login-container, div.signup-container {
 	width: 30vw;
 	padding: 0 5vw;
 	background: rgb(244, 244, 244);
-	border: 0.1vw solid grey;
+	border: none;
+	box-shadow: 0 0 10px rgba(244,244,244, .6),
+				0 0 10px rgba(244,244,244, .4),
+				0 0 10px rgba(244,244,244, .2);
 	border-radius: 1vw;
-}
-
-div.login-container {
-}
-
-div.signup-container {
 }
 
 div.main-container {

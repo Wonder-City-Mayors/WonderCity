@@ -35,16 +35,33 @@ def trackerInstanceView(request, id):
     return render(request, 'catalog/trackinggadgetinstance.html', context = {'tracker': tracker})
 		
 def HeaderPage(request, requestPath, id = None):
-	if request.method == 'POST':
+	postTitle = request.POST.get('title', None)
+	if postTitle == 'signIn':
 		username = request.POST['username']
 		password = request.POST['password']
-		print(username, password)
 		signin = authenticate(request, username=username, password=password)
 		if signin is not None:
 			login(request, signin)
 			return HttpResponse('success')
 		else:
 			return HttpResponse('unsuccess')
+			
+	elif postTitle == 'signUpEmail':
+		email = request.POST['email']
+		try:
+			user = models.User.objects.get(email=email)
+		except models.User.DoesNotExist:
+			return HttpResponse('success')
+		return HttpResponse('unsuccess\nЭтот электронный адрес уже зарегистрирован')
+		
+	elif postTitle == 'signUpUsername':
+		username = request.POST['username']
+		try:
+			user = models.User.objects.get(username=username)
+		except models.User.DoesNotExist:
+			return HttpResponse('success')
+		return HttpResponse('unsuccess\nЭтот логин уже занят')
+		
 	elif request.method == 'GET':
 		if requestPath == '':
 			pageFileName = 'index.html'
@@ -80,8 +97,5 @@ def HeaderPage(request, requestPath, id = None):
 		
 		else:
 			pageFileName = requestPath + '.html'
-			context = {
-			
-			}
 		
 		return render(request, pageFileName, context = context)

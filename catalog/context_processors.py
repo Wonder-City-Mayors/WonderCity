@@ -1,9 +1,10 @@
 import json
-from catalog.forms import LoginForm
+from catalog.forms import SignInForm, SignUpForm
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 
 def overall_variables(request):
 	return {
-		'formLogin': LoginForm(),
+		'signInForm': SignInForm(),
+		'signUpform': SignUpForm(),
 	}
