@@ -42,28 +42,87 @@ let goToTheTopOfThePage = () => {
 	});
 };
 
-jQuery.fn.makeRedPlaceholders = function(type = 'focus') {
-	let element = $(this[0]);
-	element.stop();
-	const previousPlaceholder = element.attr('placeholder');
-	element.addClass('red-placeholder');
-	element.attr('placeholder', 'Заполните это поле!');
-	element.animate({
-		borderColor: '#f00',
-		color: '#f00',
-	}, 300);
-	element.on(type, function() {
-		$(this).stop();
-		$(this).attr('placeholder', previousPlaceholder);
-		$(this).removeClass('red-placeholder');
-		$(this).animate({
-			borderColor: '#787878',
-			color: 'black',
+jQuery.fn.makeRedPlaceholders = function(type = 'focus', placeholder = 'Заполните это поле!') {
+	let elements = this;
+	for (let element of elements) {
+		element = $(element);
+		element.stop();
+		const previousPlaceholder = element.attr('placeholder');
+		element.addClass('red-placeholder');
+		element.attr('placeholder', placeholder);
+		element.animate({
+			borderColor: '#f00',
+			color: '#f00',
 		}, 300);
-		$(this).off(type);
-	});
+		element.on(type, function() {
+			$(elements).stop();
+			$(elements).attr('placeholder', previousPlaceholder);
+			$(elements).removeClass('red-placeholder');
+			$(elements).animate({
+				borderColor: '#787878',
+				color: 'black',
+			}, 300);
+			element.off(type);
+		});
+	}
 	return this;
 };
+
+jQuery.fn.makeGreenPlaceholders = function() {
+	let elements = this;
+	for (let element of elements) {
+		element = $(element);
+		element.animate({
+			borderColor: '#01aa20',
+			color: '#01aa20',
+		}, 300);
+		element.on('input', function() {
+			$(elements).stop();
+			$(elements).animate({
+				borderColor: '#787878',
+				color: 'black',
+			}, 300);
+			element.off('input');
+		});
+	}
+	return this;
+}
+
+jQuery.fn.makeEventOnPasswordInput = function() {
+	let elements = this;
+	$(elements[0]).on('blur', function() {
+		const password1 = $(this).val();
+		const password2 = $(elements[1]).val();
+		if (password1.length < 8) {
+			$(this).makeRedPlaceholders('input');
+			areSignUpFieldsCorrect[4] = false;
+		}
+		else if (password1 == password2) {
+			$(elements).makeGreenPlaceholders();
+			areSignUpFieldsCorrect[4] = true;
+		}
+		else {
+			$(elements).makeRedPlaceholders('input', 'Пароли не совпадают!');
+			areSignUpFieldsCorrect[4] = false;
+		}
+	});
+	$(elements[1]).on('blur', function() {
+		const password1 = $(elements[0]).val();
+		const password2 = $(this).val();
+		if (password2.length < 8) {
+			$(this).makeRedPlaceholders('input');
+			areSignUpFieldsCorrect[4] = false;
+		}
+		else if (password1 == password2) {
+			$(elements).makeGreenPlaceholders();
+			areSignUpFieldsCorrect[4] = true;
+		}
+		else {
+			$(elements).makeRedPlaceholders('input', 'Пароли не совпадают!');
+			areSignUpFieldsCorrect[4] = false;
+		}
+	});
+}
 
 jQuery.fn.makeCursorPointerOnHover = function() {
 	for (let element of this) {
@@ -87,120 +146,105 @@ jQuery.fn.makeResponsiveInput = function(titleName, dataName, index) {
 			$(this).makeRedPlaceholders();
 		}
 		else {
-			$.post(window.location.href,
-			`title=${titleName}&${dataName}=${value}&csrfmiddlewaretoken=${csrfToken}`,
-			function(data) {
-				dataArray = processHttpResponse(data);
-				if (dataArray[0]) {
-					areSignUpFieldsCorrect[index] = true;
-					element.animate({
-						borderColor: '#01aa20',
-							color: '#01aa20',
-					}, 300);
-					element.on('input', function() {
-						$(this).stop();
-						$(this).animate({
-							borderColor: '#787878',
-							color: 'black',
-						}, 300);
-						$(this).off('input');
-					});
-				}
-				else {
-					console.log(`Ответ сервера: "${dataArray[1]}";\nОписание ответа: "${dataArray[2]}".`);
-					areSignUpFieldsCorrect[index] = false;
-					element.animate({
-						borderColor: '#f00',
-						color: '#f00',
-					}, 300);
-					element.on('input', function() {
-						$(this).stop();
-						$(this).animate({
-							borderColor: '#787878',
-							color: 'black',
-						}, 300);
-						$(this).off('input');
-					});
-				}
-			});
+			if (index > 1) {
+				$.post(window.location.href,
+				`title=${titleName}&${dataName}=${value}&csrfmiddlewaretoken=${csrfToken}`,
+				function(data) {
+					dataArray = processHttpResponse(data);
+					if (dataArray[0]) {
+						areSignUpFieldsCorrect[index] = true;
+						element.makeGreenPlaceholders();
+					}
+					else {
+						console.log(`Ответ сервера: "${dataArray[1]}";\nОписание ответа: "${dataArray[2]}".`);
+						areSignUpFieldsCorrect[index] = false;
+						element.makeRedPlaceholders('input');
+					}
+				});
+			}
+			else {
+				element.makeGreenPlaceholders();
+				areSignUpFieldsCorrect[index] = true;
+			}
 		}
 	});
 	return this;
 };
 
 let makeDropdownMenu = (auth) => {
-  if (auth) {
-	// ССЫЛКИ В ГЛАВНОМ МЕНЮ, ЕСЛИ ПОЛЬЗОВАТЕЛЬ АВТОРИЗОВАН
-	menuLinks[3].href = hostname + '/profile/' + menuLinks[3].innerHTML;
-	menuLinks[4].href = hostname + '/authorization/logout/';
-  }
-  else {
-	// ССЫЛКИ В ГЛАВНОМ МЕНЮ, ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН
-	// ФОРМА ВХОДА
-	$('#signin').click(function() {
-		$('.authorization-container').fadeIn(600);
-		$('.login-container').fadeIn(600);
-	});
-	$('#signin, #signup').makeCursorPointerOnHover();
-	$('.signin-form').submit(function(event) {
-		event.preventDefault();
-		$.post(window.location.href,
-		'title=signIn&' + $(this).serialize(),
-		function(data) {
-			if (data == 'success') {
-				location.reload(true);
+	let checkSignUpFields = () => {
+		$('#id_firstname, #id_lastname, #id_email, #id_signup_username, #id_signup_password, #id_password_confirmation').trigger('blur');
+		for (let i = 0; i < areSignUpFieldsCorrect.length; i += 1) {
+			if (!areSignUpFieldsCorrect[i]) {
+				console.log('One or more fields is invalid');
+				return areSignUpFieldsCorrect[i];
 			}
-			else {
-				$('#id_signin_username, #id_signin_password').animate({
-					borderColor: '#f00',
-					color: '#f00',
-				}, 300);
-				$('#message').slideDown(300);
-				$('#id_signin_username, #id_signin_password').on('input', function() {
-					$('#message').slideUp(600);
-					$('#id_signin_username, #id_signin_password').animate({
-						borderColor: '#787878',
-						color: 'black',
-					}, 300);
-					$('#id_signin_username, #id_signin_password').off();
-				});
-			}
+		}
+		return true;
+	};
+	if (auth) {
+		// ССЫЛКИ В ГЛАВНОМ МЕНЮ, ЕСЛИ ПОЛЬЗОВАТЕЛЬ АВТОРИЗОВАН
+		menuLinks[3].href = hostname + '/profile/' + menuLinks[3].innerHTML;
+		menuLinks[4].href = hostname + '/authorization/logout/';
+	}
+	else {
+		// ССЫЛКИ В ГЛАВНОМ МЕНЮ, ЕСЛИ ПОЛЬЗОВАТЕЛЬ НЕ АВТОРИЗОВАН
+		// ФОРМА ВХОДА
+		$('#signin').click(function() {
+			$('.authorization-container').fadeIn(600);
+			$('.login-container').fadeIn(600);
 		});
-	});
-	// КОНЕЦ ФОРМЫ ВХОДА
+		$('#signin, #signup').makeCursorPointerOnHover();
+		$('.signin-form').submit(function(event) {
+			event.preventDefault();
+			$.post(window.location.href,
+			'title=signIn&' + $(this).serialize(),
+			function(data) {
+				if (data == 'success') {
+					location.reload(true);
+				}
+				else {
+					$('#id_signin_username, #id_signin_password').animate({
+						borderColor: '#f00',
+						color: '#f00',
+					}, 300);
+					$('#message').slideDown(300);
+					$('#id_signin_username, #id_signin_password').on('input', function() {
+						$('#message').slideUp(600);
+						$('#id_signin_username, #id_signin_password').animate({
+							borderColor: '#787878',
+							color: 'black',
+						}, 300);
+						$('#id_signin_username, #id_signin_password').off();
+					});
+				}
+			});
+		});
+		// КОНЕЦ ФОРМЫ ВХОДА
 	
 	// ФОРМА РЕГИСТРАЦИИ
 	$('#signup').click(function() {
 		$('.authorization-container').fadeIn(600);
 		$('.signup-container').fadeIn(600);
 	});
-	$('#id_email').makeResponsiveInput('signUpEmail', 'email', 0);
-	$('#id_signup_username').makeResponsiveInput('signUpUsername', 'username', 1);
+	$('#id_firstname').makeResponsiveInput(null, null, 0);
+	$('#id_lastname').makeResponsiveInput(null, null, 1);
+	$('#id_email').makeResponsiveInput('signUpEmail', 'email', 2);
+	$('#id_signup_username').makeResponsiveInput('signUpUsername', 'username', 3);
+	$('#id_signup_password, #id_password_confirmation').makeEventOnPasswordInput();
 	$('.signup-form').submit(function(event) {
 		event.preventDefault();
-		$.post(window.location.href,
-			   'title=signUp&' + $(this).serialize(),
-			   function(data) {
-			console.log(data);
-			if (data == 'success') {
-				location.reload(true);
-			}
-			else {
-				$('#id_signin_username, #id_signin_password').animate({
-					borderColor: '#f00',
-					color: '#f00',
-				}, 300);
-				$('#message').slideDown(300);
-				$('#id_signin_username, #id_signin_password').on('input', function() {
-					$('#message').slideUp(600);
-					$('#id_signin_username, #id_signin_password').animate({
-						borderColor: '#787878',
-						color: 'black',
-					}, 300);
-					$('#id_signin_username, #id_signin_password').off();
-				});
-			}
-		});
+		if (checkSignUpFields()) {
+			$.post(window.location.href,
+				   'title=signUp&' + $(this).serialize(),
+				   function(data) {
+				console.log(data);
+				if (data == 'success') {
+				}
+				else {
+				}
+			});
+		}
 	});
 	// КОНЕЦ ФОРМЫ РЕГИСТРАЦИИ
 	

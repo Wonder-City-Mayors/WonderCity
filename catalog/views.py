@@ -2,8 +2,9 @@ import json
 from django.shortcuts import render
 from django.http import Http404, HttpResponse
 from django.views import generic
-from catalog.models import City, District, House, TrackingGadgetInstance
 from django.contrib.auth import authenticate, login, models
+from catalog.models import City, District, House, TrackingGadgetInstance
+from catalog.forms import SignUpForm
 
 class TrackerListView(generic.ListView):
     model = TrackingGadgetInstance
@@ -62,6 +63,23 @@ def HeaderPage(request, requestPath, id = None):
 			return HttpResponse('success')
 		return HttpResponse('unsuccess\nЭтот логин уже занят')
 		
+	elif postTitle == 'signUp':
+		form = SignUpForm(request.POST)
+		if form.is_valid:
+			username = request.POST['username']
+			password = request.POST['password']
+			email = request.POST['email']
+			first_name = request.POST['firstname']
+			last_name = request.POST['lastname']
+			new_user = models.User.objects.create_user(username=username, email=email, password=password)
+			new_user.is_active = True
+			new_user.first_name = first_name
+			new_user.last_name = last_name
+			new_user.save()
+			login(request, new_user)
+			return HttpResponse('success')
+		return HttpResponse('Form is invalid!')
+
 	elif request.method == 'GET':
 		if requestPath == '':
 			pageFileName = 'index.html'
