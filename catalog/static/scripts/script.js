@@ -42,11 +42,17 @@ let goToTheTopOfThePage = () => {
 	});
 };
 
+let makeDescriptionParagraphAfterElement = (description) => {
+	let paragraph = document.createElement('p');
+	$(paragraph).addClass('centered red-text unvisible');
+	$(paragraph).html(description);
+	return paragraph;
+}
+
 jQuery.fn.makeRedPlaceholders = function(type = 'focus', placeholder = 'Заполните это поле!') {
-	let elements = this;
-	for (let element of elements) {
-		element = $(element);
-		element.stop();
+	element = $(this[0]);
+	element.stop();
+	if (element.val() == 0) {
 		const previousPlaceholder = element.attr('placeholder');
 		element.addClass('red-placeholder');
 		element.attr('placeholder', placeholder);
@@ -55,10 +61,31 @@ jQuery.fn.makeRedPlaceholders = function(type = 'focus', placeholder = 'Запо
 			color: '#f00',
 		}, 300);
 		element.on(type, function() {
-			$(elements).stop();
-			$(elements).attr('placeholder', previousPlaceholder);
-			$(elements).removeClass('red-placeholder');
-			$(elements).animate({
+			element.stop();
+			element.attr('placeholder', previousPlaceholder);
+			element.removeClass('red-placeholder');
+			element.animate({
+				borderColor: '#787878',
+				color: 'black',
+			}, 300);
+			element.off(type);
+		});
+	}
+	else {
+		let paragraph = makeDescriptionParagraphAfterElement(placeholder);
+		element.parent().append(paragraph);
+		$(paragraph).slideDown(300);
+		element.animate({
+			borderColor: '#f00',
+			color: '#f00',
+		}, 300);
+		element.on(type, function() {
+			$(paragraph).stop();
+			$(paragraph).slideUp(300, function() {
+				paragraph.parentNode.removeChild(paragraph);
+			});
+			element.stop();
+			element.animate({
 				borderColor: '#787878',
 				color: 'black',
 			}, 300);
@@ -89,36 +116,14 @@ jQuery.fn.makeGreenPlaceholders = function() {
 }
 
 jQuery.fn.makeEventOnPasswordInput = function() {
-	let elements = this;
-	$(elements[0]).on('blur', function() {
-		const password1 = $(this).val();
-		const password2 = $(elements[1]).val();
-		if (password1.length < 8) {
-			$(this).makeRedPlaceholders('input');
+	$(this).on('blur', function() {
+		const password = $(this).val();
+		if (password.length == 0) {
+			$(this).makeRedPlaceholders();
 			areSignUpFieldsCorrect[4] = false;
 		}
-		else if (password1 == password2) {
-			$(elements).makeGreenPlaceholders();
-			areSignUpFieldsCorrect[4] = true;
-		}
-		else {
-			$(elements).makeRedPlaceholders('input', 'Пароли не совпадают!');
-			areSignUpFieldsCorrect[4] = false;
-		}
-	});
-	$(elements[1]).on('blur', function() {
-		const password1 = $(elements[0]).val();
-		const password2 = $(this).val();
-		if (password2.length < 8) {
-			$(this).makeRedPlaceholders('input');
-			areSignUpFieldsCorrect[4] = false;
-		}
-		else if (password1 == password2) {
-			$(elements).makeGreenPlaceholders();
-			areSignUpFieldsCorrect[4] = true;
-		}
-		else {
-			$(elements).makeRedPlaceholders('input', 'Пароли не совпадают!');
+		else if (password.length < 8) {
+			$(this).makeRedPlaceholders('focus', 'Ваш пароль короче 8 символов!');
 			areSignUpFieldsCorrect[4] = false;
 		}
 	});
@@ -146,7 +151,34 @@ jQuery.fn.makeResponsiveInput = function(titleName, dataName, index) {
 			$(this).makeRedPlaceholders();
 		}
 		else {
-			if (index > 1) {
+			if (titleName == null) {
+				element.makeGreenPlaceholders();
+				areSignUpFieldsCorrect[index] = true;
+			}
+			else if (titleName == 'signUpEmail') {
+				let incorrectEmailError = () => {
+					element.makeRedPlaceholders('focus', 'Некорректный адрес');
+				}
+				const atPosition = value.search('@')
+				if (atPosition <= 0
+				|| atPosition != value.lastIndexOf('@')) {
+					incorrectEmailError();
+				}
+				else {
+					const dotPosition = value.indexOf('.', atPosition);
+					if (dotPosition == -1 
+					|| dotPosition == atPosition + 1 
+					|| dotPosition == value.length
+					|| dotPosition != value.lastIndexOf('.')) {
+						incorrectEmailError();
+					}
+					else {
+						element.makeGreenPlaceholders();
+						areSignUpFieldsCorrect[index] = true;
+					}
+				}
+			}
+			else {
 				$.post(window.location.href,
 				`title=${titleName}&${dataName}=${value}&csrfmiddlewaretoken=${csrfToken}`,
 				function(data) {
@@ -156,15 +188,10 @@ jQuery.fn.makeResponsiveInput = function(titleName, dataName, index) {
 						element.makeGreenPlaceholders();
 					}
 					else {
-						console.log(`Ответ сервера: "${dataArray[1]}";\nОписание ответа: "${dataArray[2]}".`);
 						areSignUpFieldsCorrect[index] = false;
-						element.makeRedPlaceholders('input');
+						element.makeRedPlaceholders('input', dataArray[2]);
 					}
 				});
-			}
-			else {
-				element.makeGreenPlaceholders();
-				areSignUpFieldsCorrect[index] = true;
 			}
 		}
 	});
@@ -172,7 +199,30 @@ jQuery.fn.makeResponsiveInput = function(titleName, dataName, index) {
 };
 
 let makeDropdownMenu = (auth) => {
+	let passwordConfirmationError = () => {
+		let passwordField = $('#id_signup_password');
+		passwordField.focus();
+		let paragraph = makeDescriptionParagraphAfterElement('Пароли не совпадают');
+		$('#id_password_confirmation').parent().append(paragraph);
+		$(paragraph).slideDown(300);
+		passwordField.on('blur.sqbit', function() {
+			$(paragraph).slideUp(300, function() {
+				paragraph.parentNode.removeChild(paragraph);
+			});
+			$(this).off('blur.sqbit');
+		});
+	}
 	let checkSignUpFields = () => {
+		const password1 = $('#id_signup_password').val();
+		const password2 = $('#id_password_confirmation').val();
+		if (password1 != password2) {
+			passwordConfirmationError();
+			areSignUpFieldsCorrect[4] = false;
+			return false;
+		}
+		else {
+			areSignUpFieldsCorrect[4] = true;
+		}
 		$('#id_firstname, #id_lastname, #id_email, #id_signup_username, #id_signup_password, #id_password_confirmation').trigger('blur');
 		for (let i = 0; i < areSignUpFieldsCorrect.length; i += 1) {
 			if (!areSignUpFieldsCorrect[i]) {
@@ -240,8 +290,10 @@ let makeDropdownMenu = (auth) => {
 				   function(data) {
 				console.log(data);
 				if (data == 'success') {
+					location.reload(true);
 				}
 				else {
+					alert('SOMETHING WENT WRONG!..\nI haven\'t predicted that... or have I?');
 				}
 			});
 		}
@@ -303,8 +355,9 @@ let areSignUpFieldsCorrect = [
 	false, // ПАРОЛИ СОВПАДАЮТ
 ]
 
+resizeMargins();
+
 $(document).ready(function(){
-	resizeMargins();
 	$('ul.dropdown').css('display', 'none');
 	$('main').slideDown(600);
 	$('footer').slideDown(600);
@@ -361,7 +414,7 @@ $(document).ready(function(){
 		isUserAuthenticated = true;
 	}
 	makeDropdownMenu(isUserAuthenticated);
+	window.onresize = resizeMargins;
 });
 
-window.onresize = resizeMargins;
 

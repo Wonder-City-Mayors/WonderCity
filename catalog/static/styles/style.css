@@ -20,6 +20,14 @@ p.centered {
 	text-align: center;
 }
 
+p.unvisible {
+	display: none;
+}
+
+p.red-text {
+	color: red;
+}
+
 p.right {
 	text-align: right;
 }
@@ -163,11 +171,12 @@ div.authorization-container {
 
 div.login-container, div.signup-container {
 	display: none;
+	box-sizing: border-box;
 	z-index: 20;
 	position: fixed;
 	top: 10vh;
-	left: 30vw;
-	width: 30vw;
+	left: 25vw;
+	width: 50vw;
 	padding: 0 5vw;
 	background: rgb(244, 244, 244);
 	border: none;
