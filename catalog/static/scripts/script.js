@@ -28,7 +28,7 @@ let getCookie = (name) => {
     return cookieValue;
 };
 
-let redirectPage = () => {
+let redirectPage = (linkLocation) => {
 	// ФУНКЦИЯ ССЫЛКИ НА ДРУГУЮ СТРАНИЦУ
     window.location = linkLocation;
 };
@@ -301,24 +301,6 @@ let makeDropdownMenu = (auth) => {
 	// КОНЕЦ ФОРМЫ РЕГИСТРАЦИИ
 	
 	// ОБЩИЕ ЭЛЕМЕНТЫ У ФОРМ
-	$('.submit').hover(
-		function() {
-			$(this).stop();
-			$(this).css('cursor', 'pointer');
-			$(this).animate({
-				backgroundColor: '#787878',
-				color: 'rgb(244, 244, 244)',
-			});
-		},
-		function() {
-			$(this).stop();
-			$(this).css('cursor', 'default');
-			$(this).animate({
-				backgroundColor: 'rgb(244, 244, 244)',
-				color: '#787878',
-			});
-		}
-	);
 	$('#id_signin_username, #id_signin_password, #id_firstname, #id_lastname').on('blur', function() {
 		if ($(this).val() == '') {
 			$(this).makeRedPlaceholders();
@@ -330,15 +312,6 @@ let makeDropdownMenu = (auth) => {
 	});
 	// КОНЕЦ ОБЩИХ ЭЛЕМЕНТОВ У ФОРМ
   } 
-};
-
-let resizeMargins = () => {
-	// ФУНКЦИЯ ЦЕНТРИРОВАНИЯ НАДПИСЕЙ В ГЛАВНОМ МЕНЮ
-	const viewportWidth = document.documentElement.clientWidth;
-	const viewportHeight = document.documentElement.clientHeight;
-	for (let span of document.getElementsByClassName('header-span')) {
-		$(span).css('margin', `${0.035 * viewportHeight - 0.5 * span.clientHeight}px 0 0 ${0.096 * viewportWidth - 0.5 * span.clientWidth}px`);
-	}
 };
 
 const csrfToken = getCookie('csrftoken');
@@ -355,18 +328,15 @@ let areSignUpFieldsCorrect = [
 	false, // ПАРОЛИ СОВПАДАЮТ
 ]
 
-resizeMargins();
-
 $(document).ready(function(){
-	$('ul.dropdown').css('display', 'none');
-	$('main').slideDown(600);
-	$('footer').slideDown(600);
+	$('main').css('animation', 'appear 1s ease forwards');
 	$('a.header-link').click(function(event){
-		event.preventDefault();
 		goToTheTopOfThePage();
-		linkLocation = this.href;
-		$('footer').slideUp(600);
-		$('main').slideUp(600, redirectPage);	
+		event.preventDefault();
+		$('main').css('animation', 'disappear 1s ease');
+		setTimeout(() => {
+			redirectPage(this.href);
+		}, 600);
 	});
 	$('span.header-span').hover(
 		function() {
@@ -414,7 +384,6 @@ $(document).ready(function(){
 		isUserAuthenticated = true;
 	}
 	makeDropdownMenu(isUserAuthenticated);
-	window.onresize = resizeMargins;
 });
 
 

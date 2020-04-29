@@ -16,5 +16,4 @@ def main():
 
 
 if __name__ == '__main__':
-    print("Welcome, Kimp13. Or should I call you master?")
     main()

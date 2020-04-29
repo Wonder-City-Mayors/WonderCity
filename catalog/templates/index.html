@@ -4,13 +4,82 @@
 <title>WonderCity</title>
 {% endblock %}
 
+{% block static %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'styles/index.css' %}">
+{% endblock %}
+
 {% block content %}
 	<h1>
-		Добро пожаловать!
+		<p class="centered">
+			WonderCity
+		</p>
 	</h1>
-	В системе WonderCity задействованы
-	<ul>
-		<li>{{ num_cities }} {{ string_cities }}</li>
-		<li>{{ num_districts }} {{ string_districts }} (из них {{ num_districts_in_Izhevsk }} {{ string_districts_in_Izhevsk }} в родном городе команды SQBit).</li>
-	</ul>
+	<table>
+		<tr>
+			<th>Идентификатор</th>
+			<th>Подпись</th>
+			<th>Тип счётчика</th>
+			<th>Показания</th>
+		</tr>
+		{% for modem in tree %}
+			<tr>
+				<td class="narrow">{{modem.0}}</td>
+				<td class="wide">{{modem.1}}</td>
+				<td class="narrow">{{modem.2}}</td>
+				<td class="narrow">
+					{% if modem.3 %}
+						{{ modem.3 }} 
+					{% else %}
+						Показаний нет
+					{% endif %}
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<div class="flex-space-evenly">
+		{% if paginationType == 'start' %}
+		<div class="flex-content">
+			{% for i in firstRange %}
+				<a class="page-switcher" href="/?page={{i}}">{{i}}</a>
+			{% endfor %}
+			<span class="current-page-switcher">{{requestedPage}}</span>
+			{% for i in lastRange %}
+				<a class="page-switcher" href="/?page={{i}}">{{i}}</a>
+			{% endfor %}
+		</div>
+		<div class="flex-edge">
+			<a class="edge-page-switcher" href="/?page={{maxPage}}">{{maxPage}}</a>
+		</div>
+		{% elif paginationType == 'end' %}
+		<div class="flex-edge">
+			<a class="edge-page-switcher" href="/?page=1">1</a>
+		</div>
+		<div class="flex-content">
+			{% for i in firstRange %}
+				<a class="page-switcher" href="/?page={{i}}">{{i}}</a>
+			{% endfor %}
+			<span class="current-page-switcher">{{requestedPage}}</span>
+			{% for i in lastRange %}
+				<a class="page-switcher" href="/?page={{i}}">{{i}}</a>
+			{% endfor %}
+		</div>
+		{% else %}
+		<div class="flex-edge">
+			<a class="edge-page-switcher" href="/?page=1">1</a>
+		</div>
+		<div class="flex-content">
+			{% for i in firstRange %}
+				<a class="page-switcher" href="/?page={{i}}">{{i}}</a>
+			{% endfor %}
+			<span class="current-page-switcher">{{requestedPage}}</span>
+			{% for i in lastRange %}
+				<a class="page-switcher" href="/?page={{i}}">{{i}}</a>
+			{% endfor %}
+		</div>
+		<div class="flex-edge">
+			<a class="edge-page-switcher" href="/?page={{maxPage}}">{{maxPage}}</a>
+		</div>
+		{% endif %}
+	</div>
 {% endblock %}

@@ -1,3 +1,13 @@
+* {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	vertical-align: baseline;
+	background: transparent;
+	z-index: 0;
+}
+
 body {
   color: black;
   font: 16px calibri;
@@ -8,8 +18,12 @@ header {
   color: white;
 }
 
-main, footer {
-  display: none;
+main {
+	opacity: 0;
+}
+
+footer {
+	margin-top: 1rem;
 }
 
 p {
@@ -65,11 +79,21 @@ input.wide::placeholder {
 }
 
 input.submit {
+	box-sizing: border-box;
 	border: none;
-	border-bottom: 1px solid grey;
-	color: grey;
+	border-bottom: 1px solid #787878;
+	color: #787878;
 	background: inherit;
 	box-sizing: border-box;
+	text-align: center;
+	padding: 4px 10px;
+	transition: all .3s linear;
+}
+
+input.submit:hover {
+	cursor: pointer;
+	color: rgb(244, 244, 244);
+	background: #787878;
 }
 
 header ul, header li {
@@ -99,20 +123,15 @@ div.header {
 }
 
 div.header-part {
-  display: inline-block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
   vertical-align: top;
   margin: none;
   width: 20vw;
   height: 100%;
   background: #607d8b;
   font: 1.5vw calibri;
-}
-
-div.header-major-part {
-  background: rgba(255, 0, 0, .4);
-  border-bottom-left-radius: 1vw;
-  width: 100%;
-  height: 100%;
 }
 
 ul.dropdown-container {
@@ -126,6 +145,7 @@ ul.dropdown-container li {
 
 ul.dropdown {
 	position: relative;
+	display: none;
 }
 
 ul.dropdown li {
@@ -180,9 +200,9 @@ div.login-container, div.signup-container {
 	padding: 0 5vw;
 	background: rgb(244, 244, 244);
 	border: none;
-	box-shadow: 0 0 10px rgba(244,244,244, .6),
-				0 0 10px rgba(244,244,244, .4),
-				0 0 10px rgba(244,244,244, .2);
+	box-shadow: 0 0 20px rgba(244,244,244, .6),
+				0 0 20px rgba(244,244,244, .4),
+				0 0 20px rgba(244,244,244, .2);
 	border-radius: 1vw;
 }
 
@@ -197,8 +217,27 @@ div.footer-container {
   width: 80vw;
 }
 
+@keyframes disappear {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes appear {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
 #first {
 	border-bottom-left-radius: 1vw;
+	background-color: #ae4d4e;
 }
 
 #last-up {

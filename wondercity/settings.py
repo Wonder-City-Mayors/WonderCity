@@ -70,9 +70,20 @@ DATABASES = {
 		'ENGINE': 'django.db.backends.mysql',
 		'NAME': 'wondercity',
 		'USER': 'root',
-		'PASSWORD': '',
-		'HOST': '',
-		'PORT': '',
+		'PASSWORD': 'IM IN YR MySQL SERVER U 1234',
+		'HOST': 'localhost',
+		'PORT': '3306',
+		'OPTIONS': {
+			'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+		}
+	},
+	'lorawan': {
+		'ENGINE': 'django.db.backends.mysql',
+		'NAME': 'lorawan',
+		'USER': 'root',
+		'PASSWORD': 'IM IN YR MySQL SERVER U 1234',
+		'HOST': 'localhost',
+		'PORT': '3306',
 		'OPTIONS': {
 			'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
 		}
@@ -104,7 +115,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 

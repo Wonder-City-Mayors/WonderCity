@@ -1,28 +1,11 @@
 from django.contrib import admin
-from .models import City, District, House, TrackingGadgetInstance
-
-# INLINES
-class TrackingGadgetInstanceInline(admin.TabularInline):
-	model = TrackingGadgetInstance
-
-# ADMINS
-class HouseAdmin(admin.ModelAdmin):
-	inlines = [TrackingGadgetInstanceInline]
-
-class TrackingGadgetInstanceAdmin(admin.ModelAdmin):
-	list_display = ('type', 'manufacturer', 'readings')
-	list_filter = ('type', 'manufacturer', 'readings')
-	fieldsets = (
-		(None, {
-			'fields': ('manufacturer', 'house')
-		}),
-		('Показания', {
-			'fields': ('type', 'readings')
-		}),
-	)
+from .models import City, District, House, Modems, Tree, Types, ValuesT1
 	
 # REGISTRATION
 admin.site.register(City)
 admin.site.register(District)
-admin.site.register(House, HouseAdmin)
-admin.site.register(TrackingGadgetInstance, TrackingGadgetInstanceAdmin)
+admin.site.register(House)
+admin.site.register(Modems)
+admin.site.register(Tree)
+admin.site.register(Types)
+admin.site.register(ValuesT1)

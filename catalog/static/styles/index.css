@@ -1,0 +1,78 @@
+table {
+	margin-top: 1rem;
+	width: 100%;
+	border: 1px solid grey;
+	border-collapse: collapse;
+}
+
+th, td {
+	border: 1px solid grey;
+	padding: 4px;
+	text-align: center;
+	vertical-align: center;
+}
+
+th {
+	background-color: #ae4d4e;
+	color: white;
+}
+
+td {
+	
+}
+
+.flex-space-evenly {
+	margin-top: 1rem;
+	display: flex;
+	justify-content: space-evenly;
+	width: 100%;
+}
+
+.edge-page-switcher, .current-page-switcher, .page-switcher {
+	display: inline-block;
+	width: 30px;
+	height: 20px;
+	text-align: center;
+	border: none;
+	text-decoration: none;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	transition: all .3s ease;
+}
+
+.edge-page-switcher {
+	border-bottom-color: #ae4d4e;
+	color: #ae4d4e;
+}
+
+.edge-page-switcher:hover {
+	background: #ae4d4e;
+	color: white;
+}
+
+.current-page-switcher {
+	border-bottom-color: black;
+	color: black;
+}
+
+.page-switcher {
+	border-bottom-color: #607d8b;
+	color: #607d8b;
+}
+
+.page-switcher:hover {
+	background: #607d8b;
+	color: white;
+}
+
+
+tr:nth-child(even) {
+	background-color: #f6f6f6;
+}
+
+td.narrow {
+	width: 15%;
+}
+td.wide {
+	width: 55%;
+}
