@@ -15,6 +15,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Email settings
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'academy.wondercity@gmail.com'
+EMAIL_HOST_PASSWORD = 'IM IN YR CITY'
+
 
 # Application definition
 
@@ -44,8 +51,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-			os.path.join(BASE_DIR, 'templates'),
-		],
+          os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -53,7 +60,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-				'catalog.context_processors.overall_variables',
+                'catalog.context_processors.overall_variables',
             ],
         },
     },
@@ -89,6 +96,7 @@ DATABASES = {
 		}
 	}
 }
+
 
 
 # Password validation

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ru">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block title %}
+    {% endblock %}
+    {% load static %}
+    {% if user.is_authenticated %}
+      <script src="{% static 'scripts/authorization/noentry.js' %}"></script>
+    {% else %}
+      
+		  <script src="{% static 'scripts/authorization/script.js' %}"></script>
+      <script src="{% static 'scripts/jquery-3.4.1.min.js' %}"></script>
+      <script src="https://kit.fontawesome.com/0a9e08bc03.js" crossorigin="anonymous"></script>
+      <link rel="stylesheet" href="{% static 'styles/authorization/style.css' %}">
+    {% endif %}
+    {% block static %}
+    {% endblock %}
+	</head>
+	<body>
+    <header>
+      {% block header %}
+      {% endblock %}
+		</header>
+		<main>
+      {% block content %}
+      {% endblock %}
+		</main>
+	</body>
+</html>

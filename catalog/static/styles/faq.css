@@ -1,0 +1,23 @@
+body main .faq-article #question-me {
+  width: 12rem;
+  text-align: center;
+  color: white;
+  background: #a64ac9;
+  margin: 0 auto;
+  padding: .25rem 1rem; }
+  body main .faq-article #question-me:hover {
+    cursor: pointer;
+    -webkit-animation: pulse .3s ease;
+            animation: pulse .3s ease; }
+
+@-webkit-keyframes pulse {
+  from {
+    outline: 0 solid #a64ac9; }
+  to {
+    outline: 1rem solid rgba(255, 0, 0, 0); } }
+
+@keyframes pulse {
+  from {
+    outline: 0 solid #a64ac9; }
+  to {
+    outline: 1rem solid rgba(255, 0, 0, 0); } }

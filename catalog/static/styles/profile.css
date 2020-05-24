@@ -1,0 +1,105 @@
+.grey {
+  color: grey; }
+
+#things-change {
+  color: purple;
+  display: grid;
+  grid-gap: .5rem;
+  grid-template-rows: repeat(3, auto);
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-areas: "header header header" "switcher1 switcher2 switcher3" "content content content";
+  width: 100%; }
+  #things-change > * {
+    padding: .5rem;
+    text-align: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
+  #things-change > button {
+    color: inherit;
+    font: inherit;
+    -webkit-box-shadow: 0 0 0 .2rem transparent inset;
+            box-shadow: 0 0 0 .2rem transparent inset;
+    -webkit-transition: background .3s ease, color .3s ease, -webkit-box-shadow .3s ease;
+    transition: background .3s ease, color .3s ease, -webkit-box-shadow .3s ease;
+    transition: background .3s ease, color .3s ease, box-shadow .3s ease;
+    transition: background .3s ease, color .3s ease, box-shadow .3s ease, -webkit-box-shadow .3s ease; }
+    #things-change > button.change-username {
+      grid-area: switcher1; }
+    #things-change > button.change-password {
+      grid-area: switcher2; }
+    #things-change > button.add-tracker {
+      grid-area: switcher3; }
+    #things-change > button.active {
+      background: purple;
+      color: white; }
+    #things-change > button.clickable:hover {
+      -webkit-box-shadow: 0 0 0 .2rem purple inset;
+              box-shadow: 0 0 0 .2rem purple inset;
+      cursor: pointer;
+      outline-color: purple; }
+  #things-change h2 {
+    grid-area: header; }
+  #things-change #content-wrapper {
+    grid-area: content;
+    color: purple; }
+    #things-change #content-wrapper form {
+      width: 30rem;
+      max-width: 90%;
+      display: none; }
+      #things-change #content-wrapper form .form-error-block {
+        list-style: none;
+        color: white;
+        width: 100%;
+        background: rgba(255, 0, 0, 0.6); }
+        #things-change #content-wrapper form .form-error-block > * {
+          text-align: center;
+          -webkit-transition: background .3s ease-out;
+          transition: background .3s ease-out;
+          padding: .5rem 0; }
+          #things-change #content-wrapper form .form-error-block > *:hover {
+            cursor: pointer;
+            background: rgba(255, 0, 0, 0.6); }
+      #things-change #content-wrapper form .form-success-block {
+        list-style: none;
+        color: white;
+        width: 100%;
+        background: rgba(0, 255, 0, 0.6); }
+        #things-change #content-wrapper form .form-success-block > * {
+          text-align: center;
+          -webkit-transition: background .3s ease-out;
+          transition: background .3s ease-out;
+          padding: .5rem 0; }
+      #things-change #content-wrapper form.active {
+        display: block;
+        z-index: 0; }
+      #things-change #content-wrapper form input {
+        color: inherit;
+        margin: .5rem auto;
+        width: 90%;
+        border: .1rem solid purple;
+        padding: .25rem .5rem;
+        text-align: center; }
+      #things-change #content-wrapper form input[type="submit"] {
+        -webkit-transition: background .3s ease, color .3s ease;
+        transition: background .3s ease, color .3s ease;
+        color: inherit; }
+        #things-change #content-wrapper form input[type="submit"]:hover {
+          cursor: pointer;
+          background: purple;
+          color: white; }
+
+@media all and (orientation: landscape) {
+  #things-change {
+    grid-template-rows: repeat(4, 3rem);
+    grid-template-columns: 2fr 5fr;
+    grid-template-areas: "header header" "switcher1 content" "switcher2 content" "switcher3 content";
+    width: 60rem;
+    max-width: 100%;
+    margin: 0 auto; } }

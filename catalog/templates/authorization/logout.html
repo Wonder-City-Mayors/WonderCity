@@ -1,0 +1,13 @@
+{% extends 'base-generic.html' %}
+
+{% block title %}
+  <title>Выход</title>
+{% endblock %}
+
+{% block content %}
+  {% if loggedout %}
+    <h2 class="centered">Вы успешно вышли из системы.</h2>
+  {% else %}
+    <h2 class="centered">Вы не авторизованы в системе, так что выходить Вам неоткуда.</h2>
+  {% endif %}
+{% endblock %}

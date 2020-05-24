@@ -1,0 +1,39 @@
+{% extends 'authorization/base-generic.html' %}
+
+{% block static %}
+  {% load static %}
+  <script src="{% static 'scripts/authorization/index.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'styles/authorization/index.css' %}">
+{% endblock %}
+
+{% block title %}
+  <title>Авторизация</title>
+{% endblock %}
+
+{% block header %}
+  <a href="/" id="main-page-link"><i class="fas fa-arrow-circle-left"></i>На главную</a>
+	<div class="switcher">Вход</div>
+	<div class="switcher">Регистрация</div>
+{% endblock %}
+
+{% block content %}
+	<form action="" class="signin-form slided-left">
+    {% csrf_token %}
+		<input autocomplete="on" type="email" name="email" placeholder="Электронная почта">
+		<input autocomplete="on" type="password" name="password" placeholder="Пароль">
+		<input type="submit" value="Войти">
+	</form>
+	<form action=""	class="signup-form slided-right">
+		<input type="text" placeholder="Ваше имя" class="first-name">
+    <input type="text" placeholder="Ваша фамилия" class="last-name">
+		<input type="submit" value="Зарегистрироваться">
+	</form>
+  <form action="" class="signup-continue slided-right">
+    <p class="centered"></p>
+    <p class="centered">Введите email, на который будет отправлен пароль для входа:</p>
+    {% csrf_token %}
+    <input type="email" name="email" placeholder="Ваша электронная почта">
+    <input type="submit" value="Отправить пароль">
+    <p class="centered underlined blue pointer"><i class="fas fa-arrow-circle-left"></i>Вернуться обратно</p>
+  </form>
+{% endblock %}

@@ -1,13 +1,47 @@
 {% extends "base-generic.html" %}
 
 {% block title %}
-<title>{{userOnPage.username}}'s profile</title>
+  <title>
+    {{ userOnPage.first_name }}{% if userOnPage.last_name %} {{ userOnPage.last_name }}{% endif %}
+  </title>
+{% endblock %}
+
+{% block static %}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'styles/profile.css' %}">
+  <script src="{% static 'scripts/profile.js' %}"></script>
 {% endblock %}
 
 {% block content %}
-	{% if user.is_authenticated and user.get_username == userOnPage.username %}
-	<a href="http://127.0.0.1:8000/authorization/logout/">Выйти</a>
-	{% else %}
-	Это не твоё болото, уходи.
-	{% endif %}
+  {% if user.is_authenticated and user.username == userOnPage.username %}
+    <section id="things-change">
+      <h2>Управление аккаунтом</h2>
+      <button class="change-username clickable">Сменить логин</button>
+      <button class="change-password clickable">Сменить пароль</button>
+      <button class="add-tracker clickable">Добавить счётчики</button>
+      <div id="content-wrapper">
+        <p class="grey">Выберите элемент.</p>
+        <form action="" class="change-username">
+          {% csrf_token %}
+          <input name="username" placeholder="Новый логин">
+          <input type="submit" value="Сменить">
+        </form>
+        <form action="" class="change-password">
+          {% csrf_token %}
+          <input type="password" name="old-password" autocomplete="on" placeholder="Старый пароль">
+          <input type="password" name="new-password" placeholder="Новый пароль">
+          <input type="submit" value="Сменить">
+        </form>
+        <form action="" class="add-tracker">
+          {% csrf_token %}
+          <input name="id" placeholder="Идентификатор счётчика">
+          <input type="submit" value="Добавить">
+        </form>
+      </div>
+    </section>
+    <section id="tracking-gadgets">
+    </section>
+  {% else %}
+    <h2 class="centered">Это не Ваш профиль. Как Вы сюда попали?</h2>
+  {% endif %}
 {% endblock %}
