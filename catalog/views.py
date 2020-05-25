@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.http import HttpResponse, HttpResponseForbidden
 from django.db import connections
+from catalog.models import Question
 
 def authenticateByEmail(email, password):
 	try:
@@ -74,6 +75,14 @@ def addTracker(request):
 		print('Not post')
 		return HttpResponseForbidden()
 
+def addQuestion(request):
+	if request.method == 'POST':
+		question = Question(subject=request.POST['subject'], description=request.POST['description'])
+		question.save()
+		return HttpResponse('OK')
+	else:
+		return HttpResponseForbidden()
+
 def authorization(request):
     context = {}
     return render(request, 'profile.html', context = context)
@@ -129,6 +138,11 @@ def HeaderPage(request, requestPath, id = None):
 				return render(request, 'authorization/logout.html', {'loggedout': True})
 			else:
 				return render(request, 'authorization/logout.html', {'loggedout': False})
+		elif requestPath == 'faq':
+			pageFileName = requestPath + '.html'
+			answeredQuestions = Question.objects.exclude(answer__exact = '')
+			print(answeredQuestions)
+			context['questions'] = answeredQuestions
 		else:
 			pageFileName = requestPath + '.html'
 		

@@ -5,6 +5,7 @@ urlpatterns = [
 	path('', views.HeaderPage, {'requestPath': ''}, name='index'),
 	path('about/', views.HeaderPage, {'requestPath': 'about'}, name='about'),
 	path('faq/', views.HeaderPage, {'requestPath': 'faq'}, name='faq'),
+	path('faq/add-question', views.addQuestion, name='add-question'),
 	path('authorization/logout', views.HeaderPage, {'requestPath': 'logout'}, name='logout'),
 	path('authorization/', views.authorizationPage, name='auth'),
 	path('profile-management/change-username', views.changeUsername, name='change-username'),

@@ -1,23 +1,125 @@
-body main .faq-article #question-me {
+h2 {
+  margin-bottom: 1rem; }
+
+.faq-article .question {
+  padding: .25rem .5rem;
+  width: 90%;
+  border-top: .1rem solid purple;
+  border-bottom: .1rem solid purple;
+  margin: 1rem auto; }
+  .faq-article .question h3 {
+    color: purple; }
+  .faq-article .question .question-subject:hover {
+    cursor: pointer; }
+  .faq-article .question .question-subject h3 {
+    display: inline; }
+  .faq-article .question .question-subject .fas {
+    float: right;
+    width: 1.25rem;
+    height: 1.25rem;
+    padding: .2rem;
+    background: purple;
+    color: white;
+    border-radius: 1rem;
+    -webkit-transition: -webkit-transform .4s ease-out;
+    transition: -webkit-transform .4s ease-out;
+    transition: transform .4s ease-out;
+    transition: transform .4s ease-out, -webkit-transform .4s ease-out; }
+    .faq-article .question .question-subject .fas.rotated {
+      -webkit-transform: rotate(180deg);
+          -ms-transform: rotate(180deg);
+              transform: rotate(180deg); }
+  .faq-article .question .question-info {
+    overflow-y: hidden;
+    text-align: center;
+    -webkit-transition: line-height .3s .15s ease-out, font-size .3s .15s ease-out, opacity .3s ease-out;
+    transition: line-height .3s .15s ease-out, font-size .3s .15s ease-out, opacity .3s ease-out;
+    line-height: 0;
+    opacity: 0; }
+    .faq-article .question .question-info h3 {
+      -webkit-transition: margin .3s .15s ease-out;
+      transition: margin .3s .15s ease-out;
+      margin: 0; }
+    .faq-article .question .question-info.opened {
+      -webkit-transition: line-height .3s ease-out, font-size .3s ease-out, opacity .3s .15s ease-out;
+      transition: line-height .3s ease-out, font-size .3s ease-out, opacity .3s .15s ease-out;
+      line-height: 1;
+      opacity: 1; }
+      .faq-article .question .question-info.opened h3 {
+        -webkit-transition: margin .3s ease-out;
+        transition: margin .3s ease-out;
+        margin: 1rem 0; }
+    .faq-article .question .question-info div {
+      text-align: justify; }
+
+.faq-article #question-me {
   width: 12rem;
   text-align: center;
   color: white;
   background: #a64ac9;
-  margin: 0 auto;
+  margin: 1rem auto;
   padding: .25rem 1rem; }
-  body main .faq-article #question-me:hover {
+  .faq-article #question-me:hover {
     cursor: pointer;
     -webkit-animation: pulse .3s ease;
             animation: pulse .3s ease; }
+
+form {
+  -webkit-transition: -webkit-transform .6s ease;
+  transition: -webkit-transform .6s ease;
+  transition: transform .6s ease;
+  transition: transform .6s ease, -webkit-transform .6s ease;
+  -webkit-transform-origin: 0 0 0;
+      -ms-transform-origin: 0 0 0;
+          transform-origin: 0 0 0;
+  -webkit-transform: rotateX(-90deg);
+          transform: rotateX(-90deg); }
+  form .form-success-block {
+    list-style: none;
+    color: white;
+    width: 100%;
+    background: rgba(0, 255, 0, 0.6); }
+    form .form-success-block > * {
+      text-align: center;
+      -webkit-transition: background .3s ease-out;
+      transition: background .3s ease-out;
+      padding: .5rem 0; }
+  form.opened {
+    -webkit-transform: rotateX(0);
+            transform: rotateX(0); }
+  form * {
+    margin: 0 auto;
+    padding: .25rem .5rem;
+    width: 80%; }
+  form input, form textarea {
+    display: block;
+    border: .2rem solid purple;
+    color: purple;
+    font-weight: 700; }
+  form input {
+    text-align: center; }
+  form textarea {
+    resize: none;
+    height: 4rem; }
+  form input[type="submit"] {
+    float: right;
+    margin: 1rem 10% 0 0;
+    width: auto;
+    -webkit-transition: color .3s ease, background .3s ease;
+    transition: color .3s ease, background .3s ease; }
+    form input[type="submit"]:hover {
+      color: white;
+      background: purple;
+      cursor: pointer; }
 
 @-webkit-keyframes pulse {
   from {
     outline: 0 solid #a64ac9; }
   to {
-    outline: 1rem solid rgba(255, 0, 0, 0); } }
+    outline: 1.5rem solid rgba(255, 0, 0, 0); } }
 
 @keyframes pulse {
   from {
     outline: 0 solid #a64ac9; }
   to {
-    outline: 1rem solid rgba(255, 0, 0, 0); } }
+    outline: 1.5rem solid rgba(255, 0, 0, 0); } }

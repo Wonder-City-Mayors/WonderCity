@@ -21,6 +21,9 @@ body {
 a {
   text-decoration: none; }
 
+input, textarea {
+  font-family: inherit; }
+
 html {
   font-size: -webkit-calc(1vw + 1vh);
   font-size: calc(1vw + 1vh);

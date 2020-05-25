@@ -1,6 +1,17 @@
 from django.db import models
 from django.urls import reverse
-	
+
+class Question(models.Model):
+	subject = models.CharField(max_length = 64, verbose_name = 'Тема вопроса')
+	description = models.TextField(blank = True, verbose_name = 'Описание вопроса')
+	answer = models.TextField(blank = True, verbose_name = 'Ответ на вопрос')
+
+	def get_absolute_url(self):
+		return reverse('model-detail-view', args=[str(self.id)])
+
+	def __str__(self):
+		return self.subject
+
 class Modems(models.Model):
   sn_m = models.IntegerField()
   name = models.TextField()

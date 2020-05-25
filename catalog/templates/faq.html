@@ -7,37 +7,39 @@
 {% block static %}
   {% load static %}
   <link href="{% static 'styles/faq.css' %}" rel="stylesheet">
-  <script src="{% static 'scripts/faq.js' %}" defer></script>
+  <script src="{% static 'scripts/faq.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 	<h2 class="centered">Ответы на частые вопросы</h2>
 	<article class="faq-article">
-    {% if questions %}
-      <h3 class="centered">Не нашли ответа на свой вопрос?</h3>
-    {% else %}
-      <h4 class="centered">Кажется, здесь нет вопросов.</h3>
-    {% endif %}
-    <div id="question-me">Задайте свой вопрос!</a>
+    {% for question in questions %}
+      <div class="question">
+        <div class="question-subject">
+          <h3>{{ question.subject|escape }}</h3>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="question-info closed">
+          <h3 class="centered">Описание</h3>
+          <div class="question-description">
+            {{ question.description|escape }}
+          </div>
+          <h3 class="centered">Ответ</h3>
+          <div class="question-answer">
+            {{ question.answer|escape }}
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    <h3 class="centered">Не нашли ответа на свой вопрос?</h3>
+    <div id="question-me">Задайте свой вопрос!</div>
+    <form action="">
+      {% csrf_token %}
+      <label for="input-subject" placeholder="Тема"><h3>Введите тему вопроса (не более 64 символов):</h3></label>
+      <input type="text" maxlength="64" id="input-subject" name="subject">
+      <label for="textarea-question"><h3>Опишите вопрос:</h3></label>
+      <textarea id="textarea-question" name="description"></textarea>
+      <input type="submit" value="Задать вопрос">
+    </form>
 	</article>
-  <div>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsam, quidem. Aut, beatae quae excepturi possimus! Suscipit, perferendis expedita fuga temporibus autem odio, veniam ea maxime fugiat, distinctio culpa cumque eos.</div>
-  <div>Architecto obcaecati autem temporibus facere modi atque odit debitis, enim quam fugit perferendis eaque ipsam suscipit tenetur repudiandae consequuntur. Aspernatur maxime quidem totam at id itaque minima repellat nisi neque.</div>
-  <div>Numquam dignissimos minus sequi praesentium debitis ut incidunt nostrum suscipit animi amet veniam inventore qui molestiae atque odit illum voluptates corporis ipsum, neque eveniet similique quam assumenda ipsa at? Omnis!</div>
-  <div>Earum accusantium ut aperiam illum dolorem sunt, odit sint ipsam repellendus incidunt blanditiis mollitia quod labore cum hic aspernatur reiciendis placeat atque. Assumenda illum cum deserunt asperiores facilis laudantium earum.</div>
-  <div>Eaque accusamus doloremque fugit impedit iure ducimus ea laboriosam cum aspernatur voluptatum beatae suscipit ab magnam officiis incidunt a, aperiam sapiente, ut quas quod iste recusandae ipsa hic sunt. Minima!</div>
-  <div>Omnis repellendus, voluptatibus nemo quos ea beatae consequuntur quisquam velit eius iure dolore ex, mollitia nisi numquam quibusdam, expedita vitae labore architecto placeat vero corporis at. Tempore nihil repudiandae laboriosam.</div>
-  <div>Provident quae perferendis, ipsa enim, quisquam laudantium ab quaerat dolor illum! Blanditiis, odit totam modi. Reiciendis fugiat quo, maiores est sint. Dolore aliquam, eveniet ut minima fugiat sunt dicta molestiae!</div>
-  <div>Voluptatum eaque ut tenetur explicabo recusandae corporis in nobis enim, dolor, eos deleniti, est iste impedit vel at laboriosam ducimus optio ex illo fugiat commodi, a. Quia aut dolor ea!</div>
-  <div>Laudantium repudiandae praesentium iure deleniti atque quos amet, porro omnis, minima alias! Fuga cum esse, quia velit similique accusamus quidem doloribus voluptatem adipisci, nam vitae saepe sint nulla iusto sit!</div>
-  <div>Voluptatum vero earum autem, sint assumenda delectus nisi asperiores optio, ea accusamus incidunt, itaque ratione tempore voluptas. Ipsum distinctio tenetur, vel pariatur labore incidunt sequi minus adipisci dignissimos. Id, assumenda.</div>
-  <div>Non soluta modi facilis necessitatibus temporibus, labore aut, distinctio quo reprehenderit veniam aperiam natus, sunt vel sit asperiores nihil repudiandae voluptas deleniti fuga harum. Esse tempora commodi, quam eveniet omnis.</div>
-  <div>Aliquid asperiores, deserunt minima quas! Vitae quae amet ipsum nesciunt praesentium ad consequuntur dolorum tempora placeat mollitia. Illo, quas, laborum? Nobis enim aliquid incidunt culpa, inventore repellendus vitae expedita quo.</div>
-  <div>Tenetur, ratione rem architecto autem tempore inventore voluptatibus ad, saepe accusantium temporibus sit illo dicta ipsa, dignissimos explicabo laborum consequatur dolore fuga? Corporis harum incidunt, odit nisi illum cum quas.</div>
-  <div>Natus maxime, repellendus minus officiis adipisci, blanditiis necessitatibus ea placeat at exercitationem vitae debitis consectetur! Porro doloribus, similique illo, minus dolores ullam optio perferendis odit ducimus sequi sint dignissimos, voluptas.</div>
-  <div>Accusamus, perspiciatis fugiat eligendi quaerat, adipisci eaque consequuntur quam magni odit tempore ducimus quibusdam delectus labore cum rerum debitis laudantium? Soluta hic harum magni nam deserunt suscipit. Odit, nisi, dolorem.</div>
-  <div>Autem, a tempore ratione maxime ad quasi cum fugit totam reiciendis ipsum. Ad laborum sed optio cum asperiores exercitationem est, aperiam, esse incidunt nesciunt ut, enim aliquid. Sequi in, saepe.</div>
-  <div>Suscipit minima dolore eius in neque reprehenderit, perspiciatis distinctio veritatis laborum voluptas maiores hic culpa optio cumque praesentium nulla vitae, commodi deserunt esse ducimus soluta nihil molestiae quasi fuga. Omnis.</div>
-  <div>At sed dolore provident ad possimus quae minima odio in, quos harum, ducimus maiores velit quam dolorem eum. Eius voluptatum, maiores eum. Dolor optio asperiores qui, quos enim ratione mollitia.</div>
-  <div>Explicabo dolorem quaerat architecto mollitia possimus voluptatum placeat eligendi temporibus accusantium culpa quidem labore nam vero saepe facere, sapiente? Amet, facere omnis. Repellat unde libero placeat iure eveniet veritatis id.</div>
-  <div>Dicta asperiores repudiandae dolor totam quis quam illo veniam possimus quae praesentium nostrum similique a delectus facere doloribus deserunt expedita adipisci iste, repellendus quidem harum laborum voluptate assumenda amet commodi?</div>
 {% endblock %}
