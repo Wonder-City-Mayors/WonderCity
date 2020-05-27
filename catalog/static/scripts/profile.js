@@ -30,6 +30,27 @@ $(document).ready(function() {
     $(this).off('click');
     this.classList.remove('clickable');
   }
+  function trackerTransition() {
+    let trackerId = this.value;
+    this.removeEventListener('transitionend', trackerTransition);
+    this.value = '';
+    this.setAttribute('name', 'text');
+    this.setAttribute('maxlength', '128');
+    this.setAttribute('placeholder', 'Описание');
+    this.classList.remove('closed');
+    $(this.parentNode).off('submit').on('submit', function(event) {
+      event.preventDefault();
+      this.children[this.children.length - 1].style.display = 'none';
+      $.ajax({
+        method: 'POST',
+        url: '/profile-management/add-tracker',
+        data: 'title=desc&tracker-id=' + trackerId + '&' + $(this).serialize(),
+        success: () => {
+          this.children[0].innerHTML = '<li>Успешно!</li>';
+        }
+      });
+    });
+  }
   let forms = document.getElementsByTagName('form'),
     attentionParagraph = document.getElementById('content-wrapper').children[0];
   $('.clickable').on('click', handleSwitcherClick);
@@ -108,7 +129,8 @@ $(document).ready(function() {
   });
   $(forms[2]).on('submit', function(event) {
     event.preventDefault();
-    let trackerIdField = this[1],
+    let form = this,
+      trackerIdField = this[1],
       trackerId = trackerIdField.value,
       submitButton = this.children[this.children.length - 1],
       regex = /[^0-9]/;
@@ -119,9 +141,12 @@ $(document).ready(function() {
       $.ajax({
         method: 'POST',
         url: '/profile-management/add-tracker',
-        data: $(this).serialize(),
+        data: 'title=register&' + $(form).serialize(),
         success: (data) => {
-          formmng.showSuccess(this, 'Считывающее устройство успешно добавлено!');
+          formmng.showSuccess(form, 'Отлично! Добавьте описание к устройству (или оставьте его пустым):');
+          trackerIdField.classList.add('closed');
+          trackerIdField.addEventListener('transitionend', trackerTransition);
+          submitButton.style.display = '';
         },
         error: (data) => {
           formmng.showError(trackerIdField, data.responseText);

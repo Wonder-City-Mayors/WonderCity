@@ -19,7 +19,7 @@
 {% block content %}
 	<form action="" class="signin-form slided-left">
     {% csrf_token %}
-		<input autocomplete="on" type="email" name="email" placeholder="Электронная почта">
+		<input autocomplete="on" type="text" name="email" placeholder="Email или логин">
 		<input autocomplete="on" type="password" name="password" placeholder="Пароль">
 		<input type="submit" value="Войти">
 	</form>

@@ -57,17 +57,25 @@ def changePassword(request):
 def addTracker(request):
 	if request.method == 'POST':
 		if request.user.is_authenticated:
-			with connections['lorawan'].cursor() as cursor:
-				cursor.execute("SELECT id, user_id FROM tree WHERE id = %s AND parent <> '#'", [request.POST['id']])
-				modem = cursor.fetchone()
-				if (modem):
-					if modem[1] is None:
-						cursor.execute("UPDATE tree SET user_id = %s WHERE id = %s", [request.user.id, request.POST['id']])
-						return HttpResponse('OK')
+			title = request.POST['title']
+			if title == 'register':
+				with connections['lorawan'].cursor() as cursor:
+					cursor.execute("SELECT id, user_id FROM tree WHERE id = %s AND parent <> '#'", [request.POST['id']])
+					modem = cursor.fetchone()
+					if (modem):
+						if modem[1] is None:
+							cursor.execute("UPDATE tree SET user_id = %s, text = NULL WHERE id = %s", [request.user.id, request.POST['id']])
+							return HttpResponse('OK')
+						else:
+							return HttpResponseForbidden('Считывающее устройство с таким идентификатором уже зарегистрировано.')
 					else:
-						return HttpResponseForbidden('Считывающее устройство с таким идентификатором уже зарегистрировано.')
-				else:
-					return HttpResponseForbidden('Считывающего устройства с таким идентификатором не существует.')
+						return HttpResponseForbidden('Считывающего устройства с таким идентификатором не существует.')
+			else:
+				with connections['lorawan'].cursor() as cursor:
+					text = request.POST['text']
+					cursor.execute("UPDATE tree SET text = %s WHERE id = %s", [text, request.POST['tracker-id']]);
+					print('OK')
+					return HttpResponse('OK')
 		else:
 			print('Not authenticated')
 			return HttpResponseForbidden()
@@ -98,18 +106,20 @@ def HeaderPage(request, requestPath, id = None):
 					cursor.execute("SELECT COUNT(*) FROM tree WHERE user_id = %s", [request.user.id])
 					maxPage = cursor.fetchone()[0]
 					if maxPage != 0:
-						maxPage = maxPage // 10 + 1
+						if (maxPage % 10 != 0):
+							maxPage += 10
+						maxPage = maxPage // 10
 						try:
 							requestedPage = int(request.GET.get('page', 1))
 						except ValueError:
 							requestedPage = 1
 						if requestedPage < 1 or requestedPage > maxPage:
 							requestedPage = 1
-						cursor.execute("SELECT * FROM tree WHERE user_id = %s ORDER BY ID ASC LIMIT %s, 10", [request.user.id, (requestedPage - 1) * 10])
+						cursor.execute("SELECT id, text, type FROM tree WHERE user_id = %s ORDER BY ID ASC LIMIT %s, 10", [request.user.id, (requestedPage - 1) * 10])
 						rawTree = cursor.fetchall()
 						tree = []
 						for stick in rawTree:
-							stick = [stick[0], stick[3], stick[4]]
+							stick = [stick[i] for i in range(len(stick))]
 							cursor.execute(f'SELECT `energy_A` FROM `values_t1` WHERE `tree_id` = {stick[0]} ORDER BY `time_stamp_db` DESC LIMIT 1')
 							newStick = cursor.fetchone()
 							if newStick:
@@ -156,16 +166,20 @@ def authorizationPage(request):
 		title = request.POST.get('title', False)
 		if title:
 			if title == 'logUserIn':
+				type = request.POST['type'];
 				email = request.POST['email']
 				password = request.POST['password']
-				user = User.objects.get(email=email)
-				if user:
+				try:
+					if type == 'email':
+						user = User.objects.get(email=email)
+					else:
+						user = User.objects.get(username=email)
 					if user.check_password(password):
 						login(request, user)
 						return HttpResponse()
 					else:
 						return HttpResponseForbidden('Неверный адрес или пароль.')
-				else:
+				except User.DoesNotExist:
 					return HttpResponseForbidden('Неверный адрес или пароль.')
 
 			elif title == 'signUserUp':
@@ -182,7 +196,7 @@ def authorizationPage(request):
 						fail_silently=False,
 						html_message='Ваш пароль:<p style="font-weight: 700; font-size: 1.5rem">' +
 						password + '<p>Используйте его вместе с вашей электронной почтой для входа.')
-					user = User.objects.create_user('', email, password)
+					user = User.objects.create_user(password, email, password)
 					user.first_name = name
 					if surname:
 						user.last_name = surname

@@ -81,11 +81,17 @@
         z-index: 0; }
       #things-change #content-wrapper form input {
         color: inherit;
+        overflow: hidden;
         margin: .5rem auto;
+        max-height: 3rem;
         width: 90%;
         border: .1rem solid purple;
         padding: .25rem .5rem;
-        text-align: center; }
+        text-align: center;
+        -webkit-transition: all .3s ease;
+        transition: all .3s ease; }
+      #things-change #content-wrapper form input.closed {
+        opacity: 0; }
       #things-change #content-wrapper form input[type="submit"] {
         -webkit-transition: background .3s ease, color .3s ease;
         transition: background .3s ease, color .3s ease;

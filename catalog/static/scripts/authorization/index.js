@@ -52,12 +52,25 @@ $(document).ready(function() {
   passiveSwitcher.on('click', sw1tch);
   signinForm.on("submit", function(event) {
     event.preventDefault();
-    let emailField = this[1];
-    let passwordField = this[2];
-    let valid = true;
-    if (!validateEmail(emailField.value)) {
-      forms.showError(emailField, "Некорректный email.");
+    let emailField = this[1],
+      passwordField = this[2],
+      valid = true,
+      loginType = 'email';
+    if (emailField.value === '') {
+      forms.showError(emailField, 'Введите email или логин.');
       valid = false;
+    } else if (emailField.value.includes('@')) {
+      if (!validateEmail(emailField.value)) {
+        forms.showError(emailField, 'Некорректный email.');
+        valid = false;
+      }
+    } else {
+      let regex = /[^a-zA-Z0-9]/;
+      loginType = 'username';
+      if (regex.test(emailField.value)) {
+        forms.showError(emailField, 'Некорректный логин.');
+        valid = false;
+      }
     }
     if (passwordField.value === "") {
       forms.showError(passwordField, "Введите пароль.");
@@ -72,7 +85,7 @@ $(document).ready(function() {
       $.ajax({
         method: "POST",
         url: "",
-        data: "title=logUserIn&" + $(this).serialize(),
+        data: "title=logUserIn&type=" + loginType + '&' + $(this).serialize(),
         success: function(data) {
           window.location.href = "/";
         },

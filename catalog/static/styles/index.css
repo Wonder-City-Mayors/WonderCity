@@ -20,6 +20,10 @@ table {
     table td .wide {
       width: 55%; }
 
+.underestimated {
+  color: #0008;
+  font-size: .75em; }
+
 main span, main a {
   border-bottom-width: .2rem;
   border-bottom-style: solid;
@@ -47,14 +51,16 @@ main a {
 
 main #alittleofmodems {
   display: grid;
+  grid-auto-flow: column;
   grid-auto-columns: 1fr;
   grid-gap: 1rem;
-  justify-items: center; }
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center; }
 
 main #alotofmodems {
   display: grid;
   grid-gap: 1rem;
-  justify-items: stretch;
   grid-template-columns: 4fr repeat(9, 1fr) 4fr; }
 
 @media all and (orientation: landscape) {
