@@ -1,10 +1,6 @@
 frontend:
-html
-css bootstrap
-javascript jquery
+SVEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELTE! YEAH!! (html, js, css preprocessor)
+Sass (css preprocessor)
 backend:
-python + django
-Альтернативы backend:
-node.js
-vue.js
-php laravel
+polka (lightweight server framework for node.js)
+sapper (SSR framework for Svelte)
