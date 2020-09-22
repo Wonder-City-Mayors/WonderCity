@@ -54,6 +54,38 @@ global.wonder = new Object();
 wonder.knex = knex;
 
 /**
+ * Function to be a member of polka's res object
+ */
+function send (payload = new Object) {
+  if (payload instanceof Object) {
+    if (payload._statusCode) {
+      this.statusCode = payload._statusCode;
+      delete payload._statusCode;
+    } else {
+      this.statusCode = 200;
+    }
+
+    payload = JSON.stringify(payload);
+  } else {
+    this.statusCode = 200;
+
+    payload = JSON.stringify({
+      response: payload
+    });
+  }
+
+  this.end(payload);
+}
+
+/**
+ * Function to be a member of polka's res object
+ */
+function _throw (statusCode = 400) {
+  this.statusCode = statusCode;
+  this.end('{}');
+}
+
+/**
  * Main function of the server.
  */
 const main = () => {
@@ -162,6 +194,8 @@ const main = () => {
               }
 
               if (req.path.substring(0, 4) === '/api') {
+                res.throw = _throw;
+
                 req.path = req.path.substring(4);
 
                 if (req.path.charAt(req.path.length - 1) !== '/') {
@@ -173,16 +207,16 @@ const main = () => {
                   wonder.paths[req.method].hasOwnProperty(req.path)
                 ) {
                   try {
+                    res.send = send;
+
                     await wonder.paths[req.method][req.path](req, res);
                   } catch (e) {
                     console.log(e);
 
-                    res.statusCode = 500;
-                    res.end('{}');
+                    res.throw(500);
                   }
                 } else {
-                  res.statusCode = 404;
-                  res.end('{}');
+                  res.throw(404)
                 }
 
                 return;

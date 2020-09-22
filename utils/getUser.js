@@ -1,16 +1,30 @@
-const parsePermissions = require("./permissionArrayToObject");
+const parsePermissions = array => {
+  return array.map(obj => obj.name);
+};
 
-module.exports = async jwt => {
+export default async jwt => {
   if (jwt) {
     const payload = await mg.services.jwt.verify(jwt);
 
     if (payload) {
-      let user = (await mg.models.User.where('id', payload.id).fetch({
-        withRelated: ['role.permissions']
-      })).toJSON();
+      let user = (await mg.knex
+        .select('*')
+        .from('user')
+        .where('id', payload.id))[0];
 
-      user.permissions = parsePermissions(user.role.permissions);
-      delete user.role;
+      user.permissions = user.role_id ?
+        parsePermissions(
+          await mg.knex
+            .select('permission.*')
+            .from('permission')
+            .innerJoin(
+              'permission_role',
+              'permission_role.permission_id',
+              'permission.id'
+            )
+            .where('permission_role.role_id', user.role_id)
+        ) :
+        [];
 
       return user;
     }

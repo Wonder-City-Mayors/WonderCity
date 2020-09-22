@@ -11,4 +11,8 @@
   }
 </style>
 
-<h1>Привет, {$session.user.username || "неизвестный пользователь!"}!</h1>
+<svelte:head>
+  <title>WonderCity</title>
+</svelte:head>
+
+<h1>Привет, {$session.user.username || "неизвестный пользователь"}!</h1>

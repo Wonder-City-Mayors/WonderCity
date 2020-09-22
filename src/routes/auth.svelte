@@ -103,107 +103,128 @@
   const signin = (e) => {};
 </script>
 
-<style lang="sass">
-  @import "../styles/global"
+<style lang="scss">
+  @import "../theme/global";
 
   form,
-  .already-registered
-    width: 100%
-    max-width: 35rem
-    margin: 0 auto
-    padding: 3rem 0
-    text-align: right
+  .already-registered {
+    width: 100%;
+    max-width: 35rem;
+    margin: 0 auto;
+    padding: 3rem 0;
+    text-align: right;
+  }
 
-  form
-    h1
-      color: $color_blue
-      text-align: center
+  form {
+    h1 {
+      color: $color_blue;
+      text-align: center;
+    }
 
-    .error
-      text-align: center
-      color: $color_error_red
-      font-size: .8rem
-      width: 85%
-      margin: .75rem auto
+    .error {
+      text-align: center;
+      color: $color_error_red;
+      font-size: .8rem;
+      width: 85%;
+      margin: .75rem auto;
+    }
 
-    .await
-      text-align: right
-      color: $color_green
-      width: 90%
-      margin: .75rem 10% 0 0
+    .await {
+      text-align: right;
+      color: $color_green;
+      width: 90%;
+      margin: .75rem 10% 0 0;
+    }
 
-    input
-      display: block
-      font-size: 1rem
-      color: $color_green
-      border-bottom: .1rem solid $color_green
-      padding: .25rem .5rem
-      font-family: defaultFont
-      font-weight: 700
+    input {
+      display: block;
+      font-size: 1rem;
+      color: $color_green;
+      border-bottom: .1rem solid $color_green;
+      padding: .25rem .5rem;
+      font-family: defaultFont;
+      font-weight: 700;
+    }
 
-    .key-input
-      width: 90%
-      margin: .75rem auto
-      text-align: center
+    .key-input {
+      width: 90%;
+      margin: .75rem auto;
+      text-align: center;
 
-      &::placeholder
-        color: inherit
+      &::placeholder {
+        color: inherit;
+      }
+    }
     
-    .submit
-      display: inline-block
-      transition: color .3s ease, background .3s ease
-      margin-right: 5%
+    .submit {
+      display: inline-block;
+      transition: color .3s ease, background .3s ease;
+      margin-right: 5%;
 
-      &.disabled
-        opacity: .6
+      &.disabled {
+        opacity: .6;
 
-        &:hover
-          cursor: not-allowed
+        &:hover {
+          cursor: not-allowed;
+        }
+      }
 
-      &:not(.disabled):hover
-        color: $color_gray
-        background: $color_green
-        cursor: pointer
+      &:not(.disabled):hover {
+        color: $color_gray;
+        background: $color_green;
+        cursor: pointer;
+      }
+    }
+  }
 
-  .already-registered
-    h1
-      font-size: 4em
+  .already-registered {
+    h1 {
+      font-size: 4em;
+    }
 
     h1,
     h2,
-    p
-      text-align: center
-      color: $color_green
-      margin: .5em 0
+    p {
+      text-align: center;
+      color: $color_green;
+      margin: .5em 0;
+    }
     
-    button
-      display: inline-block
-      font-size: 1rem
-      font-family: defaultFont
-      border-width: .15rem
-      border-style: solid
-      margin: .5em
-      padding: .25rem .5rem
-      transition: color .3s ease, background-color .3s ease
+    button {
+      display: inline-block;
+      font-size: 1rem;
+      font-family: defaultFont;
+      border-width: .15rem;
+      border-style: solid;
+      margin: .5em;
+      padding: .25rem .5rem;
+      transition: color .3s ease, background-color .3s ease;
 
-      &:hover
-        cursor: pointer
+      &:hover {
+        cursor: pointer;
+      }
+    }
 
-    .logout
-      color: $color_error_red
-      border-color: $color_error_red
+    .logout {
+      color: $color_error_red;
+      border-color: $color_error_red;
 
-      &:hover
-        background-color: $color_error_red
-        color: white
+      &:hover {
+        background-color: $color_error_red;
+        color: white;
+      }
+    }
 
-    .continue
-      color: $color_blue
-      border-color: $color_blue
+    .continue {
+      color: $color_blue;
+      border-color: $color_blue;
 
-      &:hover
-        background-color: $color_blue
-        color: white
+      &:hover {
+        background-color: $color_blue;
+        color: white;
+      }
+    }
+  }
 </style>
 
 <svelte:head>

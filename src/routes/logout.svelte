@@ -18,18 +18,20 @@
   });
 </script>
 
-<style lang="sass">
-  @import "../styles/theme"
+<style lang="scss">
+  @import "../theme/colors";
 
-  .logout
-    margin: 0 auto
-    padding: 3rem 0
-    width: 90%
-    max-width: 35rem
+  .logout {
+    margin: 0 auto;
+    padding: 3rem 0;
+    width: 90%;
+    max-width: 35rem;
     
     h2,
-    h3
-      color: $color_green
-      text-align: left
+    h3 {
+      color: $color_green;
+      text-align: left;
+    }
+  }
 </style>
 
