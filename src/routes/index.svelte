@@ -1,5 +1,6 @@
 <script>
   import { stores } from "@sapper/app";
+  import TransitionWrapper from "../components/TransitionWrapper.svelte";
 
   const { session } = stores();
 </script>
@@ -15,4 +16,6 @@
   <title>WonderCity</title>
 </svelte:head>
 
-<h1>Привет, {$session.user.username || "неизвестный пользователь"}!</h1>
+<TransitionWrapper>
+  <h1>Привет, {$session.user.username || "неизвестный пользователь"}!</h1>
+</TransitionWrapper>
