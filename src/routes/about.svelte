@@ -2,6 +2,10 @@
   import TransitionWrapper from "../components/TransitionWrapper.svelte";
 </script>
 
+<svelte:head>
+  <title>О SQBit • WonderCity Reborn</title>
+</svelte:head>
+
 <style lang="scss">
 
 </style>

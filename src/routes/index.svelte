@@ -13,7 +13,7 @@
 </style>
 
 <svelte:head>
-  <title>WonderCity</title>
+  <title>Главная • WonderCity Reborn</title>
 </svelte:head>
 
 <TransitionWrapper>

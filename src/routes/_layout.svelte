@@ -51,6 +51,8 @@
 </script>
 
 <style global lang="scss">
+  @import "../theme/global";
+
   @font-face {
     font-family: defaultFont;
     font-weight: 400;
@@ -109,6 +111,7 @@
     height: 3rem;
     background: white;
     z-index: 2;
+    box-shadow: 0 0 .2rem $mdc-theme-primary;
 
     .top-nav {
       display: flex;
@@ -154,7 +157,7 @@
       &-tabs {
         order: 3;
         width: auto;
-        height: 100%;
+        height: 102.5%;
 
         *[class^="mdc-tab-scroller"] {
           height: 100%;
@@ -163,6 +166,7 @@
         &-tab {
           height: 100%;
           font-family: defaultFont, serif;
+          font-weight: 700;
         }
       }
     }
@@ -170,6 +174,7 @@
 
   main {
     padding-top: 3rem;
+    height: 100%;
   }
 
   @media all and (orientation: landscape) {

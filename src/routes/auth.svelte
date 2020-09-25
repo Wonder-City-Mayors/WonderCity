@@ -1,142 +1,134 @@
-<script context="module">
-  export async function preload(page, session) {
-    return {
-      props: await (await this.fetch(session.apiUrl + "/users/count")).json(),
-      apiUrl: session.apiUrl,
-    };
-  }
-</script>
-
 <script>
   import { goto, stores } from "@sapper/app";
-  import { fly } from "svelte/transition";
+  import { onMount } from "svelte";
 
-  import Textfield from "../components/TextfieldWithLeadingIcon.svelte";
   import Tab, { Label } from "@smui/tab";
   import TabBar from "@smui/tab-bar";
   import Card from "@smui/card";
   import TransitionWrapper from "../components/TransitionWrapper.svelte";
+  import SignIn from "../components/auth/SignIn.svelte";
+  import SignUp from "../components/auth/SignUp.svelte";
 
-  import { postApi } from "../../utils/requests.js";
   import { setCookie } from "../../utils/cookies";
 
-  export let apiUrl, props;
   const { page, session } = stores();
   const user = $session.user;
   const tabs = ["Вход", "Регистрация"];
 
-  let usernameEntered = false, passwordEntered = false;
-  let username = '', password = '';
-  let usernameError, passwordError;
+  let formsWrapper, signInForm, signUpForm;
+
   let activeIndex = 0;
 
-  $: {
-    if (username.length > 0 && !usernameEntered) {
-      usernameEntered = true;
-    }
+  onMount(
+    () =>
+      (formsWrapper.style.height =
+        (signInForm ? signInForm.offsetHeight : signUpForm.offsetHeight) + "px")
+  );
 
-    if (usernameEntered) {
-      if (username.length === 0) {
-        usernameError = "Заполните это поле.";
-      } else if (/[^0-9a-zA-Z#$*_]/.test(username)) {
-        usernameError =
-          "Логин может состоять только из английских букв, цифр и знаков" +
-          " #, $, *, _.";
-      } else {
-        usernameError = "";
-      }
-    }
-
-    console.log(usernameError);
-  }
-
-  $: if (password !== undefined) {
-    if (password.length === 0) {
-      passwordError = "Заполните это поле.";
-    } else if (password.length < 8) {
-      passwordError = "Пароль должен состоять как минимум из 8 символов.";
-    } else {
-      passwordError = "";
+  $: if (formsWrapper) {
+    if (activeIndex === 0 && signInForm) {
+      formsWrapper.style.height = signInForm.offsetHeight + "px";
+    } else if (signUpForm) {
+      formsWrapper.style.height = signUpForm.offsetHeight + "px";
     }
   }
 
   const logout = () => goto("/logout");
   const redirect = () => goto($page.query.redirectTo || "/");
 
-  const signin = (e) => {};
+  const signedIn = (e) => {
+    setCookie("jwt", e.jwt, {
+      sameSite: "Strict",
+      maxAge: 1296000,
+    });
+
+    session.update((oldSession) => {
+      oldSession.user = e.user;
+      return oldSession;
+    });
+
+    redirect();
+  };
 </script>
 
-<style global lang="sass">
-  @import "../theme/global"
+<style lang="sass">
+  @import '../theme/colors'
 
-  form
-    display: flex
-    flex-wrap: wrap
-    color: $mdc-theme-secondary
-
-    h3
-      text-align: center
-
-  .textfield,
-  .textfield-helpertext
+  :global(.authentication-card)
     width: 100%
+    max-width: 40rem
+    overflow: hidden
 
-  .signin
-    &-input
-      flex: 1 10rem
+    :global(.authentication-card-controls)
+      height: 3rem
 
+    .authentication-card-forms
+      position: relative
+      height: 0
+      transition: height .3s ease
+
+      :global(form)
+        position: absolute
+        top: 0
+        left: 0
+        width: 100%
+        padding: .5rem
+        text-align: right
+        color: $mdc-theme-secondary
+
+        :global(.fields)
+          display: flex
+          flex-wrap: wrap
+
+          :global(.textfield-container)
+            flex: 1 0 15rem
+
+        :global(.submit)
+          display: inline-block
+          margin: .25rem .5rem
+          font-family: defaultFont
+          font-weight: 700
 </style>
 
 <svelte:head>
-  <title>Авторизация • WonderCity</title>
+  <title>Авторизация • WonderCity Reborn</title>
 </svelte:head>
 
-<TransitionWrapper>
-    <Card style="
-      margin: 3rem auto 0;
-      width: 100%;
-      max-width: 40rem;
-      padding: .5rem;
-    ">
-      {#if user.isAuthenticated}
-        <div class="already-registered">
-          <h1>Снова..?</h1>
-          <h2>Вы уже зарегистрированы.</h2>
-          <p>
-            Если вы хотите войти в другой аккаунт, сначала выйдите из текущего.
-          </p>
-          <button class="logout" on:click={logout}> Выйти </button>
-          <button class="continue" on:click={redirect}> Продолжить </button>
-        </div>
-      {:else}
-        <TabBar {tabs} let:tab bind:activeIndex>
-          <Tab {tab}>
-            <Label style="
+<TransitionWrapper centered>
+  <Card class="authentication-card">
+    {#if user.isAuthenticated}
+      <div class="already-registered">
+        <h1>Снова..?</h1>
+        <h2>Вы уже зарегистрированы.</h2>
+        <p>
+          Если вы хотите войти в другой аккаунт, сначала выйдите из текущего.
+        </p>
+        <button class="logout" on:click={logout}> Выйти </button>
+        <button class="continue" on:click={redirect}> Продолжить </button>
+      </div>
+    {:else}
+      <TabBar
+        class="authentication-card-controls"
+        {tabs}
+        let:tab
+        bind:activeIndex>
+        <Tab {tab}>
+          <Label
+            style="
               font-family: defaultFont, sans-serif;
-            ">{tab}</Label>
-          </Tab>
-        </TabBar>
+              font-weight: 700;
+            ">
+            {tab}
+          </Label>
+        </Tab>
+      </TabBar>
+      <div bind:this={formsWrapper} class="authentication-card-forms">
         {#if activeIndex === 0}
-          <form
-            class="signin"
-            in:fly={{ x: -300, duration: 300, delay: 300 }}
-            out:fly={{ x: -300, duration: 300 }}>
-            <div class="signin-input">
-              <Textfield
-                bind:value={username}
-                error={usernameError}
-                icon="event"
-                label="Логин" />
-            </div>
-          </form>
+          <SignIn on:signedin={signedIn} bind:element={signInForm} />
         {:else}
-          <form
-            class="signup"
-            in:fly={{ x: 300, duration: 300, delay: 300 }}
-            out:fly={{ x: 300, duration: 300 }}>
-            <h3>Not yet implemented, sorry.</h3>
-          </form>
+          <SignUp bind:element={signUpForm} />
         {/if}
-      {/if}
-    </Card>
+      </div>
+    {/if}
+  </Card>
 </TransitionWrapper>
