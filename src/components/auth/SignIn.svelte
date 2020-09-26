@@ -1,29 +1,48 @@
 <script>
   import { stores } from "@sapper/app";
-  import { fly } from "svelte/transition";
+  import { fly, slide } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
 
   import Textfield from "../Textfield.svelte";
-  import Button, { Label, Icon } from "@smui/button";
+  import SubmitButton from "./SubmitButton.svelte";
 
   import { postApi } from "../../../utils/requests.js";
 
   export let element;
 
-  let usernameEntered = false,
-    passwordEntered = false;
-  let username = "",
-    password = "";
-  let usernameError, passwordError;
-  let promise;
-
   const dispatch = createEventDispatcher();
   const { session } = stores();
 
-  $: {
+  let usernameEntered = false;
+  let passwordEntered = false;
+  let wrongPassword = false;
+  let username = "";
+  let password = "";
+  let usernameError;
+  let passwordError;
+  let promise;
+
+  const checkUsernameEntered = () => {
     if (username.length > 0 && !usernameEntered) {
       usernameEntered = true;
     }
+  };
+  
+  const checkPasswordEntered = () => {
+    if (password.length > 0 && !passwordEntered) {
+      passwordEntered = true;
+    }
+  };
+
+  const checkWrongPassword = () => {
+    if (wrongPassword) {
+      wrongPassword = false;
+    }
+  };
+
+  $: {
+    checkUsernameEntered();
+    checkWrongPassword();
 
     if (usernameEntered) {
       if (username.length === 0) {
@@ -35,15 +54,12 @@
       } else {
         usernameError = "";
       }
-
-      element = element;
     }
   }
 
   $: {
-    if (password.length > 0 && !passwordEntered) {
-      passwordEntered = true;
-    }
+    checkPasswordEntered();
+    checkWrongPassword();
 
     if (passwordEntered) {
       if (password.length === 0) {
@@ -53,12 +69,10 @@
       } else {
         passwordError = "";
       }
-
-      element = element;
     }
   }
 
-  $: disabled = passwordError || usernameError;
+  $: disabled = passwordError || usernameError || wrongPassword;
 
   const signin = (e) => {
     if (passwordEntered && usernameEntered) {
@@ -74,7 +88,6 @@
                 (e) => reject(e)
               );
             } else {
-              console.log(res);
               reject(res);
             }
           });
@@ -82,10 +95,13 @@
 
         promise.then(
           (json) => {
-            dispatch("signedin", json);
+            dispatch("signed", json);
           },
           (e) => {
-            console.log(e);
+            if (e.status === 401) {
+              promise = null;
+              wrongPassword = true;
+            }
           }
         );
       }
@@ -95,22 +111,6 @@
     }
   };
 </script>
-
-<style lang="sass">
-  @import "../../theme/global.scss"
-
-  .error
-    text-align: center
-    color: $mdc-theme-error
-    font-size: .8rem
-    width: 85%
-    margin: .25rem auto
-
-  .await
-    text-align: right
-    color: $mdc-theme-primary
-    margin: .25rem .5rem
-</style>
 
 <form
   bind:this={element}
@@ -132,14 +132,19 @@
       <p class="await">Перенаправляем...</p>
     {:catch e}
       <p class="error">
-        К сожалению, что-то пошло не так. Пожалуйста, перезагрузите страницу и
-        попробуйте снова.
+        К сожалению, произошла какая-то&nbsp;
+        ошибка. Пожалуйста, попробуйте снова через&nbsp;
+        пару минут или обратитесь к администратору.
       </p>
     {/await}
   {:else}
-    <Button {disabled} class="submit" variant="raised">
-      <Icon class="material-icons">login</Icon>
-      <Label>Войти</Label>
-    </Button>
+    {#if wrongPassword}
+      <p class="error">
+        Неправильный логин или пароль.
+      </p>
+      <SubmitButton disabled />
+    {:else}
+      <SubmitButton {disabled} />
+    {/if}
   {/if}
 </form>

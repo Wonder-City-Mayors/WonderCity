@@ -1,16 +1,137 @@
 <script>
+  import { stores } from "@sapper/app";
   import { fly } from "svelte/transition";
+  import { createEventDispatcher } from "svelte";
+
   import Textfield from "../Textfield.svelte";
+  import SubmitButton from "./SubmitButton.svelte";
+
+  import { postApi } from "../../../utils/requests.js";
 
   export let element;
+
+  const dispatch = createEventDispatcher();
+  const { session } = stores();
+
+  let usernameEntered = false;
+  let passwordEntered = false;
+  let passwordRepeatEntered = false;
+  let wrongUsername = false;
+  let username = "";
+  let password = "";
+  let passwordRepeat = "";
+  let usernameError;
+  let passwordError;
+  let passwordRepeatError;
+  let promise;
+
+  const checkUsernameEntered = () => {
+    if (username.length > 0 && !usernameEntered) {
+      usernameEntered = true;
+    }
+  };
+  const checkPasswordEntered = () => {
+    if (password.length > 0 && !passwordEntered) {
+      passwordEntered = true;
+    }
+  };
+  const checkPasswordRepeatEntered = () => {
+    if (passwordRepeat.length > 0 && !passwordRepeatEntered) {
+      passwordRepeatEntered = true;
+    }
+  };
+  const checkWrongUsername = () => {
+    if (wrongUsername) {
+      wrongUsername = false;
+    }
+  };
+
+  $: {
+    checkUsernameEntered();
+    checkWrongUsername();
+
+    if (usernameEntered) {
+      if (username.length === 0) {
+        usernameError = "Заполните это поле.";
+      } else if (/[^0-9a-zA-Z#$*_]/.test(username)) {
+        usernameError =
+          "Логин может состоять только из английских букв, цифр и знаков" +
+          " #, $, *, _.";
+      } else {
+        usernameError = "";
+      }
+    }
+  }
+  $: {
+    checkPasswordEntered();
+
+    if (passwordEntered) {
+      if (password.length === 0) {
+        passwordError = "Заполните это поле.";
+      } else if (password.length < 8) {
+        passwordError = "Пароль должен состоять как минимум из 8 символов.";
+      } else {
+        passwordError = "";
+      }
+    }
+  }
+  $: {
+    checkPasswordRepeatEntered();
+
+    if (passwordRepeatEntered) {
+      if (passwordRepeat.length === 0) {
+        passwordRepeatError = "Заполните это поле.";
+      } else if (passwordRepeat !== password) {
+        passwordRepeatError = "Пароли не совпадают.";
+      } else {
+        passwordRepeatError = "";
+      }
+    }
+  }
+  $: disabled = usernameError || passwordError || passwordRepeatError;
+
+  const signup = () => {
+    if (
+      usernameEntered &&
+      passwordEntered &&
+      passwordRepeatEntered
+    )  {
+      if (!disabled) {
+        promise = new Promise((resolve, reject) => {
+          postApi($session.apiUrl + "/users/signup", {
+            username,
+            password
+          }).then(res => {
+            if (res.ok) {
+              res.json().then(
+                (json) => resolve(json),
+                (e) => reject(e)
+              );
+            } else {
+              reject(res);
+            }
+          });
+        });
+
+        promise.then(json => {
+          dispatch("signed", json);
+        }, e => {
+          if (e.status === 403) {
+            promise = null;
+            wrongUsername = true;
+          }
+        });
+      }
+    } else {
+      usernameEntered = true;
+      passwordEntered = true;
+      passwordRepeatEntered = true;
+    }
+  };
 </script>
 
 <style lang="scss">
   @import "../../theme/global";
-
-  h3 {
-    text-align: center;
-  }
 
   form {
     display: flex;
@@ -22,6 +143,43 @@
 <form
   bind:this={element}
   class="signup"
+  on:submit|preventDefault={signup}
   transition:fly={{ x: 300, duration: 300 }}>
-  <h3>Not yet implemented, sorry.</h3>
+  <div class="fields">
+    <Textfield bind:value={username} error={usernameError} label="Логин" />
+  </div>
+  <div class="fields">
+    <Textfield
+      type="password"
+      bind:value={password}
+      error={passwordError}
+      label="Пароль" />
+    <Textfield
+      type="password"
+      bind:value={passwordRepeat}
+      error={passwordRepeatError}
+      label="Повтор пароля" />
+  </div>
+  {#if promise}
+    {#await promise}
+      <p class="await">Ждём ответа...</p>
+    {:then resolved}
+      <p class="await">Перенаправляем...</p>
+    {:catch e}
+      <p class="error">
+        К сожалению, произошла какая-то&nbsp;
+        ошибка. Пожалуйста, попробуйте снова через&nbsp;
+        пару минут или обратитесь к администратору.
+      </p>
+    {/await}
+  {:else}
+    {#if wrongUsername}
+      <p class="error">
+        Этот логин уже занят.
+      </p>
+      <SubmitButton disabled icon="how_to_reg" label="регистрация" />
+    {:else}
+      <SubmitButton {disabled} icon="how_to_reg" label="регистрация" />
+    {/if}
+  {/if}
 </form>

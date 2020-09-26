@@ -104,6 +104,8 @@
   }
 
   .layout-header {
+    @include small_box_shadow_primary;
+    
     position: fixed;
     top: 0;
     left: 0;
@@ -111,7 +113,6 @@
     height: 3rem;
     background: white;
     z-index: 2;
-    box-shadow: 0 0 .2rem $mdc-theme-primary;
 
     .top-nav {
       display: flex;

@@ -4,17 +4,17 @@ const parsePermissions = array => {
 
 export default async jwt => {
   if (jwt) {
-    const payload = await mg.services.jwt.verify(jwt);
+    const payload = await wonder.services.jwt.verify(jwt);
 
     if (payload) {
-      let user = (await mg.knex
+      let user = (await wonder.knex
         .select('*')
         .from('user')
         .where('id', payload.id))[0];
 
       user.permissions = user.role_id ?
         parsePermissions(
-          await mg.knex
+          await wonder.knex
             .select('permission.*')
             .from('permission')
             .innerJoin(

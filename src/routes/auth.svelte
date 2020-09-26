@@ -15,35 +15,38 @@
   const user = $session.user;
   const tabs = ["Вход", "Регистрация"];
 
-  let formsWrapper, signInForm, signUpForm;
+  let signInForm, signUpForm;
 
   let activeIndex = 0;
 
-  onMount(
-    () =>
-      (formsWrapper.style.height =
-        (signInForm ? signInForm.offsetHeight : signUpForm.offsetHeight) + "px")
-  );
+  $: {
+    const [active, passive] = (
+      activeIndex ?
+      [signUpForm, signInForm] :
+      [signInForm, signUpForm]
+    );
 
-  $: if (formsWrapper) {
-    if (activeIndex === 0 && signInForm) {
-      formsWrapper.style.height = signInForm.offsetHeight + "px";
-    } else if (signUpForm) {
-      formsWrapper.style.height = signUpForm.offsetHeight + "px";
+    if (active) {
+      active.classList.add('active');
+    }
+
+    if (passive) {
+      passive.classList.remove('active');
     }
   }
 
   const logout = () => goto("/logout");
   const redirect = () => goto($page.query.redirectTo || "/");
 
-  const signedIn = (e) => {
-    setCookie("jwt", e.jwt, {
+  const signed = (e) => {
+    console.log(e);
+    setCookie("jwt", e.detail.jwt, {
       sameSite: "Strict",
       maxAge: 1296000,
     });
 
     session.update((oldSession) => {
-      oldSession.user = e.user;
+      oldSession.user = e.detail.data;
       return oldSession;
     });
 
@@ -52,83 +55,88 @@
 </script>
 
 <style lang="sass">
-  @import '../theme/colors'
+  @import '../theme/global'
 
-  :global(.authentication-card)
-    width: 100%
+  .authentication-forms-container
+    position: relative
+    margin: 0 auto
     max-width: 40rem
-    overflow: hidden
 
-    :global(.authentication-card-controls)
-      height: 3rem
+    :global(form)
+      width: 100%
+      padding: .5rem
+      text-align: right
+      color: $mdc-theme-secondary
 
-    .authentication-card-forms
-      position: relative
-      height: 0
-      transition: height .3s ease
-
-      :global(form)
+      &:not(.active)
         position: absolute
         top: 0
         left: 0
+
+      &.active
+        position: static
+
+      :global(.fields)
+        display: flex
+        flex-wrap: wrap
         width: 100%
-        padding: .5rem
+
+        :global(.textfield-container)
+          flex: 1 0 15rem
+
+      :global(.submit)
+        display: inline-block
+        margin: .25rem .5rem
+        font-family: defaultFont
+        font-weight: 700
+
+      :global(p.error)
+        text-align: center
+        color: $mdc-theme-error
+        font-size: .8rem
+        width: 85%
+        margin: .25rem auto
+
+      :global(p.await)
         text-align: right
-        color: $mdc-theme-secondary
-
-        :global(.fields)
-          display: flex
-          flex-wrap: wrap
-
-          :global(.textfield-container)
-            flex: 1 0 15rem
-
-        :global(.submit)
-          display: inline-block
-          margin: .25rem .5rem
-          font-family: defaultFont
-          font-weight: 700
+        color: $mdc-theme-primary
+        margin: .25rem .5rem
 </style>
 
 <svelte:head>
   <title>Авторизация • WonderCity Reborn</title>
 </svelte:head>
 
-<TransitionWrapper centered>
-  <Card class="authentication-card">
-    {#if user.isAuthenticated}
-      <div class="already-registered">
-        <h1>Снова..?</h1>
-        <h2>Вы уже зарегистрированы.</h2>
-        <p>
-          Если вы хотите войти в другой аккаунт, сначала выйдите из текущего.
-        </p>
-        <button class="logout" on:click={logout}> Выйти </button>
-        <button class="continue" on:click={redirect}> Продолжить </button>
-      </div>
-    {:else}
-      <TabBar
-        class="authentication-card-controls"
-        {tabs}
-        let:tab
-        bind:activeIndex>
-        <Tab {tab}>
-          <Label
-            style="
+<TransitionWrapper>
+  {#if user.isAuthenticated}
+    <div class="already-registered">
+      <h1>Снова..?</h1>
+      <h2>Вы уже зарегистрированы.</h2>
+      <p>Если вы хотите войти в другой аккаунт, сначала выйдите из текущего.</p>
+      <button class="logout" on:click={logout}> Выйти </button>
+      <button class="continue" on:click={redirect}> Продолжить </button>
+    </div>
+  {:else}
+    <TabBar
+      {tabs}
+      let:tab
+      bind:activeIndex>
+      <Tab {tab}>
+        <Label
+          style="
               font-family: defaultFont, sans-serif;
               font-weight: 700;
             ">
-            {tab}
-          </Label>
-        </Tab>
-      </TabBar>
-      <div bind:this={formsWrapper} class="authentication-card-forms">
-        {#if activeIndex === 0}
-          <SignIn on:signedin={signedIn} bind:element={signInForm} />
-        {:else}
-          <SignUp bind:element={signUpForm} />
-        {/if}
-      </div>
-    {/if}
-  </Card>
+          {tab}
+        </Label>
+      </Tab>
+    </TabBar>
+    <div class="authentication-forms-container">
+      {#if activeIndex === 0}
+        <SignIn on:signed={signed} bind:element={signInForm} />
+      {:else}
+        <SignUp on:signed={signed} bind:element={signUpForm} />
+      {/if}
+    </div>
+  {/if}
 </TransitionWrapper>

@@ -18,6 +18,9 @@
     margin: .25rem .5rem
     color: $color_error_red
 
+    &-error
+      padding: .25rem
+
     :global(*) 
       font-family: defaultFont
 
