@@ -4,7 +4,7 @@
   import TabBar from "@smui/tab-bar";
   import {stores, goto} from "@sapper/app";
 
-  const {page} = stores();
+  const {page, session} = stores();
   const iconTabs = [
     {
       icon: "school",
@@ -17,13 +17,7 @@
       label: "FAQ",
       path: "/faq",
       index: 1,
-    },
-    {
-      icon: "how_to_reg",
-      label: "Авторизация",
-      path: "/auth",
-      index: 2,
-    },
+    }
   ];
   const tabsElements = [];
 
@@ -48,6 +42,22 @@
   setActive($page);
 
   page.subscribe(setActive);
+
+  if ($session.user.isAuthenticated) {
+    iconTabs.push({
+      icon: "how_to_reg",
+      label: "шо?",
+      path: "/auth",
+      index: 2
+    });
+  } else {
+    iconTabs.push({
+      icon: "how_to_reg",
+      label: "Авторизация",
+      path: "/auth",
+      index: 2
+    });
+  }
 </script>
 
 <style global lang="scss">
