@@ -3,11 +3,9 @@
 </script>
 
 <svelte:head>
-  <title>ЧАВО • WonderCity Reborn</title>
+  <title>Профиль • WonderCity Reborn</title>
 </svelte:head>
 
 <TransitionWrapper>
-  <h1>
-    FAQ is going to be here.
-  </h1>
+  <h1>profile</h1>
 </TransitionWrapper>

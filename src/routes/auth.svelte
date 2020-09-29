@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
 
   import Tab, { Label } from "@smui/tab";
+  import Button from "../components/Button.svelte";
   import TabBar from "@smui/tab-bar";
   import Card from "@smui/card";
   import TransitionWrapper from "../components/TransitionWrapper.svelte";
@@ -20,18 +21,16 @@
   let activeIndex = 0;
 
   $: {
-    const [active, passive] = (
-      activeIndex ?
-      [signUpForm, signInForm] :
-      [signInForm, signUpForm]
-    );
+    const [active, passive] = activeIndex
+      ? [signUpForm, signInForm]
+      : [signInForm, signUpForm];
 
     if (active) {
-      active.classList.add('active');
+      active.classList.add("active");
     }
 
     if (passive) {
-      passive.classList.remove('active');
+      passive.classList.remove("active");
     }
   }
 
@@ -39,7 +38,6 @@
   const redirect = () => goto($page.query.redirectTo || "/");
 
   const signed = (e) => {
-    console.log(e);
     setCookie("jwt", e.detail.jwt, {
       sameSite: "Strict",
       maxAge: 1296000,
@@ -87,8 +85,6 @@
       :global(.submit)
         display: inline-block
         margin: .25rem .5rem
-        font-family: defaultFont
-        font-weight: 700
 
       :global(p.error)
         text-align: center
@@ -113,14 +109,22 @@
       <h1>Снова..?</h1>
       <h2>Вы уже зарегистрированы.</h2>
       <p>Если вы хотите войти в другой аккаунт, сначала выйдите из текущего.</p>
-      <button class="logout" on:click={logout}> Выйти </button>
-      <button class="continue" on:click={redirect}> Продолжить </button>
+      <Button
+        class="logout"
+        variant="raised"
+        color="secondary"
+        on:click={logout}
+        icon="person_remove"
+        label="Выйти" />
+      <Button
+        class="continue"
+        variant="raised"
+        on:click={redirect}
+        icon="check_circle"
+        label="Продолжить" />
     </div>
   {:else}
-    <TabBar
-      {tabs}
-      let:tab
-      bind:activeIndex>
+    <TabBar {tabs} let:tab bind:activeIndex>
       <Tab {tab}>
         <Label
           style="

@@ -6,12 +6,16 @@
   <title>О SQBit • WonderCity Reborn</title>
 </svelte:head>
 
-<style lang="scss">
+<style lang="sass">
+  @import "../theme/global.scss"
 
+  h1
+    color: $mdc-theme-primary
+    padding: .25em .5em
 </style>
 
 <TransitionWrapper>
   <h1>
-      Hello. WonderCity here. Kimp13 and burzeppe are ready to fulfill your needs.
+      This placeholder is here until development ends.
   </h1>
 </TransitionWrapper>

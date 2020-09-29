@@ -99,9 +99,7 @@ const main = () => {
 
       wonder.paths = new Object();
       wonder.services = new Object();
-      wonder.cache = {
-        usersTokens: new Object()
-      };
+      wonder.cache = new Object();
 
       Promise.all(
         // Initialize server filesystem dependencies
@@ -135,14 +133,37 @@ const main = () => {
                       routes[j].path += '/';
                     }
 
-                    if (!wonder.paths.hasOwnProperty(routes[j].method)) {
-                      wonder.paths[routes[j].method] = new Object();
+                    _.set(wonder.paths, [
+                      routes[j].method,
+                      `/${routeName}${routes[j].path}`,
+                      'policies'
+                    ], []);
+
+                    if (routes[j].hasOwnProperty('config')) {
+                      if (routes[j].config.hasOwnProperty('policies')) {
+                        for (let policy of routes[j].config.policies) {
+                            wonder
+                              .paths
+                              [routes[j].method]
+                              [`/${routeName}${routes[j].path}`]
+                              .policies
+                              .push(wonder.policies[policy]);
+                        }
+                      }
                     }
 
-                    wonder.paths[routes[j].method][`/${routeName}${routes[j].path}`] = (
-                      routes[j].handler === 'default' ?
-                        controllers :
-                        controllers[routes[j].handler]
+                    _.set(
+                      wonder.paths,
+                      [
+                        routes[j].method,
+                        `/${routeName}${routes[j].path}`,
+                        'handler'
+                      ],
+                      (
+                        routes[j].handler === 'default' ?
+                          controllers :
+                          controllers[routes[j].handler]
+                      )
                     );
 
                     resolve();
@@ -209,7 +230,17 @@ const main = () => {
                   try {
                     res.send = send;
 
-                    await wonder.paths[req.method][req.path](req, res);
+                    responseHandling: {
+                      for (let policy of wonder.paths[req.method][req.path].policies) {
+                        await policy(req, res);
+
+                        if (res.headersSent) {
+                          break responseHandling;
+                        }
+                      };
+  
+                      await wonder.paths[req.method][req.path].handler(req, res);
+                    }
                   } catch (e) {
                     console.log(e);
 
@@ -262,6 +293,7 @@ fs.access(configPath, fs.F_OK, err => {
   if (err) main();
 
   const bootstrapPath = path.join(configPath, 'functions', 'bootstrap.js');
+  const policiesPath = path.join(configPath, 'functions', 'policies');
   const commonEnvironmentPath = path.join(configPath, 'environments', 'common.js');
   const specialEnvironmentPath = (
     dev ?
@@ -269,33 +301,58 @@ fs.access(configPath, fs.F_OK, err => {
       path.join(configPath, 'environments', 'production.js')
   );
 
-  fs.access(bootstrapPath, fs.F_OK, err => {
-    if (err) main();
+  Promise.all([
+    new Promise((resolve, reject) => {
+      fs.access(specialEnvironmentPath, fs.F_OK, err => {
+        if (!err) {
+          let specialConfig = require(specialEnvironmentPath);
+      
+          if (wonder.config) {
+            wonder.config = _.defaults(specialConfig, wonder.config);
+          } else {
+            wonder.config = specialConfig;
+          }
+        }
+        
+        resolve();
+      });
+    }),
+    new Promise((resolve, reject) => {
+      fs.access(commonEnvironmentPath, fs.F_OK, err => {
+        if (!err) {
+          let commonConfig = require(commonEnvironmentPath);
+      
+          if (wonder.config) {
+            wonder.config = _.defaults(wonder.config, commonConfig);
+          } else {
+            wonder.config = commonConfig;
+          }
+        }
+      
+        resolve();
+      });
+    }),
+    new Promise((resolve, reject) => {
+      fs.readdir(policiesPath, (err, files) => {
+        wonder.policies = new Object();
 
-    require(bootstrapPath)().then(main);
-  });
-
-  fs.access(commonEnvironmentPath, fs.F_OK, err => {
-    if (err) return;
-
-    let commonConfig = require(commonEnvironmentPath);
-
-    if (wonder.config) {
-      wonder.config = _.defaults(wonder.config, commonConfig);
-    } else {
-      wonder.config = commonConfig;
-    }
-  });
-
-  fs.access(specialEnvironmentPath, fs.F_OK, err => {
-    if (err) return;
-
-    let specialConfig = require(specialEnvironmentPath);
-
-    if (wonder.config) {
-      wonder.config = _.defaults(specialConfig, wonder.config);
-    } else {
-      wonder.config = specialConfig;
-    }
-  });
+        if (!err) {
+          for (let file of files) {
+            const filePath = path.join(policiesPath, file);
+  
+            wonder.policies[file.replace(/\.[^/.]+$/, "")] = require(filePath);
+          }
+        }
+        
+        resolve();
+      })
+    })
+  ])
+    .then(() => {
+      fs.access(bootstrapPath, fs.F_OK, err => {
+        if (err) main();
+    
+        require(bootstrapPath)().then(main);
+      });
+    });
 });

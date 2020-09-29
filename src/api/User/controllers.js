@@ -48,8 +48,10 @@ module.exports = {
         res.send({
           jwt,
           data: {
+            isAuthenticated: true,
             first_name: 'Аноним',
             last_name: 'Анонимус',
+            permissions: [],
             username
           }
         });
@@ -106,7 +108,8 @@ module.exports = {
         res.send({
           jwt,
           data: Object.assign({
-            permissions
+            isAuthenticated: true,
+            permissions,
           }, pick(user, ['first_name', 'last_name', 'username']))
         });
   

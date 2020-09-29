@@ -1,14 +1,34 @@
 <script>
-  import Tab, {Icon, Label} from "@smui/tab";
+  import Tab, { Icon, Label } from "@smui/tab";
   import Button from "@smui/button";
   import TabBar from "@smui/tab-bar";
-  import {stores, goto} from "@sapper/app";
+  import { stores, goto } from "@sapper/app";
 
-  const {page, session} = stores();
-  const iconTabs = [
+  const { page, session } = stores();
+  const tabsElements = [];
+
+  const setActive = (location) => {
+    for (let i = 0; i < iconTabs.length; i += 1) {
+      if (
+        location.path.substring(0, iconTabs[i].path.length) === iconTabs[i].path
+      ) {
+        activeIndex = i;
+        return;
+      }
+    }
+
+    activeIndex = -1;
+
+    for (let i = 0; i < tabsElements.length; i += 1) {
+      tabsElements[i].deactivate();
+    }
+  };
+
+  let activeIndex;
+  let iconTabs = [
     {
       icon: "school",
-      label: "О нас",
+      label: "О SQBit",
       path: "/about",
       index: 0,
     },
@@ -17,47 +37,44 @@
       label: "FAQ",
       path: "/faq",
       index: 1,
-    }
+    },
   ];
-  const tabsElements = [];
-
-  const setActive = (location) => {
-    if (location.path.substring(0, 6) === "/about") {
-      activeIndex = 0;
-    } else if (location.path.substring(0, 4) === "/faq") {
-      activeIndex = 1;
-    } else if (location.path.substring(0, 5) === "/auth") {
-      activeIndex = 2;
-    } else {
-      activeIndex = -1;
-
-      for (let i = 0; i < tabsElements.length; i += 1) {
-        tabsElements[i].deactivate();
-      }
-    }
-  };
-
-  let activeIndex;
 
   setActive($page);
 
   page.subscribe(setActive);
 
-  if ($session.user.isAuthenticated) {
-    iconTabs.push({
-      icon: "how_to_reg",
-      label: "шо?",
-      path: "/auth",
-      index: 2
-    });
-  } else {
-    iconTabs.push({
-      icon: "how_to_reg",
-      label: "Авторизация",
-      path: "/auth",
-      index: 2
-    });
-  }
+  session.subscribe((value) => {
+    if (value.user.isAuthenticated) {
+      iconTabs = [
+        ...iconTabs.slice(0, 2),
+        {
+          icon: "cast",
+          label: "Отслеживание",
+          path: "/monit",
+          index: 3,
+        },
+        {
+          icon: "account_circle",
+          label: "Профиль",
+          path: "/profile",
+          index: 2,
+        },
+      ];
+    } else {
+      iconTabs = [
+        ...iconTabs.slice(0, 2),
+        {
+          icon: "how_to_reg",
+          label: "Авторизация",
+          path: "/auth",
+          index: 2,
+        },
+      ];
+    }
+
+    setActive($page);
+  });
 </script>
 
 <style global lang="scss">
@@ -115,7 +132,7 @@
 
   .layout-header {
     @include small_box_shadow_primary;
-    
+
     position: fixed;
     top: 0;
     left: 0;
@@ -129,17 +146,17 @@
       height: 100%;
 
       &-logo {
-        font-family: defaultFont,serif;
+        font-family: defaultFont, serif;
         order: 1;
         flex: 0 0 auto;
         display: flex;
-        padding: .25rem .5rem;
+        padding: 0.25rem 0.5rem;
         height: 100%;
 
         &-icon {
           width: 2.5rem;
           font-size: 2.5rem;
-          margin-right: .5rem;
+          margin-right: 0.5rem;
         }
 
         &-caption {
@@ -153,14 +170,14 @@
           }
 
           &-min {
-            font-size: .75rem;
-            margin-right: .5rem;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
           }
         }
       }
 
       &::before {
-        content: '';
+        content: "";
         order: 2;
         flex: 1;
       }
@@ -184,6 +201,7 @@
   }
 
   main {
+    position: relative;
     padding-top: 3rem;
     height: 100%;
   }
@@ -196,27 +214,27 @@
 </style>
 
 <header class="layout-header">
-    <nav class="top-nav">
-      <Button color="primary" class="top-nav-logo" on:click={() => goto('/')}>
-        <span class="material-icons top-nav-logo-icon">insights</span>
-        <div class="top-nav-logo-caption">
-          <span class="top-nav-logo-caption-max">WonderCity</span>
-          <span class="top-nav-logo-caption-min">REBORN</span>
-        </div>
-      </Button>
-      <TabBar tabs={iconTabs} class="top-nav-tabs" let:tab bind:activeIndex>
-        <Tab
-          {tab}
-          minWidth
-          on:click={() => goto(tab.path)}
-          class="top-nav-tabs-tab"
-          bind:this={tabsElements[tab.index]}>
-          <Icon class="material-icons">{tab.icon}</Icon>
-          <Label>{tab.label}</Label>
-        </Tab>
-      </TabBar>
-    </nav>
-  </header>
+  <nav class="top-nav">
+    <Button color="primary" class="top-nav-logo" on:click={() => goto('/')}>
+      <span class="material-icons top-nav-logo-icon">insights</span>
+      <div class="top-nav-logo-caption">
+        <span class="top-nav-logo-caption-max">WonderCity</span>
+        <span class="top-nav-logo-caption-min">REBORN</span>
+      </div>
+    </Button>
+    <TabBar tabs={iconTabs} class="top-nav-tabs" let:tab bind:activeIndex>
+      <Tab
+        {tab}
+        minWidth
+        on:click={() => goto(tab.path)}
+        class="top-nav-tabs-tab"
+        bind:this={tabsElements[tab.index]}>
+        <Icon class="material-icons">{tab.icon}</Icon>
+        <Label>{tab.label}</Label>
+      </Tab>
+    </TabBar>
+  </nav>
+</header>
 <main>
   <slot />
 </main>

@@ -1,20 +1,22 @@
-<div class="logout">
-  <h2>
-    Выходим, выходим, выходим!
-  </h2>
-  <h3>
-    Наступят времена почище.
-  </h3>
-</div>
-
 <script>
   import { deleteCookie } from "../../utils/cookies";
   import { onMount } from "svelte";
+  import { stores, goto } from "@sapper/app";
+
+  const { session } = stores();
 
   onMount(() => {
     deleteCookie('jwt');
 
-    window.location.href = '/auth';
+    session.update((oldSession) => {
+      oldSession.user = {
+        isAuthenticated: false,
+      };
+
+      return oldSession;
+    });
+
+    goto('/');
   });
 </script>
 
@@ -26,12 +28,20 @@
     padding: 3rem 0;
     width: 90%;
     max-width: 35rem;
-    
+
     h2,
     h3 {
-      color: $color_green;
+      color: $mdc-theme-primary;
       text-align: left;
     }
   }
 </style>
 
+<svelte:head>
+  <title>Выход • WonderCity Reborn</title>
+</svelte:head>
+
+<div class="logout">
+  <h2>Выходим, выходим, выходим!</h2>
+  <h3>Наступят времена почище.</h3>
+</div>
