@@ -1,23 +1,50 @@
 <script>
-  import { fly } from "svelte/transition";
-  import { cubicIn } from "svelte/easing";
-  import { onDestroy } from "svelte";
+  import { quadIn, cubicIn } from "svelte/easing";
+  import { getContext } from "svelte";
 
   export let centered = false;
-  let it;
 
-  const absoluteFly = (node, { duration = 300, x = 0, y = 0 }) => ({
-    duration,
-    css: (t) => {
-      const eased = cubicIn(1 - t);
+  function updateTransitionDirection(newTransitionDirection) {
+    if (newTransitionDirection > 0) {
+      isFade = false;
+      x = 500;
+    } else if (newTransitionDirection < 0) {
+      isFade = false;
+      x = -500;
+    } else {
+      isFade = true;
+    }
+  }
 
-      return `
-        transform: translate(${eased * x}px, ${eased * y}px);
-        opacity: ${cubicIn(t)};
-        position: absolute;
-      `;
-    },
-  });
+  const transitionDirection = getContext("transitionDirection");
+  let it,
+    x = 0,
+    isFade = true;
+
+  const absoluteTransition = (node, { duration = 300, reverse = false }) => {
+    updateTransitionDirection($transitionDirection);
+
+    return {
+      duration,
+      css: (t) => {
+        if (isFade) {
+          return `
+            transform: none;
+            opacity: ${cubicIn(t)};
+            position: absolute;
+          `;
+        } else {
+          const eased = reverse ? -quadIn(1 - t) : quadIn(1 - t);
+
+          return `
+            transform: translateX(${eased * x}px);
+            opacity: ${cubicIn(t)};
+            position: absolute;
+          `;
+        }
+      },
+    };
+  };
 </script>
 
 <style lang="sass">
@@ -35,7 +62,7 @@
 <div
   class:centered
   bind:this={it}
-  in:absoluteFly={{ x: 500, duration: 300 }}
-  out:absoluteFly={{ x: -500, duration: 300 }}>
+  in:absoluteTransition
+  out:absoluteTransition={{ reverse: true }}>
   <slot />
 </div>

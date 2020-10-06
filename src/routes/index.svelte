@@ -5,11 +5,12 @@
   const { session } = stores();
 </script>
 
-<style lang="scss">
-  h1 {
-    color: #aaa;
-    text-align: center;
-  }
+<style lang="sass">
+  @import "../theme/colors"
+
+  h1
+    color: $mdc-theme-secondary
+    text-align: center
 </style>
 
 <svelte:head>

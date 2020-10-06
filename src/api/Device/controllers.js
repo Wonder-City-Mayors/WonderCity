@@ -1,6 +1,11 @@
+const jsonify = require("../../../utils/searchToJson");
+
 module.exports = {
   getReadouts: async (req, res) => {
-    res.send('[]');
+    const search = jsonify(req.search);
+    console.log(search);
+
+    res.send([]);
 
     return;
   }

@@ -1,6 +1,6 @@
-export const getApiResponse = async (path, query, auth) => {
+const createUrl = (path, query, auth) => {
   let keys,
-      queryString = '';
+    queryString = '';
 
   if (query) {
     keys = Object.keys(query);
@@ -16,16 +16,28 @@ export const getApiResponse = async (path, query, auth) => {
     queryString += `&${keys[i]}=${query[keys[i]]}`;
   }
 
-  let url = encodeURI(path + queryString);
+  return encodeURI(path + queryString);
+};
 
-  let response = await fetch(url, {
+export const getApiResponse = async (path, query, auth) => {
+  const url = createUrl(path, query, auth);
+
+  return await (await fetch(url, {
     method: 'GET',
     headers: {
       'Custom-Authorization': auth || ''
     }
-  });
+  })).json();
+};
 
-  return await response.json();
+export const getPreloadApiResponse = async (path, query, sapperInstance) => {
+  const url = createUrl(path, query);
+
+  return await (
+    await sapperInstance.fetch(url, {
+      credentials: 'include'
+    })
+  ).json();
 };
 
 export const postApi = async (path, query) => {

@@ -1,22 +1,51 @@
 <script>
+  import { setContext } from "svelte";
+  import { writable } from "svelte/store";
+  import { stores, goto } from "@sapper/app";
+
   import Tab, { Icon, Label } from "@smui/tab";
   import Button from "@smui/button";
   import TabBar from "@smui/tab-bar";
-  import { stores, goto } from "@sapper/app";
+
+  export let segment;
 
   const { page, session } = stores();
   const tabsElements = [];
+  const pathRegEx = /^(.*?)\?/;
 
-  const setActive = (location) => {
+  let loaded = false;
+
+  const setActive = (newSegment) => {
+    if (typeof newSegment !== "string") {
+      if (loaded) {
+        newSegment = '/';
+      } else {
+        newSegment = $page.path;
+      }
+    } else {
+      loaded = true;
+    }
+
+    console.log(newSegment);
+
+    if (newSegment[0] !== "/") {
+      newSegment = "/" + newSegment;
+    }
+
     for (let i = 0; i < iconTabs.length; i += 1) {
-      if (
-        location.path.substring(0, iconTabs[i].path.length) === iconTabs[i].path
-      ) {
+      const path = pathRegEx.exec(iconTabs[i].path);
+
+      if ((path && newSegment === path[1]) || newSegment === iconTabs[i].path) {
+        if (activeIndex !== -1) {
+          transitionDirection.set(i - activeIndex);
+        }
+
         activeIndex = i;
         return;
       }
     }
 
+    transitionDirection.set(0);
     activeIndex = -1;
 
     for (let i = 0; i < tabsElements.length; i += 1) {
@@ -39,10 +68,11 @@
       index: 1,
     },
   ];
+  let transitionDirection = writable(0);
 
-  setActive($page);
+  setContext("transitionDirection", transitionDirection);
 
-  page.subscribe(setActive);
+  $: setActive(segment);
 
   session.subscribe((value) => {
     if (value.user.isAuthenticated) {
@@ -51,7 +81,7 @@
         {
           icon: "cast",
           label: "Отслеживание",
-          path: "/monit",
+          path: "/monit?page=1",
           index: 3,
         },
         {
@@ -73,7 +103,7 @@
       ];
     }
 
-    setActive($page);
+    setActive(segment);
   });
 </script>
 
@@ -222,7 +252,7 @@
         <span class="top-nav-logo-caption-min">REBORN</span>
       </div>
     </Button>
-    <TabBar tabs={iconTabs} class="top-nav-tabs" let:tab bind:activeIndex>
+    <TabBar tabs={iconTabs} class="top-nav-tabs" let:tab activeIndex>
       <Tab
         {tab}
         minWidth
