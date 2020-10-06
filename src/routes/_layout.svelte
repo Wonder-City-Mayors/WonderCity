@@ -18,15 +18,13 @@
   const setActive = (newSegment) => {
     if (typeof newSegment !== "string") {
       if (loaded) {
-        newSegment = '/';
+        newSegment = "/";
       } else {
         newSegment = $page.path;
       }
-    } else {
+    } else if (!loaded) {
       loaded = true;
     }
-
-    console.log(newSegment);
 
     if (newSegment[0] !== "/") {
       newSegment = "/" + newSegment;
@@ -252,7 +250,11 @@
         <span class="top-nav-logo-caption-min">REBORN</span>
       </div>
     </Button>
-    <TabBar tabs={iconTabs} class="top-nav-tabs" let:tab activeIndex>
+    <TabBar
+      tabs={iconTabs}
+      class="top-nav-tabs"
+      let:tab
+      active={iconTabs[activeIndex]}>
       <Tab
         {tab}
         minWidth

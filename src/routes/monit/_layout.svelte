@@ -1,5 +1,5 @@
 <script context="module">
-  import { getPreloadApiResponse } from "../../utils/requests";
+  import { getPreloadApiResponse } from "../../../utils/requests";
 
   export async function preload(page, session) {
     try {
@@ -26,7 +26,7 @@
 </script>
 
 <script>
-  import TransitionWrapper from "../components/TransitionWrapper.svelte";
+  import TransitionWrapper from "../../components/TransitionWrapper.svelte";
 
   export let devices;
 </script>
@@ -36,7 +36,7 @@
 </svelte:head>
 
 <style lang="sass">
-  @import "../theme/colors"
+  @import "../../theme/colors"
 
   .no-devices
     color: $mdc-theme-secondary
@@ -45,6 +45,7 @@
 </style>
 
 <TransitionWrapper>
+  <slot />
   {#if devices.length === 0}
     <h2 class="no-devices">
       К сожалению, у Вас нет зарегистрированных считывающих устройств.
