@@ -32,12 +32,15 @@ export const getApiResponse = async (path, query, auth) => {
 
 export const getPreloadApiResponse = async (path, query, sapperInstance) => {
   const url = createUrl(path, query);
-
-  return await (
+  const response = await (
     await sapperInstance.fetch(url, {
       credentials: 'include'
     })
-  ).json();
+  ).json()
+
+  return response.hasOwnProperty('response') ?
+    response.response :
+    response;
 };
 
 export const postApi = async (path, query) => {

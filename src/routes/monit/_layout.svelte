@@ -3,24 +3,23 @@
 
   export async function preload(page, session) {
     try {
-      const devices = await getPreloadApiResponse(
-        `${session.apiUrl}/devices/getReadouts`,
-        {
-          page: page.query.page,
-        },
+      const count = await getPreloadApiResponse(
+        `${session.apiUrl}/devices/countMine`,
+        {},
         this
       );
 
-      if (devices.length === 0 && page.query.page != 1) {
-        await this.redirect(301, "/monit?page=1");
-      }
-
       return {
-        devices,
+        count,
       };
     } catch (e) {
+      await this.redirect(301, "/auth");
+
       console.log(e);
-      this.redirect(301, "/auth");
+
+      return {
+        count: false,
+      };
     }
   }
 </script>
@@ -28,12 +27,8 @@
 <script>
   import TransitionWrapper from "../../components/TransitionWrapper.svelte";
 
-  export let devices;
+  export let count;
 </script>
-
-<svelte:head>
-  <title>Отслеживание показаний • WonderCity Reborn</title>
-</svelte:head>
 
 <style lang="sass">
   @import "../../theme/colors"
@@ -44,13 +39,16 @@
     text-align: center
 </style>
 
-<TransitionWrapper>
-  <slot />
-  {#if devices.length === 0}
-    <h2 class="no-devices">
-      К сожалению, у Вас нет зарегистрированных считывающих устройств.
-    </h2>
-  {:else}
-    <h1>monitoring</h1>
-  {/if}
-</TransitionWrapper>
+<svelte:head>
+  <title>Отслеживание показаний • WonderCity Reborn</title>
+</svelte:head>
+
+{#if count > 0}
+  <TransitionWrapper>
+    <slot />
+  </TransitionWrapper>
+{:else}
+  <h2 class="no-devices">
+    К сожалению, у Вас нет зарегистрированных считывающих устройств.
+  </h2>
+{/if}

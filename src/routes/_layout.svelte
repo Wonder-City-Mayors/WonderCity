@@ -11,9 +11,10 @@
 
   const { page, session } = stores();
   const tabsElements = [];
-  const pathRegEx = /^(.*?)\?/;
+  const pathRegEx = /^(.+?)(\?|\/)/;
 
   let loaded = false;
+  let activeIndex = -1;
 
   const setActive = (newSegment) => {
     if (typeof newSegment !== "string") {
@@ -47,11 +48,12 @@
     activeIndex = -1;
 
     for (let i = 0; i < tabsElements.length; i += 1) {
-      tabsElements[i].deactivate();
+      try {
+        tabsElements[i].deactivate();
+      } catch (e) {}
     }
   };
 
-  let activeIndex;
   let iconTabs = [
     {
       icon: "school",
@@ -70,7 +72,9 @@
 
   setContext("transitionDirection", transitionDirection);
 
-  $: setActive(segment);
+  $: if (tabsElements.length > 0) {
+    setActive(segment);
+  }
 
   session.subscribe((value) => {
     if (value.user.isAuthenticated) {
@@ -79,7 +83,7 @@
         {
           icon: "cast",
           label: "Отслеживание",
-          path: "/monit?page=1",
+          path: "/monit/1",
           index: 3,
         },
         {
@@ -217,6 +221,10 @@
 
         *[class^="mdc-tab-scroller"] {
           height: 100%;
+        }
+
+        .mdc-tab-scroller__scroll-area--scroll {
+          overflow-x: hidden;
         }
 
         &-tab {

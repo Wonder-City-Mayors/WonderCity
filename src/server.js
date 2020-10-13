@@ -186,7 +186,6 @@ const main = () => {
         }))
       )
         .then(() => {
-
           polka()
             .use(bodyParser.json({ extended: true }))
             .use(async (req, res, next) => {
