@@ -1,0 +1,6 @@
+frontend:
+SVEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELTE! YEAH!! (html, js, css preprocessor)
+Sass (css preprocessor)
+backend:
+polka (lightweight server framework for node.js)
+sapper (SSR framework for Svelte)

@@ -1,0 +1,12 @@
+[
+  {
+    "method": "POST",
+    "path": "/signin",
+    "handler": "signIn"
+  },
+  {
+    "method": "POST",
+    "path": "/signup",
+    "handler": "signUp"
+  }
+]

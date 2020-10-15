@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/getReadouts",
+    "handler": "getReadouts",
+    "method": "GET",
+    "config": {
+      "policies": ["userFromCookies"]
+    }
+  },
+  {
+    "path": "/countMine",
+    "handler": "count",
+    "method": "GET",
+    "config": {
+      "policies": ["userFromCookies"]
+    }
+  }
+]
