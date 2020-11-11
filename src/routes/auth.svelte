@@ -1,14 +1,13 @@
 <script>
   import { goto, stores } from "@sapper/app";
-  import { onMount } from "svelte";
 
   import Tab, { Label } from "@smui/tab";
-  import Button from "../components/Button.svelte";
   import TabBar from "@smui/tab-bar";
-  import Card from "@smui/card";
-  import TransitionWrapper from "../components/TransitionWrapper.svelte";
-  import SignIn from "../components/auth/SignIn.svelte";
-  import SignUp from "../components/auth/SignUp.svelte";
+
+  import Button from "Button.svelte";
+  import TransitionWrapper from "TransitionWrapper.svelte";
+  import SignIn from "auth/SignIn.svelte";
+  import SignUp from "auth/SignUp.svelte";
 
   import { setCookie } from "../../utils/cookies";
 
@@ -48,6 +47,7 @@
       return oldSession;
     });
 
+    console.log($page.query.redirectTo);
     redirect();
   };
 </script>

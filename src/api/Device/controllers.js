@@ -1,4 +1,5 @@
 const jsonify = require("../../../utils/searchToJson");
+const defaults = require("lodash/defaults");
 
 // const commonQuery = (knex, userId) => knex
 //   .innerJoin('values_t1 as v1', 'v1.tree_id', 'tree.id')
@@ -44,7 +45,7 @@ module.exports = {
                 .where('tree_id', tree.id)
                 .orderBy('time_stamp_db', 'desc')
                 .limit(1)
-                .then(value => resolve(value[0]));
+                .then(value => resolve(defaults(value[0], tree)));
             })
           ))));
 

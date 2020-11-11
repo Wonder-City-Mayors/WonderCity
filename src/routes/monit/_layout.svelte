@@ -25,9 +25,20 @@
 </script>
 
 <script>
-  import TransitionWrapper from "../../components/TransitionWrapper.svelte";
+  import { goto } from "@sapper/app";
+
+  import TransitionWrapper from "TransitionWrapper.svelte";
+  import Title from "Title.svelte";
+  import Switchers from "Switchers.svelte";
 
   export let count;
+  export let segment;
+
+  $: current = parseInt(segment, 10);
+
+  const switchPage = e => {
+    goto(`/monit/${e.detail}`);
+  };
 </script>
 
 <style lang="sass">
@@ -39,13 +50,12 @@
     text-align: center
 </style>
 
-<svelte:head>
-  <title>Отслеживание показаний • WonderCity Reborn</title>
-</svelte:head>
+<Title caption="Отслеживание показаний" />
 
 {#if count > 0}
   <TransitionWrapper>
     <slot />
+    <Switchers {count} {current} on:switch={switchPage} />
   </TransitionWrapper>
 {:else}
   <h2 class="no-devices">

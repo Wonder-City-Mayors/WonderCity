@@ -2,10 +2,11 @@ import alias from '@rollup/plugin-alias';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import commonjs from '@rollup/plugin-commonjs';
-import svelte from 'rollup-plugin-svelte';
-import sveltePreprocess from 'svelte-preprocess';
-import postcss from "rollup-plugin-postcss";
 import babel from '@rollup/plugin-babel';
+import json from '@rollup/plugin-json';
+import svelte from 'rollup-plugin-svelte';
+import postcss from "rollup-plugin-postcss";
+import includePaths from 'rollup-plugin-includepaths';
 import { terser } from 'rollup-plugin-terser';
 import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
@@ -24,11 +25,7 @@ const onwarn = (warning, onwarn) =>
 /**
  * svelte-preprocess
  */
-const preprocess = sveltePreprocess({
-  sass: {
-    includePaths: ['./src/theme']
-  }
-});
+const { preprocess } = require('./svelte.config');
 
 const aliases = () => ({
   resolve: [".svelte", ".js", ".scss", ".css"],
@@ -71,6 +68,13 @@ const postcssConfig = () => ({
   ]
 });
 
+const includePathsOptions = () => ({
+  include: {},
+  paths: ['utils', 'src/components', 'static'],
+  external: [],
+  extensions: ['.js']
+});
+
 export default {
 	client: {
 		input: config.client.input(),
@@ -80,7 +84,8 @@ export default {
 			replace({
 				'process.browser': true,
 				'process.env.NODE_ENV': JSON.stringify(mode)
-			}),
+      }),
+      json(),
 			svelte({
 				dev,
 				hydratable: true,
@@ -92,7 +97,8 @@ export default {
 				browser: true,
 				dedupe: ['svelte']
 			}),
-			commonjs(),
+      commonjs(),
+      includePaths(includePathsOptions()),
       postcss(postcssConfig()),
 
 			legacy && babel({
@@ -129,7 +135,8 @@ export default {
 			replace({
 				'process.browser': false,
 				'process.env.NODE_ENV': JSON.stringify(mode)
-			}),
+      }),
+      json(),
 			svelte({
 				generate: 'ssr',
         hydratable: true,
@@ -142,6 +149,7 @@ export default {
 				dedupe: ['svelte']
 			}),
       commonjs(),
+      includePaths(includePathsOptions()),
       postcss(postcssConfig())
 		],
 		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),

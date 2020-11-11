@@ -1,13 +1,21 @@
 <script>
-  import TransitionWrapper from "../components/TransitionWrapper.svelte";
+  import TransitionWrapper from "TransitionWrapper.svelte";
+  import Title from "Title.svelte";
 </script>
 
-<svelte:head>
-  <title>ЧАВО • WonderCity Reborn</title>
-</svelte:head>
+<Title caption="FAQ" />
+
+<style lang="scss">
+  @import "colors";
+
+  h1 {
+    color: $mdc-theme-primary;
+    margin: .25em .5em;
+  }
+</style>
 
 <TransitionWrapper>
   <h1>
-    FAQ is going to be here.
+    Здесь будет FAQ, а когда &mdash; решает Бог.
   </h1>
 </TransitionWrapper>

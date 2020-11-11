@@ -34,10 +34,21 @@
     for (let i = 0; i < iconTabs.length; i += 1) {
       const path = pathRegEx.exec(iconTabs[i].path);
 
-      if ((path && newSegment === path[1]) || newSegment === iconTabs[i].path) {
+      if (
+        (path && newSegment === path[1]) ||
+        newSegment === iconTabs[i].path
+      ) {
         if (activeIndex !== -1) {
           transitionDirection.set(i - activeIndex);
         }
+
+        try {
+          tabsElements[activeIndex].deactivate()
+        } catch(e) {}
+
+        try {
+          tabsElements[i].activate();
+        } catch(e) {}
 
         activeIndex = i;
         return;
@@ -54,6 +65,43 @@
     }
   };
 
+  const updateIconTabs = user => {
+    const newIconTabs = iconTabs.slice(0, initialTabsLength);
+    let index;
+
+    if (user.isAuthenticated) {
+      index = newIconTabs.push({
+        icon: 'cast',
+        label: 'Отслеживание',
+        path: '/monit/1'
+      }) - 1;
+
+      newIconTabs[index].index = index;
+
+      index =
+        newIconTabs.push({
+          icon: "account_circle",
+          label: "Профиль",
+          path: "/profile",
+        }) - 1;
+
+      newIconTabs[index].index = index;
+    } else {
+      index =
+        newIconTabs.push({
+          icon: "how_to_reg",
+          label: "Авторизация",
+          path: "/auth",
+        }) - 1;
+
+      newIconTabs[index].index = index;
+    }
+
+    iconTabs = newIconTabs;
+
+    setActive(segment);
+  };
+
   let iconTabs = [
     {
       icon: "school",
@@ -68,6 +116,7 @@
       index: 1,
     },
   ];
+  const initialTabsLength = iconTabs.length;
   let transitionDirection = writable(0);
 
   setContext("transitionDirection", transitionDirection);
@@ -76,41 +125,11 @@
     setActive(segment);
   }
 
-  session.subscribe((value) => {
-    if (value.user.isAuthenticated) {
-      iconTabs = [
-        ...iconTabs.slice(0, 2),
-        {
-          icon: "cast",
-          label: "Отслеживание",
-          path: "/monit/1",
-          index: 3,
-        },
-        {
-          icon: "account_circle",
-          label: "Профиль",
-          path: "/profile",
-          index: 2,
-        },
-      ];
-    } else {
-      iconTabs = [
-        ...iconTabs.slice(0, 2),
-        {
-          icon: "how_to_reg",
-          label: "Авторизация",
-          path: "/auth",
-          index: 2,
-        },
-      ];
-    }
-
-    setActive(segment);
-  });
+  $: updateIconTabs($session.user);
 </script>
 
 <style global lang="scss">
-  @import "../theme/global";
+  @import "global";
 
   @font-face {
     font-family: defaultFont;
@@ -192,19 +211,8 @@
         }
 
         &-caption {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-
-          &-max {
-            font-weight: 700;
-            font-size: 1.5rem;
-          }
-
-          &-min {
-            font-size: 0.75rem;
-            margin-right: 0.5rem;
-          }
+          font-weight: 700;
+          font-size: 1.5rem;
         }
       }
 
@@ -253,10 +261,7 @@
   <nav class="top-nav">
     <Button color="primary" class="top-nav-logo" on:click={() => goto('/')}>
       <span class="material-icons top-nav-logo-icon">insights</span>
-      <div class="top-nav-logo-caption">
-        <span class="top-nav-logo-caption-max">WonderCity</span>
-        <span class="top-nav-logo-caption-min">REBORN</span>
-      </div>
+      <span class="top-nav-logo-caption">ВундерВафля</span>
     </Button>
     <TabBar
       tabs={iconTabs}

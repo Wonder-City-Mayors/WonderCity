@@ -1,14 +1,14 @@
 // server dependencies
 import dotenv from 'dotenv';
-import sirv from 'sirv';
-import polka from 'polka';
-import cookie from 'cookie';
+import express from 'express';
 import bodyParser from 'body-parser';
+import cookie from 'cookie';
 import compression from 'compression';
 import * as sapper from '@sapper/server';
 
 // database
 import Knex from 'knex';
+import addModels, * as db from '../database';
 
 // filesystem
 import path from 'path';
@@ -21,7 +21,7 @@ import getRouteName from '../utils/getRouteName';
 
 dotenv.config();
 
-// my dear knexie
+// bookshelf instance
 const knex = new Knex({
   client: process.env.DB_CLIENT || 'mysql',
   connection: {
@@ -35,11 +35,11 @@ const knex = new Knex({
 
 // working with filesystem
 const srcPath = path.join(process.cwd(), 'src');
-const apiPath = path.join(srcPath, 'api');
+const modelsPath = path.join(srcPath, 'api');
 const configPath = path.join(srcPath, 'config');
 
 // environment
-const { PORT, NODE_ENV, API_URL } = process.env;
+const { PORT, NODE_ENV, API_URL, PATH_TO_FIREBASE_KEY } = process.env;
 const dev = NODE_ENV === 'development';
 
 if (!API_URL) {
@@ -50,37 +50,18 @@ if (!API_URL) {
  * Global variable containing server cache, plugins, models, functions
  * @returns JS object
  */
-global.wonder = new Object();
+global.wonder = {};
 wonder.knex = knex;
 
-/**
- * Function to be a member of polka's res object
- */
-function send (payload = new Object) {
-  if (payload instanceof Object) {
-    if (payload._statusCode) {
-      this.statusCode = payload._statusCode;
-      delete payload._statusCode;
-    } else {
-      this.statusCode = 200;
-    }
+function _send(payload = {}, statusCode = 200) {
+  this.statusCode = statusCode;
 
-    payload = JSON.stringify(payload);
-  } else {
-    this.statusCode = 200;
-
-    payload = JSON.stringify({
-      response: payload
-    });
-  }
-
-  this.end(payload);
+  this.end(JSON.stringify({
+    response: payload
+  }));
 }
 
-/**
- * Function to be a member of polka's res object
- */
-function _throw (statusCode = 400) {
+function _throw(statusCode = 400) {
   this.statusCode = statusCode;
   this.end('{}');
 }
@@ -91,26 +72,52 @@ function _throw (statusCode = 400) {
 const main = () => {
   // proceed if connected to database
   knex.raw('select 1 + 1 as testValue').then(() => {
-    fs.readdir(apiPath, (err, files) => {
+    fs.readdir(modelsPath, (err, files) => {
       if (err) {
         console.log('You have no API. I don\'t want to start the server.');
         return;
       };
 
-      wonder.paths = new Object();
-      wonder.services = new Object();
-      wonder.cache = new Object();
+      wonder.models = [];
+      wonder.paths = {};
+      wonder.services = {};
+      wonder.cache = {};
 
       Promise.all(
-        // Initialize server filesystem dependencies
         files.map(file => new Promise((resolve, reject) => {
-          let currentPath = path.join(apiPath, file),
+          let currentPath = path.join(modelsPath, file),
+            modelPath = path.join(currentPath, 'model.js'),
             servicesPath = path.join(currentPath, 'services.js'),
             routesPath = path.join(currentPath, 'routes.json'),
             controllersPath = path.join(currentPath, 'controllers.js'),
             routeName = getRouteName(file);
 
           Promise.all([
+            new Promise((resolve, reject) => {
+              fs.access(modelPath, fs.F_OK, err => {
+                if (err) {
+                  resolve();
+                  return;
+                }
+
+                const model = require(modelPath);
+                wonder.models.push(model);
+
+                if (file.toLowerCase() === 'user') {
+                  wonder
+                    .knex('user')
+                    .count('id')
+                    .then(count => {
+                      wonder.cache.usersCount =
+                        count[0][Object.keys(count[0])[0]];
+
+                      resolve();
+                    });
+                } else {
+                  resolve();
+                }
+              });
+            }),
             new Promise((resolve, reject) => {
               fs.access(routesPath, fs.F_OK, err => {
                 if (err) {
@@ -133,21 +140,23 @@ const main = () => {
                       routes[j].path += '/';
                     }
 
+                    const routePath = `/${routeName}${routes[j].path}`;
+
                     _.set(wonder.paths, [
                       routes[j].method,
-                      `/${routeName}${routes[j].path}`,
+                      routePath,
                       'policies'
                     ], []);
 
                     if (routes[j].hasOwnProperty('config')) {
                       if (routes[j].config.hasOwnProperty('policies')) {
                         for (let policy of routes[j].config.policies) {
-                            wonder
-                              .paths
-                              [routes[j].method]
-                              [`/${routeName}${routes[j].path}`]
-                              .policies
-                              .push(wonder.policies[policy]);
+                          wonder
+                            .paths
+                          [routes[j].method]
+                          [routePath]
+                            .policies
+                            .push(wonder.policies[policy]);
                         }
                       }
                     }
@@ -156,7 +165,7 @@ const main = () => {
                       wonder.paths,
                       [
                         routes[j].method,
-                        `/${routeName}${routes[j].path}`,
+                        routePath,
                         'handler'
                       ],
                       (
@@ -182,11 +191,18 @@ const main = () => {
                 resolve();
               });
             })
-          ]).then(resolve);
+          ]).then(resolve, e => console.log(e));
         }))
       )
+        .then(() => addModels(knex, wonder.models))
         .then(() => {
-          polka()
+          // Set Query function
+          wonder.query = db.query;
+          wonder.queryAll = db.queryAll;
+
+          const app = express();
+
+          app
             .use(bodyParser.json({ extended: true }))
             .use(async (req, res, next) => {
               const start = new Date();
@@ -196,94 +212,93 @@ const main = () => {
               const ms = Date.now() - start.getTime();
 
               console.log(
-                `${start.toLocaleString()} | ${res.statusCode} ${req.method} on ` +
-                req.url + ' took ' + ms + ' ms'
+                `${start.toLocaleString()} | ${res.statusCode} ` +
+                `${req.method} on ${req.originalUrl} took ${ms} ms`
               );
             })
+            .use('/api', async (req, res, next) => {
+              req.cookies = cookie.parse(req.headers.cookie || '');
+              req.search = req.url.substring(req.path.length + 1);
+
+              res.throw = _throw;
+
+              const path = (
+                req.path[req.path.length - 1] === '/' ?
+                  req.path :
+                  req.path + '/'
+              );
+
+              if (
+                wonder.paths.hasOwnProperty(req.method) &&
+                wonder.paths[req.method].hasOwnProperty(path)
+              ) {
+                try {
+                  res.send = _send;
+
+                  responseHandling: {
+                    for (
+                      const policy of
+                      wonder.paths[req.method][path].policies
+                    ) {
+                      await policy(req, res);
+
+                      if (res.headersSent) {
+                        break responseHandling;
+                      }
+                    };
+
+                    await wonder
+                      .paths
+                      [req.method]
+                      [path]
+                      .handler(req, res);
+                  }
+                } catch (e) {
+                  console.log(e);
+
+                  res.throw(500);
+                }
+              } else {
+                res.throw(404);
+              }
+
+              return;
+            })
+            .use(compression({ threshold: 0 }))
+            .use(express.static('static'))
             .use(async (req, res, next) => {
               req.cookies = cookie.parse(req.headers.cookie || '');
 
-              const questionMarkIndex = req.url.indexOf('?');
-
-              if (questionMarkIndex === -1) {
-                req.path = req.url;
-                req.search = '';
-              } else {
-                req.path = req.url.substring(0, questionMarkIndex);
-                req.search = req.url.substring(questionMarkIndex + 1);
-              }
-
-              if (req.path.substring(0, 4) === '/api') {
-                res.throw = _throw;
-
-                req.path = req.path.substring(4);
-
-                if (req.path.charAt(req.path.length - 1) !== '/') {
-                  req.path += '/';
-                }
-
-                if (
-                  wonder.paths.hasOwnProperty(req.method) &&
-                  wonder.paths[req.method].hasOwnProperty(req.path)
-                ) {
-                  try {
-                    res.send = send;
-
-                    responseHandling: {
-                      for (let policy of wonder.paths[req.method][req.path].policies) {
-                        await policy(req, res);
-
-                        if (res.headersSent) {
-                          break responseHandling;
-                        }
-                      };
-  
-                      await wonder.paths[req.method][req.path].handler(req, res);
-                    }
-                  } catch (e) {
-                    console.log(e);
-
-                    res.throw(500);
-                  }
-                } else {
-                  res.throw(404)
-                }
-
-                return;
-              } else {
-                await next();
-              }
-            })
-            .use(compression({ threshold: 0 }))
-            .use(sirv('static', { dev }))
-            .use(async (req, res, next) => {
-              let user = await getUser(req.cookies.jwt);
-
-              if (user) {
-                user = Object.assign({
-                  isAuthenticated: true
-                }, _.pick(user, ['first_name', 'last_name', 'username', 'permissions']))
-              } else {
-                user = {
-                  isAuthenticated: false
-                }
-              }
+              req.user = await getUser(req.cookies.jwt);
 
               sapper.middleware({
                 session: () => {
                   return {
                     apiUrl: API_URL,
-                    user
+                    user: (
+                      req.user ?
+                        Object.assign({
+                          isAuthenticated: true
+                        }, _.pick(req.user, [
+                          'first_name',
+                          'last_name',
+                          'username',
+                          'permissions'
+                        ])) :
+                        {
+                          isAuthenticated: false
+                        }
+                    )
                   };
                 }
               })(req, res, next);
-            })
-            .listen(PORT, err => {
-              if (err) console.log('error', err);
             });
-        }, e => {
-          console.log(e);
-        });
+
+          app.listen(PORT, err => {
+            if (err) console.log('error', err);
+          });
+        })
+        .catch(e => console.log(e));
     });
   });
 };
@@ -291,9 +306,21 @@ const main = () => {
 fs.access(configPath, fs.F_OK, err => {
   if (err) main();
 
-  const bootstrapPath = path.join(configPath, 'functions', 'bootstrap.js');
-  const policiesPath = path.join(configPath, 'functions', 'policies');
-  const commonEnvironmentPath = path.join(configPath, 'environments', 'common.js');
+  const bootstrapPath = path.join(
+    configPath,
+    'functions',
+    'bootstrap.js'
+  );
+  const policiesPath = path.join(
+    configPath,
+    'functions',
+    'policies'
+  );
+  const commonEnvironmentPath = path.join(
+    configPath,
+    'environments',
+    'common.js'
+  );
   const specialEnvironmentPath = (
     dev ?
       path.join(configPath, 'environments', 'development.js') :
@@ -304,45 +331,46 @@ fs.access(configPath, fs.F_OK, err => {
     new Promise((resolve, reject) => {
       fs.access(specialEnvironmentPath, fs.F_OK, err => {
         if (!err) {
-          let specialConfig = require(specialEnvironmentPath);
-      
+          const specialConfig = require(specialEnvironmentPath);
+
           if (wonder.config) {
             wonder.config = _.defaults(specialConfig, wonder.config);
           } else {
             wonder.config = specialConfig;
           }
         }
-        
+
         resolve();
       });
     }),
     new Promise((resolve, reject) => {
       fs.access(commonEnvironmentPath, fs.F_OK, err => {
         if (!err) {
-          let commonConfig = require(commonEnvironmentPath);
-      
+          const commonConfig = require(commonEnvironmentPath);
+
           if (wonder.config) {
             wonder.config = _.defaults(wonder.config, commonConfig);
           } else {
             wonder.config = commonConfig;
           }
         }
-      
+
         resolve();
       });
     }),
     new Promise((resolve, reject) => {
       fs.readdir(policiesPath, (err, files) => {
-        wonder.policies = new Object();
+        wonder.policies = {};
 
         if (!err) {
-          for (let file of files) {
+          for (const file of files) {
             const filePath = path.join(policiesPath, file);
-  
-            wonder.policies[file.replace(/\.[^/.]+$/, "")] = require(filePath);
+
+            wonder.policies[file.replace(/\.[^/.]+$/, "")] =
+              require(filePath);
           }
         }
-        
+
         resolve();
       })
     })
@@ -350,7 +378,7 @@ fs.access(configPath, fs.F_OK, err => {
     .then(() => {
       fs.access(bootstrapPath, fs.F_OK, err => {
         if (err) main();
-    
+
         require(bootstrapPath)().then(main);
       });
     });

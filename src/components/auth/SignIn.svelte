@@ -27,7 +27,7 @@
       usernameEntered = true;
     }
   };
-  
+
   const checkPasswordEntered = () => {
     if (password.length > 0 && !passwordEntered) {
       passwordEntered = true;
@@ -77,20 +77,9 @@
   const signin = (e) => {
     if (passwordEntered && usernameEntered) {
       if (!disabled) {
-        promise = new Promise((resolve, reject) => {
-          postApi($session.apiUrl + "/users/signin", {
-            username,
-            password,
-          }).then((res) => {
-            if (res.ok) {
-              res.json().then(
-                (json) => resolve(json),
-                (e) => reject(e)
-              );
-            } else {
-              reject(res);
-            }
-          });
+        promise = postApi($session.apiUrl + "/users/signin", {
+          username,
+          password,
         });
 
         promise.then(
@@ -132,19 +121,14 @@
       <p class="await">Перенаправляем...</p>
     {:catch e}
       <p class="error">
-        К сожалению, произошла какая-то&nbsp;
-        ошибка. Пожалуйста, попробуйте снова через&nbsp;
-        пару минут или обратитесь к администратору.
+        К сожалению, произошла какая-то&nbsp; ошибка. Пожалуйста, попробуйте
+        снова через&nbsp; пару минут или обратитесь к администратору.
       </p>
     {/await}
+  {:else if wrongPassword}
+    <p class="error">Неправильный логин или пароль.</p>
+    <SubmitButton disabled />
   {:else}
-    {#if wrongPassword}
-      <p class="error">
-        Неправильный логин или пароль.
-      </p>
-      <SubmitButton disabled />
-    {:else}
-      <SubmitButton {disabled} />
-    {/if}
+    <SubmitButton {disabled} />
   {/if}
 </form>

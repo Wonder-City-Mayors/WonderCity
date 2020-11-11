@@ -1,6 +1,7 @@
 <script>
   import { stores } from "@sapper/app";
-  import TransitionWrapper from "../components/TransitionWrapper.svelte";
+  import TransitionWrapper from "TransitionWrapper.svelte";
+  import Title from "Title.svelte";
 
   const { session } = stores();
 </script>
@@ -13,10 +14,12 @@
     text-align: center
 </style>
 
-<svelte:head>
-  <title>Главная • WonderCity Reborn</title>
-</svelte:head>
+<Title caption="Главная" />
 
 <TransitionWrapper>
-  <h1>Привет, {$session.user.username || "неизвестный пользователь"}!</h1>
+  {#if $session.user.isAuthenticated}
+    <h1>Привет, {$session.user.username}!</h1>
+  {:else}
+    <h1>Слава Богу, ты пришёл!</h1>
+  {/if}
 </TransitionWrapper>

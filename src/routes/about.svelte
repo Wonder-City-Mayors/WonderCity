@@ -1,21 +1,20 @@
 <script>
-  import TransitionWrapper from "../components/TransitionWrapper.svelte";
+  import TransitionWrapper from "TransitionWrapper.svelte";
+  import Title from "Title.svelte";
 </script>
 
-<svelte:head>
-  <title>О SQBit • WonderCity Reborn</title>
-</svelte:head>
+<Title caption="О SQBit" />
 
 <style lang="sass">
-  @import "../theme/global.scss"
+  @import "global.scss"
 
   h1
     color: $mdc-theme-primary
-    padding: .25em .5em
+    margin: .25em .5em
 </style>
 
 <TransitionWrapper>
   <h1>
-      This placeholder is here until development ends.
+    Всем хай, велкоме, добрый вечер: я диспетчер.
   </h1>
 </TransitionWrapper>
