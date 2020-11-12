@@ -1,6 +1,8 @@
+class technology_stack {
 frontend:
-SVEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELTE! YEAH!! (html, js, css preprocessor)
-Sass (css preprocessor)
+  compiler framework svelte (html, css, js); // Суперсила. Подробнее: ru.svelte.dev
+  compiler sass (css); // Препроцессор для CSS. Подробнее: sass-scss.ru
 backend:
-polka (lightweight server framework for node.js)
-sapper (SSR framework for Svelte)
+  framework express (nodejs); // Стандартный выбор большинства нодеров. Подробнее: expressjs.com/ru
+  ssr framework sapper (svelte, express); // Напарник супергероя. Подробнее: ru.sapper.svelte.dev
+};
