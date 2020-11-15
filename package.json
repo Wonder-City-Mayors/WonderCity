@@ -1,6 +1,6 @@
 {
-  "name": "wonder_city_reborn",
-  "description": "Port of WonderCity from django to sapper.",
+  "name": "wondercity",
+  "description": "Kalashnikov Academy project. That's it.",
   "version": "0.0.1",
   "scripts": {
     "dev": "sapper dev",

@@ -7,6 +7,172 @@ const UTILITY_DATABASE_NAME = 'tables';
 const _models = {};
 let hasInitialized = false;
 
+class KnexManageModel {
+  constructor(knex, model) {
+    this.specs = model;
+    this.knex = knex;
+  }
+
+  async _findRelated(entity, related, model = this) {
+    const dotIndex = related.indexOf('.');
+    const relatedModelName = (
+      dotIndex === -1 ?
+        related :
+        related.substring(0, dotIndex)
+    );
+    const next = (
+      dotIndex === -1 ?
+        false :
+        related.substring(dotIndex + 1)
+    );
+
+    if (model.specs.relations) {
+      for (const relation of model.specs.relations) {
+        if (
+          relation.with[0] === relatedModelName &&
+          relation.with[1] === model.specs.origin
+        ) {
+          const type = relation.type.split(':');
+          const relatedModel = query(...relation.with);
+
+          if (type[1] === 'many') {
+            let relatedEntities;
+
+            if (type[0] === 'many') {
+              relatedEntities = await this.knex
+                .select(`${relatedModel.specs.tableName}.*`)
+                .from(relatedModel.specs.tableName)
+                .innerJoin(
+                  relation.junctionTableName,
+                  relation.junctionTableName + '.' +
+                  relation.junctionToColumn,
+                  relatedModel.specs.tableName + '.id'
+                )
+                .where(
+                  relation.junctionTableName + '.' +
+                  relation.junctionFromColumn,
+                  entity.id
+                );
+            } else {
+              relatedEntities = await relatedModel.find({
+                id: entity[`${relatedModel.specs.tableName}_id`]
+              });
+            }
+
+            set(
+              entity,
+              ['_relations', relatedModelName],
+              relatedEntities
+            );
+
+            if (next) {
+              await Promise.all(
+                relatedEntities.map(relatedEntity => this._findRelated(
+                  relatedEntity,
+                  next,
+                  relatedModel
+                ))
+              );
+            }
+          } else {
+            const relatedEntity = await relatedModel.findOne({
+              id: entity[`${relatedModel.specs.tableName}_id`]
+            });
+
+            set(
+              entity,
+              ['_relations', relatedModelName],
+              relatedEntity
+            );
+            if (next) {
+              await this._findRelated(relatedEntity, next, relatedModel);
+            }
+          }
+
+          break;
+        }
+      }
+    }
+  }
+
+  _findBase(args = {}, related = []) {
+    const [orderColumn, orderType] = (
+      args.hasOwnProperty('_sort') ?
+        args._sort.split(':') :
+        [false]
+    );
+
+    const limit = (
+      args.hasOwnProperty('_limit') ?
+        args._limit :
+        100
+    );
+
+    const offset = (
+      args.hasOwnProperty('_skip') ?
+        args._skip :
+        0
+    );
+
+    delete args._sort;
+    delete args._limit;
+    delete args._skip;
+
+    let query = parseArgs(
+      this.knex
+        .select('*')
+        .from(this.specs.tableName),
+      args
+    );
+
+    if (orderColumn !== false) {
+      query = query.orderBy(orderColumn, orderType);
+    }
+
+    query = query.limit(limit);
+    query = query.offset(offset);
+
+    if (related.length > 0) {
+      query = query.then(result => new Promise((resolve, reject) => {
+        Promise.all(
+          result.map(entity => Promise.all(
+            related.map(
+              relation => this._findRelated(entity, relation)
+            )
+          ))
+        ).then(() => resolve(result));
+      }));
+    }
+
+    return query;
+  }
+
+  find(args = {}, related = []) {
+    return this._findBase(args, related).then(result => result);
+  }
+
+  findOne(args = {}, related = []) {
+    args._limit = 1;
+
+    return this._findBase(args, related).then(result => result[0]);
+  }
+
+  delete(args = {}) {
+    return parseArgs(this.knex(this.specs.tableName), args)
+      .del().then(result => result);
+  }
+
+  update(where = {}, set = {}) {
+    return parseArgs(this.knex(this.specs.tableName), where)
+      .update(set).then(result => result);
+  }
+
+  create(value = {}) {
+    return this.knex(this.specs.tableName)
+      .insert(value).then(result => result);
+  }
+};
+
 const checkTable = (trx, model) => trx.schema
   .hasTable(model.tableName)
   .then(exists => {
@@ -176,19 +342,7 @@ const checkTable = (trx, model) => trx.schema
     }
   });
 
-export const query = (name, origin = 'unspecified') => {
-  return get(_models, [origin, name], null);
-};
-
-export const queryAll = origin => {
-  if (origin) {
-    return _models[origin];
-  }
-
-  return _models;
-}
-
-export const parseArgs = (query, args = {}, property = 'where') => {
+const parseArgs = (query, args = {}, property = 'where') => {
   let result = query;
   const keys = Object.keys(args);
 
@@ -261,173 +415,7 @@ export const parseArgs = (query, args = {}, property = 'where') => {
   return result;
 };
 
-export class KnexManageModel {
-  constructor(knex, model) {
-    this.specs = model;
-    this.knex = knex;
-  }
-
-  async _findRelated(entity, related, model = this) {
-    const dotIndex = related.indexOf('.');
-    const relatedModelName = (
-      dotIndex === -1 ?
-        related :
-        related.substring(0, dotIndex)
-    );
-    const next = (
-      dotIndex === -1 ?
-        false :
-        related.substring(dotIndex + 1)
-    );
-
-    if (model.specs.relations) {
-      for (const relation of model.specs.relations) {
-        if (
-          relation.with[0] === relatedModelName &&
-          relation.with[1] === model.specs.origin
-        ) {
-          const type = relation.type.split(':');
-          const relatedModel = query(...relation.with);
-
-          if (type[1] === 'many') {
-            let relatedEntities;
-
-            if (type[0] === 'many') {
-              relatedEntities = await this.knex
-                .select(`${relatedModel.specs.tableName}.*`)
-                .from(relatedModel.specs.tableName)
-                .innerJoin(
-                  relation.junctionTableName,
-                  relation.junctionTableName + '.' +
-                  relation.junctionToColumn,
-                  relatedModel.specs.tableName + '.id'
-                )
-                .where(
-                  relation.junctionTableName + '.' +
-                  relation.junctionFromColumn,
-                  entity.id
-                );
-            } else {
-              relatedEntities = await relatedModel.find({
-                id: entity[`${relatedModel.specs.tableName}_id`]
-              });
-            }
-
-            set(
-              entity,
-              ['_relations', relatedModelName],
-              relatedEntities
-            );
-
-            if (next) {
-              await Promise.all(
-                relatedEntities.map(relatedEntity => this._findRelated(
-                  relatedEntity,
-                  next,
-                  relatedModel
-                ))
-              );
-            }
-          } else {
-            const relatedEntity = await relatedModel.findOne({
-              id: entity[`${relatedModel.specs.tableName}_id`]
-            });
-
-            set(
-              entity,
-              ['_relations', relatedModelName],
-              relatedEntity
-            );
-            if (next) {
-              await this._findRelated(relatedEntity, next, relatedModel);
-            }
-          }
-
-          break;
-        }
-      }
-    }
-  }
-
-  _findBase(args = {}, related = []) {
-    const [orderColumn, orderType] = (
-      args.hasOwnProperty('_sort') ?
-        args._sort.split(':') :
-        [false]
-    );
-
-    const limit = (
-      args.hasOwnProperty('_limit') ?
-        args._limit :
-        100
-    );
-
-    const offset = (
-      args.hasOwnProperty('_skip') ?
-        args._skip :
-        0
-    );
-
-    delete args._sort;
-    delete args._limit;
-    delete args._skip;
-
-    let query = parseArgs(
-      this.knex
-        .select('*')
-        .from(this.specs.tableName),
-      args
-    );
-
-    if (orderColumn !== false) {
-      query = query.orderBy(orderColumn, orderType);
-    }
-
-    query = query.limit(limit);
-    query = query.offset(offset);
-
-    if (related.length > 0) {
-      query = query.then(result => new Promise((resolve, reject) => {
-        Promise.all(
-          result.map(entity => Promise.all(
-            related.map(
-              relation => this._findRelated(entity, relation)
-            )
-          ))
-        ).then(() => resolve(result));
-      }));
-    }
-
-    return query;
-  }
-
-  find(args = {}, related = []) {
-    return this._findBase(args, related).then(result => result);
-  }
-
-  findOne(args = {}, related = []) {
-    args._limit = 1;
-
-    return this._findBase(args, related).then(result => result[0]);
-  }
-
-  delete(args = {}) {
-    return parseArgs(this.knex(this.specs.tableName), args)
-      .del().then(result => result);
-  }
-
-  update(where = {}, set = {}) {
-    return parseArgs(this.knex(this.specs.tableName), where)
-      .update(set).then(result => result);
-  }
-
-  create(value = {}) {
-    return this.knex(this.specs.tableName)
-      .insert(value).then(result => result);
-  }
-};
-
-export const initializeColumn = (table, name, column) => {
+const initializeColumn = (table, name, column) => {
   switch (column.type) {
     case 'text':
       return table.text(name, column.textType);
@@ -456,7 +444,7 @@ export const initializeColumn = (table, name, column) => {
   }
 };
 
-export const heavyInit = (table, name, column, uniques) => {
+const heavyInit = (table, name, column, uniques) => {
   let dbColumn = initializeColumn(table, name, column);
 
   if (column.unique) {
@@ -474,7 +462,7 @@ export const heavyInit = (table, name, column, uniques) => {
   return dbColumn;
 };
 
-export const relationColumn = async (trx, relation) => {
+const relationColumn = async (trx, relation) => {
   const exists = await trx.schema.hasColumn(
     relation.from.tableName,
     relation.fromColumn
@@ -520,6 +508,18 @@ export const relationColumn = async (trx, relation) => {
 };
 
 export const addModel = (key, model) => _models[key] = model;
+
+export const query = (name, origin = 'unspecified') => {
+  return get(_models, [origin, name], null);
+};
+
+export const queryAll = origin => {
+  if (origin) {
+    return _models[origin];
+  }
+
+  return _models;
+}
 
 function __default(knex, models) {
   const relations = [];
@@ -619,27 +619,31 @@ function __default(knex, models) {
 
               trx.schema.hasTable(relation.junctionTableName)
                 .then(exists => {
-                  if (exists) {
+                  if (exists || relation.doesJunctionTableExist) {
+                    relation.doesJunctionTableExist = true;
+
                     trx.schema.alterTable(
                       relation.junctionTableName,
                       table => {
                         table.integer(
                           relation.junctionFromColumn
-                        ).notNull().alter();
+                        ).unsigned().notNull().alter();
 
                         table.integer(
                           relation.junctionToColumn
-                        ).notNull().alter();
+                        ).unsigned().notNull().alter();
                       }
                     ).then(resolve);
                   } else {
+                    relation.doesJunctionTableExist = true;
+
                     trx.schema.createTable(
                       relation.junctionTableName,
                       table => {
 
                         table.integer(
                           relation.junctionFromColumn
-                        ).notNull();
+                        ).unsigned().notNull();
                         table.foreign(
                           relation.junctionFromColumn
                         ).references(
@@ -648,7 +652,7 @@ function __default(knex, models) {
 
                         table.integer(
                           relation.junctionToColumn
-                        ).notNull();
+                        ).unsigned().notNull();
                         table.foreign(
                           relation.junctionToColumn
                         ).references(
@@ -660,9 +664,29 @@ function __default(knex, models) {
                           relation.junctionToColumn
                         ]);
                       }
-                    ).then(resolve);
+                    ).then(resolve).catch(e => {
+                      if (e.errno === 1050) {
+                        trx.schema.alterTable(
+                          relation.junctionTableName,
+                          table => {
+                            table.integer(
+                              relation.junctionFromColumn
+                            ).unsigned().notNull().alter();
+    
+                            table.integer(
+                              relation.junctionToColumn
+                            ).unsigned().notNull().alter();
+                          }
+                        ).then(resolve);
+                      } else {
+                        console.log('Error occurred while loading database:');
+                        console.log(e.sqlMessage);
+                      }
+                    });
                   }
                 });
+
+
             } else {
               relation.fromColumn = `${relation.to.tableName}_id`;
               relation.toColumn = 'id';
@@ -690,7 +714,8 @@ function __default(knex, models) {
         trx.rollback();
       })
     )
-    .then(() => console.log('Database loaded!'));
+    .then(() => console.log('Database loaded!'))
+    .catch(e => console.log(e));
 };
 
 export default __default;
