@@ -99,19 +99,7 @@ const main = () => {
                 const model = require(modelPath);
                 wonder.models.push(model);
 
-                if (file.toLowerCase() === 'user') {
-                  wonder
-                    .knex('user')
-                    .count('id')
-                    .then(count => {
-                      wonder.cache.usersCount =
-                        count[0][Object.keys(count[0])[0]];
-
-                      resolve();
-                    });
-                } else {
-                  resolve();
-                }
+                resolve();
               });
             }),
             new Promise((resolve, reject) => {

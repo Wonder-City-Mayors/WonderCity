@@ -10,6 +10,7 @@ let hasInitialized = false;
 const checkTable = (trx, model) => trx.schema
   .hasTable(model.tableName)
   .then(exists => {
+    console.log(`Table '${model.tableName}' exists? ${exists}`);
     if (exists) {
       return trx.raw(`describe ${model.tableName}`)
         .then(description => {
@@ -460,7 +461,7 @@ export const heavyInit = (table, name, column, uniques) => {
   let dbColumn = initializeColumn(table, name, column);
 
   if (column.unique) {
-    uniques.push(key);
+    uniques.push(name);
   }
 
   if (column.notNull) {
