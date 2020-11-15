@@ -25,7 +25,7 @@ dotenv.config();
 const knex = new Knex({
   client: process.env.DB_CLIENT || 'mysql',
   connection: {
-    host: process.env.DB_HOST || 'localhost',
+    host: process.env.DB_HOST || '127.0.0.1',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || 'root',
     database: process.env.DB_DATABASE || 'main',
@@ -39,12 +39,8 @@ const modelsPath = path.join(srcPath, 'api');
 const configPath = path.join(srcPath, 'config');
 
 // environment
-const { PORT, NODE_ENV, API_URL, PATH_TO_FIREBASE_KEY } = process.env;
+const { PORT, NODE_ENV, API_URL = 'http://localhost:3000/api' } = process.env;
 const dev = NODE_ENV === 'development';
-
-if (!API_URL) {
-  API_URL = 'http://localhost:3000';
-}
 
 /**
  * Global variable containing server cache, plugins, models, functions
