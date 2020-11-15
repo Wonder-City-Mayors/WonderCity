@@ -10,7 +10,6 @@ let hasInitialized = false;
 const checkTable = (trx, model) => trx.schema
   .hasTable(model.tableName)
   .then(exists => {
-    console.log(`Table '${model.tableName}' exists? ${exists}`);
     if (exists) {
       return trx.raw(`describe ${model.tableName}`)
         .then(description => {
