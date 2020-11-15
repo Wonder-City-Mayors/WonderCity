@@ -30,7 +30,7 @@ export const getApiResponse = async (path, query, auth) => {
   const response = await fetch(url, {
     method: 'GET',
     headers: {
-      'Custom-Authorization': auth || ''
+      'Authentication': auth || ''
     }
   }); 
 

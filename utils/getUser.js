@@ -1,6 +1,4 @@
-const parsePermissions = array => {
-  return array.map(obj => obj.name);
-};
+const parsePermissions = require('./parsePermissions');
 
 export default async jwt => {
   if (jwt) {
