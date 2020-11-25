@@ -23,30 +23,71 @@
   export let devices;
 
   let socket;
-  const socketStore = getContext('socket');
-  const ruLocale = (number, index, totalSec) =>
-    [
-      ["только что", "сейчас"],
-      ["%s секунд назад", "через %s секунд"],
-      ["минуту назад", "через минуту"],
-      ["%s минут назад", "через %s минут"],
-      ["час назад", "через час"],
-      ["%s часов назад", "через %s часов"],
-      ["день назад", "через день"],
-      ["%s дней назад", "через %s дней"],
-      ["неделю назад", "через неделю"],
-      ["%s недели назад", "через %s недели"],
-      ["месяц назад", "через месяц"],
-      ["%s месяцев назад", "через %s месяцев"],
-      ["год назад", "через год"],
-      ["%s лет назад", "через %s лет"],
-    ][index];
+  const socketStore = getContext("socket");
+  const ruLocale = (number, index, totalSec) => {
+    totalSec = parseInt(totalSec, 10);
+
+    switch (index) {
+      case 0:
+        return ["только что", "сейчас"];
+
+      case 1:
+        if (totalSec > 10 && totalSec < 20) {
+          return ["%s секунд назад", "через %s секунд"];
+        } else {
+          const remainder = totalSec % 10;
+
+          if (remainder === 1) {
+            return ["%s секунду назад", "через %s секунду"];
+          } else if (remainder > 1 && remainder < 5) {
+            return ["%s секунды назад", "через %s секунды"];
+          } else {
+            return ["%s секунд назад", "через %s секунд"];
+          }
+        }
+
+      case 2:
+        return ['минуту назад', 'через минуту'];
+
+      case 3:
+        const totalMin = totalSec / 60;
+
+        if (totalMin > 10 && totalMin < 20) {
+          return ["%s минут назад", "через %s минут"];
+        } else {
+          const remainder = totalMin % 10;
+
+          if (remainder === 1) {
+            return ["%s минуту назад", "через %s минуту"];
+          } else if (remainder > 1 && remainder < 5) {
+            return ["%s минуты назад", "через %s минуты"];
+          } else {
+            return ["%s минут назад", "через %s минут"];
+          }
+        }
+      
+      default:
+        return ['%s назад', 'через %s'];
+    }
+  };
 
   register("ru", ruLocale);
 
-  socketStore.subscribe(freshSocket => {
+  socketStore.subscribe((freshSocket) => {
     if (freshSocket) {
       socket = freshSocket;
+
+      socket.on("newReadouts", (details) => {
+        for (const device of devices) {
+          if (device.id === details.deviceId) {
+            device.power = details.value;
+            device.date = new Date();
+            device.active = true;
+
+            break;
+          }
+        }
+      });
     }
   });
 
@@ -57,7 +98,7 @@
       devicesIds.push(device.id);
       device.active = device.hasOwnProperty("power");
 
-      if (device.active) {
+      if (!device.hasOwnProperty("date") && device.active) {
         device.date = new Date(
           parseInt(device.time_stamp_db.substring(0, 4), 10),
           parseInt(device.time_stamp_db.substring(5, 7), 10),
@@ -71,9 +112,13 @@
     });
 
     if (socket) {
-      socket.emit('newDevices', devicesIds);
+      socket.emit("newDevices", devicesIds);
     }
   }
+
+  setInterval(() => {
+    devices = devices;
+  }, 1000);
 </script>
 
 <style lang="scss">

@@ -8,6 +8,30 @@ module.exports = async () => {
     'getUser'
   ));
 
+  wonder.query('tree').find().then(allDevices => {
+    setInterval(() => {
+      for (const device of allDevices) {
+        const userCache = wonder
+          .cache
+          .connectedUsers
+          [device.user_id];
+
+        if (
+          userCache &&
+          userCache
+            .devices
+            .has(device.id) &&
+          Math.random() < .1
+        ) {
+          io.to(userCache.socketId).emit('newReadouts', {
+            deviceId: device.id,
+            value: Math.random()
+          });
+        }
+      }
+    }, 3000);
+  });
+
   io.on('connection', socket => {
     const cookies = cookie.parse(socket.handshake.headers.cookie);
     let user;
@@ -41,8 +65,6 @@ module.exports = async () => {
     });
 
     socket.on('disconnect', () => {
-      console.log('user discon.');
-
       if (user) {
         delete wonder.cache.connectedUsers[user.id];
       }
