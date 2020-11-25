@@ -1,6 +1,6 @@
-const parsePermissions = require('./parsePermissions');
+const parsePermissions = array => array.map(obj => obj.name);
 
-export default async jwt => {
+module.exports = async jwt => {
   if (jwt) {
     const payload = await wonder.services.jwt.verify(jwt);
 

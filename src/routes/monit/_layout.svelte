@@ -1,5 +1,5 @@
 <script context="module">
-  import { getPreloadApiResponse } from "../../../utils/requests";
+  import { getPreloadApiResponse } from "requests";
 
   export async function preload(page, session) {
     try {
@@ -26,6 +26,8 @@
 
 <script>
   import { goto } from "@sapper/app";
+  import { onDestroy, onMount, setContext } from 'svelte';
+  import { readable } from 'svelte/store';
 
   import TransitionWrapper from "TransitionWrapper.svelte";
   import Title from "Title.svelte";
@@ -34,15 +36,43 @@
   export let count;
   export let segment;
 
+  let socket;
+
   $: current = parseInt(segment, 10);
+
+  const socketStore = readable(null, set => {
+    const interval = setInterval(() => {
+      if (typeof io !== 'undefined') {
+        clearInterval(interval);
+
+        socket = io();
+
+        set(socket);
+      }
+    });
+
+    return () => 0;
+  });
+
+  setContext('socket', socketStore);
+
+  onDestroy(() => {
+    if ($socketStore) {
+      $socketStore.disconnect();
+    }
+  });
 
   const switchPage = e => {
     goto(`/monit/${e.detail}`);
   };
 </script>
 
+<svelte:head>
+  <script src="/socket.io/socket.io.min.js"></script>
+</svelte:head>
+
 <style lang="sass">
-  @import "../../theme/colors"
+  @import "colors"
 
   .no-devices
     color: $mdc-theme-secondary
@@ -51,6 +81,7 @@
 </style>
 
 <Title caption="Отслеживание показаний" />
+
 
 {#if count > 0}
   <TransitionWrapper>

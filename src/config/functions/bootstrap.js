@@ -1,6 +1,3 @@
-module.exports = () => {
-  return new Promise((resolve, reject) => {
-    console.log('Bootstrap function loaded!');
-    resolve();
-  });
+module.exports = async () => {
+  console.log('Bootstrap. I ain\'t mean framework.');
 };

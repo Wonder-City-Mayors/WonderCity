@@ -4,6 +4,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cookie from 'cookie';
 import compression from 'compression';
+import http from 'http';
 import * as sapper from '@sapper/server';
 
 // database
@@ -77,7 +78,9 @@ const main = () => {
       wonder.models = [];
       wonder.paths = {};
       wonder.services = {};
-      wonder.cache = {};
+      wonder.cache = {
+        connectedUsers: {}
+      };
 
       Promise.all(
         files.map(file => new Promise((resolve, reject) => {
@@ -278,9 +281,17 @@ const main = () => {
               })(req, res, next);
             });
 
-          app.listen(PORT, err => {
+          wonder.http = http.createServer(app);
+
+          wonder.http.listen(PORT, err => {
             if (err) console.log('error', err);
           });
+
+          require(path.join(
+            configPath,
+            'functions',
+            'jacketzip.js'
+          ))().then(() => console.log('Jacketzip done!'));
         })
         .catch(e => console.log(e));
     });

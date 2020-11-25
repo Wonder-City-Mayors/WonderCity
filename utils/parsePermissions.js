@@ -1,3 +1,1 @@
-module.exports = array => {
-  return array.map(obj => obj.name);
-};
+module.exports = array => array.map(obj => obj.name);

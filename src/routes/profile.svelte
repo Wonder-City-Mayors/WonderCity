@@ -1,5 +1,5 @@
 <script>
-  import TransitionWrapper from "../components/TransitionWrapper.svelte";
+  import TransitionWrapper from "TransitionWrapper.svelte";
 </script>
 
 <svelte:head>

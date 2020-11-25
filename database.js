@@ -424,6 +424,9 @@ const initializeColumn = (table, name, column) => {
     case 'binary':
       return table[column.type](name, column.length);
 
+    case 'int':
+      return table.integer(name);
+
     case 'float':
     case 'decimal':
       return table[column.type](name, column.precision, column.scale);

@@ -9,7 +9,7 @@
   import SignIn from "auth/SignIn.svelte";
   import SignUp from "auth/SignUp.svelte";
 
-  import { setCookie } from "../../utils/cookies";
+  import { setCookie } from "cookies";
 
   const { page, session } = stores();
   const user = $session.user;
