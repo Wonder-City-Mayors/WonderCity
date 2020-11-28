@@ -1,5 +1,5 @@
 const jsonify = require("../../../utils/searchToJson");
-const defaults = require("lodash/defaults");
+const { defaults, pick } = require('lodash');
 
 // const commonQuery = (knex, userId) => knex
 //   .innerJoin('values_t1 as v1', 'v1.tree_id', 'tree.id')
@@ -32,22 +32,17 @@ module.exports = {
 
     if (page) {
       if (req.user) {
-        const devices = await wonder.knex.transaction(trx => trx
-          .select('id')
-          .from('tree')
-          .where('tree.user_id', req.user.id)
-          .limit(10)
-          .offset((page - 1) * 10)
+        const devices = await wonder.query('tree').find({
+          user_id: req.user.id,
+          _limit: 10,
+          _skip: (page - 1) * 10
+        })
           .then(trees => Promise.all(trees.map(
-            tree => new Promise((resolve, reject) => {
-              trx.select('time_stamp_db', 'power')
-                .from('values_t1')
-                .where('tree_id', tree.id)
-                .orderBy('time_stamp_db', 'desc')
-                .limit(1)
-                .then(value => resolve(defaults(value[0], tree)));
-            })
-          ))));
+            tree => wonder.query('value').findOne({
+              tree_id: tree.id,
+              _sort: 'time_stamp_db:desc'
+            }).then(value => defaults(value, {id: tree.id}))
+          )));
 
         res.send(devices);
         return;

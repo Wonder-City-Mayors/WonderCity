@@ -1,3 +1,8 @@
+const randomInt = (start, end) => parseInt(
+  Math.random() * (end - start) + start,
+  10
+);
+
 module.exports = async () => {
   const io = require('socket.io')(wonder.http);
   const path = require('path');
@@ -7,9 +12,12 @@ module.exports = async () => {
     'utils',
     'getUser'
   ));
-
+  
   wonder.query('tree').find().then(allDevices => {
     setInterval(() => {
+      const date = new Date();
+      date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+
       for (const device of allDevices) {
         const userCache = wonder
           .cache
@@ -21,15 +29,24 @@ module.exports = async () => {
           userCache
             .devices
             .has(device.id) &&
-          Math.random() < .1
+          Math.random() < .05
         ) {
+          const value = randomInt(0, 101);
+
+          wonder.query('value').create({
+            tree_id: device.id,
+            time_stamp_db: date,
+            power: value,
+            energy: value
+          });
+
           io.to(userCache.socketId).emit('newReadouts', {
             deviceId: device.id,
-            value: Math.random()
+            value
           });
         }
       }
-    }, 3000);
+    }, 1000);
   });
 
   io.on('connection', socket => {

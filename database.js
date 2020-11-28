@@ -420,6 +420,9 @@ const initializeColumn = (table, name, column) => {
     case 'text':
       return table.text(name, column.textType);
 
+    case 'password':
+      return table.binary(name, 60);
+
     case 'string':
     case 'binary':
       return table[column.type](name, column.length);

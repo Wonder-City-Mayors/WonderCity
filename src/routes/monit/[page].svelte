@@ -24,50 +24,58 @@
 
   let socket;
   const socketStore = getContext("socket");
+  const singleDatesArray = [
+    'только что',
+    'минуту',
+    'час',
+    'день',
+    'неделю',
+    'месяц',
+    'год'
+  ];
+  const multipleDatesArray = [
+    ['секунду', 'секунды', 'секунд'],
+    ['минуту', 'минуты', 'минут'],
+    ['час', 'часа', 'часов'],
+    ['день', 'дня', 'дней'],
+    ['неделю', 'недели', 'недель'],
+    ['месяц', 'месяца', 'месяцев'],
+    ['год', 'года', 'лет']
+  ];
   const ruLocale = (number, index, totalSec) => {
     totalSec = parseInt(totalSec, 10);
+    const resultIndex = parseInt(index / 2, 10);
 
-    switch (index) {
-      case 0:
-        return ["только что", "сейчас"];
+    if (index % 2 === 0) {
+      if (index === 0) {
+        return ['только что', 'сейчас'];
+      } else {
+        return [
+          `${singleDatesArray[resultIndex]} назад`,
+          `через ${singleDatesArray[resultIndex]}`
+        ];
+      }
+    } else {
+      let numberIndex;
 
-      case 1:
-        if (totalSec > 10 && totalSec < 20) {
-          return ["%s секунд назад", "через %s секунд"];
+      if (number > 10 && number < 20) {
+        numberIndex = 2;
+      } else {
+        const remainder = number % 10;
+
+        if (remainder === 1) {
+          numberIndex = 0;
+        } else if (remainder > 1 && remainder < 5) {
+          numberIndex = 1; 
         } else {
-          const remainder = totalSec % 10;
-
-          if (remainder === 1) {
-            return ["%s секунду назад", "через %s секунду"];
-          } else if (remainder > 1 && remainder < 5) {
-            return ["%s секунды назад", "через %s секунды"];
-          } else {
-            return ["%s секунд назад", "через %s секунд"];
-          }
+          numberIndex = 2;
         }
+      }
 
-      case 2:
-        return ['минуту назад', 'через минуту'];
-
-      case 3:
-        const totalMin = totalSec / 60;
-
-        if (totalMin > 10 && totalMin < 20) {
-          return ["%s минут назад", "через %s минут"];
-        } else {
-          const remainder = totalMin % 10;
-
-          if (remainder === 1) {
-            return ["%s минуту назад", "через %s минуту"];
-          } else if (remainder > 1 && remainder < 5) {
-            return ["%s минуты назад", "через %s минуты"];
-          } else {
-            return ["%s минут назад", "через %s минут"];
-          }
-        }
-      
-      default:
-        return ['%s назад', 'через %s'];
+      return [
+        `%s ${multipleDatesArray[resultIndex][numberIndex]} назад`,
+        `через %s ${multipleDatesArray[resultIndex][numberIndex]}`
+      ];
     }
   };
 
@@ -83,6 +91,8 @@
             device.power = details.value;
             device.date = new Date();
             device.active = true;
+
+            console.log(device.date);
 
             break;
           }
@@ -101,12 +111,17 @@
       if (!device.hasOwnProperty("date") && device.active) {
         device.date = new Date(
           parseInt(device.time_stamp_db.substring(0, 4), 10),
-          parseInt(device.time_stamp_db.substring(5, 7), 10),
+          parseInt(device.time_stamp_db.substring(5, 7), 10) - 1,
           parseInt(device.time_stamp_db.substring(8, 10), 10),
           parseInt(device.time_stamp_db.substring(11, 13), 10),
           parseInt(device.time_stamp_db.substring(14, 16), 10),
           parseInt(device.time_stamp_db.substring(17, 19), 10),
           parseInt(device.time_stamp_db.substring(20, 23), 10)
+        );
+
+        device.date.setTime(
+          device.date.getTime() -
+          device.date.getTimezoneOffset() * 60000
         );
       }
     });
