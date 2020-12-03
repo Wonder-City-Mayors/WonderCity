@@ -1,5 +1,4 @@
 const jsonify = require("../../../utils/searchToJson");
-const { defaults, pick } = require('lodash');
 
 // const commonQuery = (knex, userId) => knex
 //   .innerJoin('values_t1 as v1', 'v1.tree_id', 'tree.id')
@@ -41,7 +40,11 @@ module.exports = {
             tree => wonder.query('value').findOne({
               tree_id: tree.id,
               _sort: 'time_stamp_db:desc'
-            }).then(value => defaults(value, {id: tree.id}))
+            }).then(value => {
+              if (!value) value = {};
+
+              return Object.assign(value, {id: tree.id});
+            })
           )));
 
         res.send(devices);

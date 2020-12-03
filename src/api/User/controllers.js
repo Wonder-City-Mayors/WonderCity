@@ -16,12 +16,12 @@ module.exports = {
       password.length >= 8 &&
       !/[^0-9a-zA-Z#$*_]/.test(username)
     ) {
-      const potentiallyExistingUser = await wonder.knex
-        .select('id')
-        .from('user')
-        .where('username', username);
+      const potentiallyExistingUser = await wonder
+        .query('user')
+        .findOne({username});
 
-      if (potentiallyExistingUser.length === 0) {
+
+      if (potentiallyExistingUser) {
         const userId = await wonder.knex.transaction(trx => {
           const date = new Date();
 
@@ -30,8 +30,6 @@ module.exports = {
               trx.insert({
                 first_name: '',
                 last_name: '',
-                created_at: date,
-                updated_at: date,
                 password: hash,
                 username
               })
@@ -78,11 +76,8 @@ module.exports = {
       password.length >= 8 &&
       !/[^0-9a-zA-Z#$*_]/.test(username)
     ) {
-      const user = (await wonder.knex
-        .select('*')
-        .from('user')
-        .where('username', username))[0];
-  
+      const user = await wonder.query('user').findOne({ username });
+      
       if (
         user &&
         await bcrypt.compare(password, String(user.password))

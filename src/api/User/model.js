@@ -21,8 +21,7 @@ module.exports = {
     },
 
     password: {
-      type: 'binary',
-      length: 60,
+      type: 'password',
       notNull: true
     }
   },

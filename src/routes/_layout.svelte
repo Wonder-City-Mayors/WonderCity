@@ -34,21 +34,18 @@
     for (let i = 0; i < iconTabs.length; i += 1) {
       const path = pathRegEx.exec(iconTabs[i].path);
 
-      if (
-        (path && newSegment === path[1]) ||
-        newSegment === iconTabs[i].path
-      ) {
+      if ((path && newSegment === path[1]) || newSegment === iconTabs[i].path) {
         if (activeIndex !== -1) {
           transitionDirection.set(i - activeIndex);
         }
 
         try {
-          tabsElements[activeIndex].deactivate()
-        } catch(e) {}
+          tabsElements[activeIndex].deactivate();
+        } catch (e) {}
 
         try {
           tabsElements[i].activate();
-        } catch(e) {}
+        } catch (e) {}
 
         activeIndex = i;
         return;
@@ -65,16 +62,17 @@
     }
   };
 
-  const updateIconTabs = user => {
+  const updateIconTabs = (user) => {
     const newIconTabs = iconTabs.slice(0, initialTabsLength);
     let index;
 
     if (user.isAuthenticated) {
-      index = newIconTabs.push({
-        icon: 'cast',
-        label: 'Отслеживание',
-        path: '/monit/1'
-      }) - 1;
+      index =
+        newIconTabs.push({
+          icon: "cast",
+          label: "Отслеживание",
+          path: "/monit/1",
+        }) - 1;
 
       newIconTabs[index].index = index;
 
@@ -192,6 +190,10 @@
     background: white;
     z-index: 2;
 
+    a {
+      text-decoration: none;
+    }
+
     .top-nav {
       display: flex;
       height: 100%;
@@ -259,24 +261,27 @@
 
 <header class="layout-header">
   <nav class="top-nav">
-    <Button color="primary" class="top-nav-logo" on:click={() => goto('/')}>
-      <span class="material-icons top-nav-logo-icon">insights</span>
-      <span class="top-nav-logo-caption">ВундерВафля</span>
-    </Button>
+    <a href="/">
+      <Button color="primary" class="top-nav-logo">
+        <span class="material-icons top-nav-logo-icon">insights</span>
+        <span class="top-nav-logo-caption">ВундерВафля</span>
+      </Button>
+    </a>
     <TabBar
       tabs={iconTabs}
       class="top-nav-tabs"
       let:tab
       active={iconTabs[activeIndex]}>
-      <Tab
-        {tab}
-        minWidth
-        on:click={() => goto(tab.path)}
-        class="top-nav-tabs-tab"
-        bind:this={tabsElements[tab.index]}>
-        <Icon class="material-icons">{tab.icon}</Icon>
-        <Label>{tab.label}</Label>
-      </Tab>
+      <a href={tab.path}>
+        <Tab
+          {tab}
+          minWidth
+          class="top-nav-tabs-tab"
+          bind:this={tabsElements[tab.index]}>
+          <Icon class="material-icons">{tab.icon}</Icon>
+          <Label>{tab.label}</Label>
+        </Tab>
+      </a>
     </TabBar>
   </nav>
 </header>

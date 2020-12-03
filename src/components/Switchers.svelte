@@ -5,8 +5,12 @@
 
   export let count;
   export let current;
+  export let baseUrl;
 
-  const dispatch = createEventDispatcher();
+  if (baseUrl[baseUrl.length - 1] !== '/') {
+    baseUrl += '/';
+  }
+
   const pageCount = parseInt(count / 10, 10) + (count % 10 ? 1 : 0);
 
   const min = (a, b) => (a > b ? b : a);
@@ -19,6 +23,10 @@
   .switchers {
     display: flex;
     justify-content: center;
+
+    a {
+      text-decoration: none;
+    }
 
     .switcher {
       padding: 0.3rem 1rem;
@@ -64,41 +72,39 @@
 <div class="switchers">
   {#if pageCount <= 9}
     {#each arrayOf(1, current) as page (page)}
-      <div on:click={() => dispatch('switch', page)} class="switcher">
-        {page}
-      </div>
+      <a href="{baseUrl}{page}">
+        <div class="switcher">{page}</div>
+      </a>
     {/each}
     <div class="switcher current">{current}</div>
     {#each arrayOf(current + 1, pageCount + 1) as page (page)}
-      <div on:click={() => dispatch('switch', page)} class="switcher">
-        {page}
-      </div>
+      <a href="{baseUrl}{page}">
+        <div class="switcher">{page}</div>
+      </a>
     {/each}
   {:else}
     {#if current !== 1}
-      <div
-        on:click={() => dispatch('switch', 1)}
-        class="switcher {current <= 4 ? '' : 'edge'}">
-        1
-      </div>
+      <a href="{baseUrl}1">
+        <div class="switcher {current <= 4 ? '' : 'edge'}">1</div>
+      </a>
     {/if}
     {#each arrayOf(max(2, min(pageCount - 7, current - 3)), current) as page (page)}
-      <div on:click={() => dispatch('switch', page)} class="switcher">
-        {page}
-      </div>
+      <a href="{baseUrl}{page}">
+        <div class="switcher">{page}</div>
+      </a>
     {/each}
     <div class="switcher current">{current}</div>
     {#each arrayOf(current + 1, max(9, min(pageCount, current + 4))) as page (page)}
-      <div on:click={() => dispatch('switch', page)} class="switcher">
-        {page}
-      </div>
+      <a href="{baseUrl}{page}">
+        <div class="switcher">{page}</div>
+      </a>
     {/each}
     {#if current !== pageCount}
-      <div
-        on:click={() => dispatch('switch', pageCount)}
-        class="switcher {pageCount - current > 3 ? 'edge' : ''}">
-        {pageCount}
-      </div>
+      <a href="{baseUrl}{pageCount}">
+        <div class="switcher {pageCount - current > 3 ? 'edge' : ''}">
+          {pageCount}
+        </div>
+      </a>
     {/if}
   {/if}
 </div>

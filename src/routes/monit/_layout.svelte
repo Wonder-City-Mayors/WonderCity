@@ -86,7 +86,7 @@
 {#if count > 0}
   <TransitionWrapper>
     <slot />
-    <Switchers {count} {current} on:switch={switchPage} />
+    <Switchers {count} {current} baseUrl="/monit" />
   </TransitionWrapper>
 {:else}
   <h2 class="no-devices">

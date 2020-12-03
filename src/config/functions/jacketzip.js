@@ -1,3 +1,5 @@
+const size = require('lodash/size');
+
 const randomInt = (start, end) => parseInt(
   Math.random() * (end - start) + start,
   10
@@ -12,41 +14,49 @@ module.exports = async () => {
     'utils',
     'getUser'
   ));
-  
+
+  wonder.query('user').findOne({
+    username: 'asdfasdf',
+    password: 'asdfasdf'
+  }).then(user => 'ye');
+
   wonder.query('tree').find().then(allDevices => {
     setInterval(() => {
       const date = new Date();
-      date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+      // date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+      // по идее, надо бы записывать время по Гринвичу, но js+knex настолько умный,
+      // что достаёт потом это время в местном формате и в строчку превращает
+      // как надо, так что... всё ок :)
 
       for (const device of allDevices) {
         const userCache = wonder
           .cache
           .connectedUsers
-          [device.user_id];
+        [device.user_id];
 
-        if (
-          userCache &&
-          userCache
-            .devices
-            .has(device.id) &&
-          Math.random() < .05
-        ) {
-          const value = randomInt(0, 101);
+        if (userCache) {
+          const value = randomInt(0, 501);
 
-          wonder.query('value').create({
-            tree_id: device.id,
-            time_stamp_db: date,
-            power: value,
-            energy: value
-          });
+          if (value <= 100) {
+            wonder.query('value').create({
+              tree_id: device.id,
+              time_stamp_db: date,
+              power: value,
+              energy: value
+            });
 
-          io.to(userCache.socketId).emit('newReadouts', {
-            deviceId: device.id,
-            value
-          });
+            for (const key in userCache) {
+              if (userCache[key].has(device.id)) {
+                io.to(key).emit('newReadouts', {
+                  deviceId: device.id,
+                  value
+                });
+              }
+            }
+          }
         }
       }
-    }, 1000);
+    }, 3000);
   });
 
   io.on('connection', socket => {
@@ -57,10 +67,11 @@ module.exports = async () => {
       user = result;
 
       if (user && socket.connected) {
-        wonder.cache.connectedUsers[user.id] = {
-          socketId: socket.id,
-          devices: new Set()
-        };
+        if (!wonder.cache.connectedUsers.hasOwnProperty(user.id)) {
+          wonder.cache.connectedUsers[user.id] = {};
+        }
+
+        wonder.cache.connectedUsers[user.id][socket.id] = new Set();
       }
     });
 
@@ -69,13 +80,18 @@ module.exports = async () => {
         wonder.query('tree').find({
           id_in: devices
         }).then(dbDevices => {
-          for (const device of dbDevices) {
-            if (device.user_id !== user.id) return;
-          }
-
           if (socket.connected) {
-            wonder.cache.connectedUsers[user.id]
-              .devices = new Set(devices);
+            for (const device of dbDevices) {
+              if (device.user_id !== user.id) {
+                return;
+              }
+            }
+
+            wonder
+              .cache
+              .connectedUsers
+            [user.id]
+            [socket.id] = new Set(devices);
           }
         });
       }
@@ -83,7 +99,11 @@ module.exports = async () => {
 
     socket.on('disconnect', () => {
       if (user) {
-        delete wonder.cache.connectedUsers[user.id];
+        delete wonder.cache.connectedUsers[user.id][socket.id];
+
+        if (size(wonder.cache.connectedUsers[user.id]) === 0) {
+          delete wonder.cache.connectedUsers[user.id];
+        }
       }
     });
   });

@@ -2,6 +2,7 @@
 
 import set from 'lodash/set';
 import get from 'lodash/get';
+import bcrypt from 'bcrypt';
 
 const UTILITY_DATABASE_NAME = 'tables';
 const _models = {};
@@ -95,6 +96,94 @@ class KnexManageModel {
     }
   }
 
+  async prepareArgs(args = {}) {
+    const keys = Object.keys(args);
+
+    for (const key of keys) {
+      if (
+        this.specs.columns.hasOwnProperty(key) &&
+        this.specs.columns[key].type === 'password'
+      ) {
+        args[key] = Buffer.from(await bcrypt.hash(args[key], 10), 'binary');
+      }
+    }
+
+    return args;
+  }
+
+  parseArgs(query, args = {}, property = 'where') {
+    let result = query;
+    const keys = Object.keys(args);
+
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
+      const method = i !== 0 ? property : 'where';
+
+      if (key === '_or') {
+        result = result[method](builder =>
+          this.parseArgs(
+            builder,
+            args._or,
+            'orWhere'
+          )
+        );
+      } else if (key === '_and') {
+        result = result[method](builder =>
+          this.parseArgs(
+            builder,
+            args._and,
+            'where'
+          )
+        );
+      } else {
+        const lastLoDash = key.lastIndexOf('_'); // Sounds like a film name :)
+        let column, end;
+
+        if (lastLoDash === -1) {
+          column = key;
+          end = '';
+        } else {
+          column = key.substring(0, lastLoDash); // No one likes to see
+          end = key.substring(lastLoDash + 1); // Last Lo Dash :(
+        }
+
+        if (end === 'ne') {
+          result = result[method](column, '<>', args[key]);
+        } else if (end === 'lt') {
+          result = result[method](column, '<', args[key]);
+        } else if (end === 'gt') {
+          result = result[method](column, '>', args[key]);
+        } else if (end === 'lte') {
+          result = result[method](column, '<=', args[key]);
+        } else if (end === 'gte') {
+          result = result[method](column, '>=', args[key]);
+        } else if (end === 'in') {
+          result = result[method + 'In'](column, args[key]);
+        } else if (end === 'nin') {
+          result = result[method + 'NotIn'](column, args[key]);
+        } else if (end === 'contains') {
+          result = result[method](column, 'like', `%${args[key]}%`);
+        } else if (end === 'ncontains') {
+          result = result[method](column, 'not like', `%${args[key]}%`);
+        } else if (end === 'containss') {
+          result = result[method + 'Raw'](
+            `?? like binary '%${args[key]}%'`,
+            column
+          );
+        } else if (end === 'ncontainss') {
+          result = result[method + 'Raw'](
+            `?? not like binary '%${args[key]}%'`,
+            column
+          );
+        } else {
+          result = result[method](key, '=', args[key]);
+        }
+      }
+    }
+
+    return result;
+  };
+
   _findBase(args = {}, related = []) {
     const [orderColumn, orderType] = (
       args.hasOwnProperty('_sort') ?
@@ -118,7 +207,7 @@ class KnexManageModel {
     delete args._limit;
     delete args._skip;
 
-    let query = parseArgs(
+    let query = this.parseArgs(
       this.knex
         .select('*')
         .from(this.specs.tableName),
@@ -148,28 +237,63 @@ class KnexManageModel {
   }
 
   find(args = {}, related = []) {
-    return this._findBase(args, related).then(result => result);
+    return (
+      this.prepareArgs(args)
+        .then(args => this._findBase(args, related))
+        .then(result => result)
+    );
   }
 
   findOne(args = {}, related = []) {
     args._limit = 1;
 
-    return this._findBase(args, related).then(result => result[0]);
+    return (
+      this.prepareArgs(args)
+        .then(args => this._findBase(args, related))
+        .then(result => result[0])
+    );
   }
 
   delete(args = {}) {
-    return parseArgs(this.knex(this.specs.tableName), args)
-      .del().then(result => result);
+    return (
+      this.prepareArgs(args)
+        .then(args => this.parseArgs(this.knex(this.specs.tableName), args))
+        .del()
+        .then(result => result)
+    );
   }
 
   update(where = {}, set = {}) {
-    return parseArgs(this.knex(this.specs.tableName), where)
-      .update(set).then(result => result);
+    if (this.specs.hasTimestamps) {
+      const date = new Date();
+
+      // date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+
+      set.updated_at = date;
+    }
+
+    return (
+      this.prepareArgs(args)
+        .then(args => this.parseArgs(this.knex(this.specs.tableName), where))
+        .update(set)
+        .then(result => result)
+    );
   }
 
   create(value = {}) {
-    return this.knex(this.specs.tableName)
-      .insert(value).then(result => result);
+    if (this.specs.hasTimestamps) {
+      const date = new Date();
+
+      // date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+
+      set.created_at = date;
+      set.updated_at = date;
+    }
+
+    return (
+      this.prepareArgs(value)
+        .then(args => this.knex(this.specs.tableName).insert(value))
+    );
   }
 };
 
@@ -342,78 +466,7 @@ const checkTable = (trx, model) => trx.schema
     }
   });
 
-const parseArgs = (query, args = {}, property = 'where') => {
-  let result = query;
-  const keys = Object.keys(args);
 
-  for (let i = 0; i < keys.length; i += 1) {
-    const key = keys[i];
-    const method = i ? property : 'where';
-
-    if (key === '_or') {
-      result = result[method](builder => {
-        parseArgs(
-          builder,
-          args._or,
-          'orWhere'
-        )
-      });
-    } else if (key === '_and') {
-      result = result[method](builder => {
-        parseArgs(
-          builder,
-          args._and,
-          'where'
-        )
-      });
-    } else {
-      const lastLoDash = key.lastIndexOf('_'); // Sounds like a film name :)
-      let column, end;
-
-      if (lastLoDash === -1) {
-        column = key;
-        end = '';
-      } else {
-        column = key.substring(0, lastLoDash); // No one likes to see
-        end = key.substring(lastLoDash + 1); // Last Lo Dash :(
-      }
-
-      if (end === 'ne') {
-        result = result[method](column, '<>', args[key]);
-      } else if (end === 'lt') {
-        result = result[method](column, '<', args[key]);
-      } else if (end === 'gt') {
-        result = result[method](column, '>', args[key]);
-      } else if (end === 'lte') {
-        result = result[method](column, '<=', args[key]);
-      } else if (end === 'gte') {
-        result = result[method](column, '>=', args[key]);
-      } else if (end === 'in') {
-        result = result[method + 'In'](column, args[key]);
-      } else if (end === 'nin') {
-        result = result[method + 'NotIn'](column, args[key]);
-      } else if (end === 'contains') {
-        result = result[method](column, 'like', `%${args[key]}%`);
-      } else if (end === 'ncontains') {
-        result = result[method](column, 'not like', `%${args[key]}%`);
-      } else if (end === 'containss') {
-        result = result[method + 'Raw'](
-          `?? like binary '%${args[key]}%'`,
-          column
-        );
-      } else if (end === 'ncontainss') {
-        result = result[method + 'Raw'](
-          `?? not like binary '%${args[key]}%'`,
-          column
-        );
-      } else {
-        result = result[method](key, '=', args[key]);
-      }
-    }
-  }
-
-  return result;
-};
 
 const initializeColumn = (table, name, column) => {
   switch (column.type) {
@@ -678,7 +731,7 @@ function __default(knex, models) {
                             table.integer(
                               relation.junctionFromColumn
                             ).unsigned().notNull().alter();
-    
+
                             table.integer(
                               relation.junctionToColumn
                             ).unsigned().notNull().alter();
