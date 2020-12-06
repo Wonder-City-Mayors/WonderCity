@@ -634,19 +634,21 @@ function __default(knex, models, printReady = true) {
                   relations[access][withString].from = relation;
                 } else {
                   if (!relations.hasOwnProperty(withString)) {
-                    relations[relation.with] = {};
-                    relations[relation.with][access] = {};
+                    relations[withString] = {};
+                    relations[withString][access] = {};
                   } else if (
-                    !relations[relation.with].hasOwnProperty(access)
+                    !relations[withString].hasOwnProperty(access)
                   ) {
-                    relations[relation.with][access] = {};
+                    relations[withString][access] = {};
                   }
 
                   relations[withString][access].to = relation;
                 }
               } else {
                 if (relations.hasOwnProperty(withString)) {
-                  relations[withString][access].to = relation;
+                  relations[withString][access] = {
+                    to: relation
+                  };
                 } else {
                   relations[access][withString] = {
                     from: relation
