@@ -6,6 +6,7 @@ const randomInt = (start, end) => parseInt(
 );
 
 module.exports = async () => {
+  const dev = process.env.NODE_ENV === 'development';
   const io = require('socket.io')(wonder.http);
   const path = require('path');
   const cookie = require('cookie');
@@ -38,7 +39,6 @@ module.exports = async () => {
           const value = randomInt(0, 501);
 
           if (value <= 100) {
-            const dev = process.env.NODE_ENV === 'development';
             let isOnline = false;
 
             for (const key in userCache) {
