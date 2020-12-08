@@ -38,20 +38,27 @@ module.exports = async () => {
           const value = randomInt(0, 501);
 
           if (value <= 100) {
-            wonder.query('value').create({
-              tree_id: device.id,
-              time_stamp_db: date,
-              power: value,
-              energy: value
-            });
+            const dev = process.env.NODE_ENV === 'development';
+            let isOnline = false;
 
             for (const key in userCache) {
               if (userCache[key].has(device.id)) {
+                isOnline = true;
+
                 io.to(key).emit('newReadouts', {
                   deviceId: device.id,
                   value
                 });
               }
+            }
+
+            if (!dev || isOnline) {
+              wonder.query('value').create({
+                tree_id: device.id,
+                time_stamp_db: date,
+                power: value,
+                energy: value
+              });
             }
           }
         }
