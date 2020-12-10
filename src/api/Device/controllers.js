@@ -1,4 +1,4 @@
-const jsonify = require("../../../utils/searchToJson");
+import jsonify from 'searchToJson';
 
 // const commonQuery = (knex, userId) => knex
 //   .innerJoin('values_t1 as v1', 'v1.tree_id', 'tree.id')
@@ -10,7 +10,7 @@ const jsonify = require("../../../utils/searchToJson");
 //   .where('tree.user_id', parseInt(userId, 10))
 //   .andWhere('v2.id', null);
 
-module.exports = {
+export default {
   count: async (req, res) => {
     if (req.user) {
       const devices = await wonder.knex

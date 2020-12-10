@@ -1,7 +1,7 @@
 <script>
   import { setContext } from "svelte";
   import { writable } from "svelte/store";
-  import { stores, goto } from "@sapper/app";
+  import { stores } from "@sapper/app";
 
   import Tab, { Icon, Label } from "@smui/tab";
   import Button from "@smui/button";

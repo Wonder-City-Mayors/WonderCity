@@ -1,5 +1,6 @@
 <script>
   import { stores } from "@sapper/app";
+  
   import TransitionWrapper from "TransitionWrapper.svelte";
   import Title from "Title.svelte";
 

@@ -1,3 +1,3 @@
 module.exports = async () => {
-  console.log('Bootstrap. I ain\'t mean framework.');
+  console.log('Bootstrap has finished it\'s work.');
 };

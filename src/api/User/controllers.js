@@ -21,7 +21,7 @@ module.exports = {
         .findOne({username});
 
 
-      if (potentiallyExistingUser) {
+      if (!potentiallyExistingUser) {
         const userId = await wonder.knex.transaction(trx => {
           const date = new Date();
 

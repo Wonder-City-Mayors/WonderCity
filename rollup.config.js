@@ -12,6 +12,11 @@ import config from 'sapper/config/rollup.js';
 import pkg from './package.json';
 
 import path from 'path';
+import hash from 'random-hash';
+
+import { readdir, mkdir, writeFile, unlink } from './utils/filesystem';
+import glob from './utils/globPromise';
+import getRouteName from './utils/getRouteName';
 
 const mode = process.env.NODE_ENV;
 const dev = mode === 'development';
@@ -44,6 +49,10 @@ const aliases = () => ({
       find: /^@smui\/([^\/]+)\/(.*)$/,
 
       replacement: path.resolve(__dirname, "node_modules", "@smui", "$1", "$2")
+    },
+    {
+      find: /^@utils\/(.*)$/,
+      replacement: path.resolve(__dirname, 'utils', '$1')
     }
   ]
 });
@@ -91,7 +100,11 @@ export default {
 				hydratable: true,
         emitCss: false,
         css: true,
-        preprocess
+        preprocess,
+        onwarn: (warning, handler) => {
+          if (warning.code === 'a11y-label-has-associated-control') return;
+          handler(warning);
+        }
 			}),
 			resolve({
 				browser: true,
@@ -122,14 +135,18 @@ export default {
 				module: true
 			})
 		],
-
 		preserveEntrySignatures: false,
-		onwarn,
+    onwarn
 	},
 
 	server: {
 		input: config.server.input(),
-		output: config.server.output(),
+		output: Object.assign(
+      config.server.output(),
+      {
+        exports: 'auto'
+      }
+    ),
 		plugins: [
       alias(aliases()),
 			replace({
@@ -143,14 +160,79 @@ export default {
         emitCss: false,
         css: true,
         dev,
-        preprocess
+        preprocess,
+        onwarn: (warning, handler) => {
+          if (warning.code === 'a11y-label-has-associated-control') return;
+          handler(warning);
+        }
 			}),
 			resolve({
 				dedupe: ['svelte']
 			}),
+      postcss(postcssConfig()),
       commonjs(),
       includePaths(includePathsOptions()),
-      postcss(postcssConfig())
+
+      {
+        async buildStart () {
+          const regEx = /^src\/api\/(.+)\/(.+)\..+$/;
+
+          const write = object => {
+            return files => {
+              for (const file of files) {
+                const executed = regEx.exec(file);
+                const modelName = getRouteName(executed[1]);
+                const fileName = executed[2];
+                const hashed = hash({length: 16});
+
+                this.addWatchFile(file);
+                const id = this.emitFile({
+                  type: 'chunk',
+                  id: file,
+                  fileName: `${fileName}-${hashed}.js`
+                });
+
+                object[modelName] = hashed;
+              }
+            };
+          };
+
+          const wonder = {
+            routes: {},
+            services: {},
+            controllers: {},
+            models: {}
+          };
+
+          const secondDir = dev ? 'dev' : 'build';
+
+          await readdir('__sapper__')
+            .then(null, () => mkdir('__sapper__'));
+
+          await readdir(`__sapper__/${secondDir}`)
+            .then(null, () => mkdir(`__sapper__/${secondDir}`));
+
+          await readdir(`__sapper__/${secondDir}/server`)
+            .then(null, () => mkdir(`__sapper__/${secondDir}/server`));
+
+          await glob('src/api/*/routes.json')
+            .then(write(wonder.routes), console.log);
+
+          await glob('src/api/*/services.js')
+            .then(write(wonder.services), console.log);
+
+          await glob('src/api/*/controllers.js')
+            .then(write(wonder.controllers), console.log);
+
+          await glob('src/api/*/model.js')
+            .then(write(wonder.models), console.log);
+
+          await writeFile(
+            `__sapper__/${secondDir}/server/wonderSpecs.json`,
+            JSON.stringify(wonder)
+          );
+        }
+      }
 		],
 		external: Object.keys(pkg.dependencies).concat(require('module').builtinModules),
 
@@ -173,5 +255,5 @@ export default {
 
 		preserveEntrySignatures: false,
 		onwarn,
-	}
+  }
 };
