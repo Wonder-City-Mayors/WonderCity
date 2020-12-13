@@ -139,16 +139,17 @@ const main = () => {
                       'policies'
                     ], []);
 
-                    if (routes[j].hasOwnProperty('config')) {
-                      if (routes[j].config.hasOwnProperty('policies')) {
-                        for (let policy of routes[j].config.policies) {
-                          wonder
-                            .paths
-                          [routes[j].method]
-                          [routePath]
-                            .policies
-                            .push(wonder.policies[policy]);
-                        }
+                    if (
+                      routes[j].hasOwnProperty('config') &&
+                      routes[j].config.hasOwnProperty('policies')
+                    ) {
+                      for (const policy of routes[j].config.policies) {
+                        wonder
+                          .paths
+                        [routes[j].method]
+                        [routePath]
+                          .policies
+                          .push(wonder.policies[policy]);
                       }
                     }
 
@@ -212,6 +213,11 @@ const main = () => {
       const app = express();
 
       app
+        .use((req, res, next) => {
+          req.cookies = cookie.parse(req.headers.cookie || '');
+
+          next();
+        })
         .use(bodyParser.json({ extended: true }))
         .use(dev ? async (req, res, next) => {
           const start = new Date();
@@ -246,7 +252,6 @@ const main = () => {
           next();
         } : (req, res, next) => {next()})
         .use('/api', async (req, res, next) => {
-          req.cookies = cookie.parse(req.headers.cookie || '');
           req.search = req.url.substring(req.path.length + 1);
 
           res.throw = _throw;
@@ -278,8 +283,8 @@ const main = () => {
 
                 await wonder
                   .paths
-                [req.method]
-                [path]
+                  [req.method]
+                  [path]
                   .handler(req, res);
               }
             } catch (e) {
@@ -296,8 +301,6 @@ const main = () => {
         .use(compression({ threshold: 0 }))
         .use(express.static('static'))
         .use(async (req, res, next) => {
-          req.cookies = cookie.parse(req.headers.cookie || '');
-
           req.user = await getUser(req.cookies.jwt);
 
           sapper.middleware({
@@ -341,6 +344,16 @@ const main = () => {
 readFile(path.join(chunksPath, 'wonderSpecs.json'))
   .then(data => {
     wonderSpecs = JSON.parse(data);
+
+    wonder.policies = {};
+
+    for (const policyName in wonderSpecs.policies) {
+      wonder.policies[policyName] = require(path.join(
+        chunksPath,
+        `${policyName}-${wonderSpecs.policies[policyName]}.js`
+      ));
+    }
+
     return access(configPath, fs.F_OK);
   })
   .then(() => Promise.all([
@@ -360,16 +373,6 @@ readFile(path.join(chunksPath, 'wonderSpecs.json'))
         wonder.config = _.defaults(wonder.config, commonConfig);
       } else {
         wonder.config = commonConfig;
-      }
-    }),
-    readdir(policiesPath).then(files => {
-      wonder.policies = {};
-
-      for (const file of files) {
-        const filePath = path.join(policiesPath, file);
-
-        wonder.policies[file.replace(/\.[^/.]+$/, "")] =
-          require(filePath);
       }
     })
   ]))

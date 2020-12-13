@@ -77,8 +77,6 @@ module.exports = async () => {
         if (!wonder.cache.connectedUsers.hasOwnProperty(user.id)) {
           wonder.cache.connectedUsers[user.id] = {};
         }
-
-        wonder.cache.connectedUsers[user.id][socket.id] = new Set();
       }
     });
 

@@ -134,6 +134,28 @@ class KnexManageModel {
   }
 
   parseArgs(query, args = {}, property = 'where') {
+    const [orderColumn, orderType] = (
+      args.hasOwnProperty('_sort') ?
+        args._sort.split(':') :
+        [false]
+    );
+
+    const limit = (
+      args.hasOwnProperty('_limit') ?
+        args._limit :
+        100
+    );
+
+    const offset = (
+      args.hasOwnProperty('_skip') ?
+        args._skip :
+        0
+    );
+
+    delete args._sort;
+    delete args._limit;
+    delete args._skip;
+
     let result = query;
     const keys = Object.keys(args);
 
@@ -203,45 +225,23 @@ class KnexManageModel {
       }
     }
 
+    if (orderColumn !== false) {
+      result = result.orderBy(orderColumn, orderType);
+    }
+
+    result = result.limit(limit);
+    result = result.offset(offset);
+    
     return result;
   };
 
   _findBase(args = {}, related = []) {
-    const [orderColumn, orderType] = (
-      args.hasOwnProperty('_sort') ?
-        args._sort.split(':') :
-        [false]
-    );
-
-    const limit = (
-      args.hasOwnProperty('_limit') ?
-        args._limit :
-        100
-    );
-
-    const offset = (
-      args.hasOwnProperty('_skip') ?
-        args._skip :
-        0
-    );
-
-    delete args._sort;
-    delete args._limit;
-    delete args._skip;
-
     let query = this.parseArgs(
       this.knex
         .select('*')
         .from(this.specs.tableName),
       args
     );
-
-    if (orderColumn !== false) {
-      query = query.orderBy(orderColumn, orderType);
-    }
-
-    query = query.limit(limit);
-    query = query.offset(offset);
 
     if (related.length > 0) {
       query = query.then(result => new Promise((resolve, reject) => {
@@ -315,6 +315,28 @@ class KnexManageModel {
     return (
       this.prepareArgs(value)
         .then(args => this.knex(this.specs.tableName).insert(value))
+    );
+  }
+
+  count(args = {}, column = '*') {
+    return (
+      this.prepareArgs(args)
+        .then(args => this.parseArgs(
+          this.knex.count(column).from(this.specs.tableName),
+          args
+        ))
+        .then(a => a[0][`count(${column})`])
+    );
+  }
+
+  sum(column, args = {}) {
+    return (
+      this.prepareArgs(args)
+        .then(args => this.parseArgs(
+          this.knex.sum(column).from(this.specs.tableName),
+          args
+        ))
+        .then(a => a[0][`sum(\`${column}\`)`] || 0)
     );
   }
 };

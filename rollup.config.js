@@ -177,7 +177,7 @@ export default {
         async buildStart () {
           const regEx = /^src\/api\/(.+)\/(.+)\..+$/;
 
-          const write = object => {
+          const writeModel = object => {
             return files => {
               for (const file of files) {
                 const executed = regEx.exec(file);
@@ -186,7 +186,7 @@ export default {
                 const hashed = hash({length: 16});
 
                 this.addWatchFile(file);
-                const id = this.emitFile({
+                this.emitFile({
                   type: 'chunk',
                   id: file,
                   fileName: `${fileName}-${hashed}.js`
@@ -201,7 +201,8 @@ export default {
             routes: {},
             services: {},
             controllers: {},
-            models: {}
+            models: {},
+            policies: {}
           };
 
           const secondDir = dev ? 'dev' : 'build';
@@ -227,17 +228,40 @@ export default {
             .then(null, () => mkdir(`__sapper__/${secondDir}/server`));
 
           await Promise.all([
-            glob('src/api/*/routes.json')
-              .then(write(wonder.routes), console.log),
+            glob('src/api/*/routes.@(json|js)')
+              .then(writeModel(wonder.routes), console.log),
   
             glob('src/api/*/services.js')
-              .then(write(wonder.services), console.log),
+              .then(writeModel(wonder.services), console.log),
   
             glob('src/api/*/controllers.js')
-              .then(write(wonder.controllers), console.log),
+              .then(writeModel(wonder.controllers), console.log),
   
             glob('src/api/*/model.js')
-              .then(write(wonder.models), console.log)
+              .then(writeModel(wonder.models), console.log),
+
+            glob('src/config/functions/policies/*.js')
+              .then(files => {
+                for (const file of files) {
+                  const name = /^.*\/(.+).js$/.exec(file)[1];
+                  const hashed = hash({ length: 16 });
+
+                  this.emitFile({
+                    type: 'chunk',
+                    id: file,
+                    fileName: `${name}-${hashed}.js`
+                  });
+
+                  wonder.policies[name] = hashed;
+                }
+              }),
+
+            glob('src/config/**/*.js')
+              .then(files => {
+                for (const file of files) {
+                  this.addWatchFile(file);
+                }
+              })
           ]);
 
           await writeFile(

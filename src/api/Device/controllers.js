@@ -1,5 +1,3 @@
-import jsonify from 'searchToJson';
-
 // const commonQuery = (knex, userId) => knex
 //   .innerJoin('values_t1 as v1', 'v1.tree_id', 'tree.id')
 //   .leftJoin('values_t1 as v2', function () {
@@ -27,7 +25,7 @@ export default {
   },
 
   getReadouts: async (req, res) => {
-    const page = parseInt(jsonify(req.search).page, 10);
+    const page = parseInt(req.query.page, 10);
 
     if (page) {
       if (req.user) {

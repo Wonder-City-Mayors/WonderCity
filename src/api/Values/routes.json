@@ -1,0 +1,26 @@
+[
+  {
+    "method": "GET",
+    "path": "/statDay",
+    "handler": "statDay",
+    "config": {
+      "policies": ["userStrict"]
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/statMonth",
+    "handler": "statMonth",
+    "config": {
+      "policies": ["userStrict"]
+    }
+  },
+  {
+    "method": "GET",
+    "path": "/statYear",
+    "handler": "statYear",
+    "config": {
+      "policies": ["userStrict"]
+    }
+  }
+]
