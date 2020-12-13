@@ -20,7 +20,6 @@ module.exports = {
         .query('user')
         .findOne({username});
 
-
       if (!potentiallyExistingUser) {
         const userId = await wonder.knex.transaction(trx => {
           const date = new Date();
@@ -36,7 +35,6 @@ module.exports = {
               .into('user')
               .then(userId => userId[0])
             ));
-            
         });
 
         const jwt = wonder.services.jwt.issue({

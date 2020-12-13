@@ -206,6 +206,17 @@ export default {
 
           const secondDir = dev ? 'dev' : 'build';
 
+          glob(path.join(
+            '__sapper__',
+            secondDir,
+            'server',
+            '@(controllers|model|routes|services)-*.js'
+          )).then(files => {
+            for (const file of files) {
+              unlink(file);
+            }
+          });
+
           await readdir('__sapper__')
             .then(null, () => mkdir('__sapper__'));
 
@@ -215,17 +226,19 @@ export default {
           await readdir(`__sapper__/${secondDir}/server`)
             .then(null, () => mkdir(`__sapper__/${secondDir}/server`));
 
-          await glob('src/api/*/routes.json')
-            .then(write(wonder.routes), console.log);
-
-          await glob('src/api/*/services.js')
-            .then(write(wonder.services), console.log);
-
-          await glob('src/api/*/controllers.js')
-            .then(write(wonder.controllers), console.log);
-
-          await glob('src/api/*/model.js')
-            .then(write(wonder.models), console.log);
+          await Promise.all([
+            glob('src/api/*/routes.json')
+              .then(write(wonder.routes), console.log),
+  
+            glob('src/api/*/services.js')
+              .then(write(wonder.services), console.log),
+  
+            glob('src/api/*/controllers.js')
+              .then(write(wonder.controllers), console.log),
+  
+            glob('src/api/*/model.js')
+              .then(write(wonder.models), console.log)
+          ]);
 
           await writeFile(
             `__sapper__/${secondDir}/server/wonderSpecs.json`,

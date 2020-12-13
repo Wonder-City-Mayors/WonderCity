@@ -5,6 +5,7 @@ import bodyParser from 'body-parser';
 import cookie from 'cookie';
 import compression from 'compression';
 import http from 'http';
+import colors from 'colors/safe';
 import * as sapper from '@sapper/server';
 
 // database
@@ -113,8 +114,6 @@ const main = () => {
               `controllers-${wonderSpecs.controllers[routeName]}.js`
             );
 
-            console.log(routesPath, controllersPath);
-
             promiseArray.push(
               access(routesPath)
                 .then(() => {
@@ -207,7 +206,6 @@ const main = () => {
     }, console.log)
     .then(() => addModels(knex, wonder.models))
     .then(() => {
-      // Set Query function
       wonder.query = db.query;
       wonder.queryAll = db.queryAll;
 
@@ -215,18 +213,38 @@ const main = () => {
 
       app
         .use(bodyParser.json({ extended: true }))
-        .use(async (req, res, next) => {
+        .use(dev ? async (req, res, next) => {
           const start = new Date();
 
-          await next();
+          res.on('finish', () => {
+            const ms = colors.underline.bold(String(Date.now() - start.getTime()));
+            const url = colors.cyan(req.originalUrl);
+            const code = (
+              res.statusCode >= 200 ?
+                (
+                  res.statusCode >= 300 ?
+                  (
+                    res.statusCode >= 400 ?
+                    (
+                      res.statusCode >= 500 ?
+                      colors.red(res.statusCode) :
+                      colors.magenta(res.statusCode)
+                    ) :
+                    colors.yellow(res.statusCode)
+                  ) :
+                  colors.green(res.statusCode)
+                ) :
+                colors.gray(res.statusCode)
+            );
+  
+            console.log(
+              `${start.getHours()}:${start.getMinutes()}:${start.getSeconds()}` +
+              ` • ${ms} ms ${code} with ${req.method} on ${url}`
+            );
+          });
 
-          const ms = Date.now() - start.getTime();
-
-          console.log(
-            `${start.toLocaleString()} | ${res.statusCode} ` +
-            `${req.method} on ${req.originalUrl} took ${ms} ms`
-          );
-        })
+          next();
+        } : (req, res, next) => {next()})
         .use('/api', async (req, res, next) => {
           req.cookies = cookie.parse(req.headers.cookie || '');
           req.search = req.url.substring(req.path.length + 1);
@@ -317,10 +335,8 @@ const main = () => {
         'jacketzip.js'
       ))().then(() => console.log('Jacketzip done!'));
     })
-    .catch(e => console.log(e));
+    .catch(console.log);
 };
-
-console.log(bootstrapPath);
 
 readFile(path.join(chunksPath, 'wonderSpecs.json'))
   .then(data => {

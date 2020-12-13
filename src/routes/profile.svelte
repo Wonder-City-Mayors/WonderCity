@@ -1,11 +1,10 @@
 <script>
   import TransitionWrapper from "TransitionWrapper.svelte";
+  import Title from "Title.svelte";
 </script>
 
-<svelte:head>
-  <title>Профиль • WonderCity Reborn</title>
-</svelte:head>
+<Title caption="Профиль" />
 
 <TransitionWrapper>
-  <h1>profile</h1>
+  <p>Эта страница - ответственность фронтендеров :)</p>
 </TransitionWrapper>

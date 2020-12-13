@@ -83,13 +83,13 @@
 <Title caption="Отслеживание показаний" />
 
 
-{#if count > 0}
-  <TransitionWrapper>
-    <slot />
-    <Switchers {count} {current} baseUrl="/monit" />
-  </TransitionWrapper>
-{:else}
-  <h2 class="no-devices">
-    К сожалению, у Вас нет зарегистрированных считывающих устройств.
-  </h2>
-{/if}
+<TransitionWrapper>
+  {#if count > 0}
+      <slot />
+      <Switchers {count} {current} baseUrl="/monit" />
+  {:else}
+    <h2 class="no-devices">
+      К сожалению, у Вас нет зарегистрированных считывающих устройств.
+    </h2>
+  {/if}
+</TransitionWrapper>
