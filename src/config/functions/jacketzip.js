@@ -1,9 +1,67 @@
 const size = require('lodash/size');
+let port;
+
+if (process.env.SERIAL_PORT_NAME) {
+  const SerialPort = require('serialport');
+
+  port = SerialPort(process.env.SERIAL_PORT_NAME, {
+    baudRate: process.env.SERIAL_PORT_BAUD_RATE || 9600
+  });
+}
 
 const randomInt = (start, end) => parseInt(
   Math.random() * (end - start) + start,
   10
 );
+
+const mainCycle = async max => {
+  let resolveCurrent, currentId;
+
+  port.on('data', data => {
+    data = data.toString();
+
+    if (data === 'error') {
+      console.log('blin' + currentId);
+    } else {
+      const value = parseInt(data, 10);
+
+      wonder.query('value').findOne({
+        tree_id: currentId
+      }).then(lastRow => {
+        const difference = value - lastRow.last_record;
+
+        wonder.query('value').update({
+          id: lastRow.id
+        }, {
+          last_record: value,
+          sum: lastRow.sum + difference
+        });
+      });
+    }
+
+    resolveCurrent();
+  });
+
+  for (let number = 0; number < max; number += 1) {
+    await wonder.query('tree').findOne({
+      _skip: number
+    }).then(device => {
+      currentId = device.id;
+
+      port.write(currentId, err => {
+        if (err) {
+          console.log('афигеть');
+        }
+      });
+
+      return new Promise((resolve, reject) => {
+        resolveCurrent = resolve;
+      });
+    });
+  }
+
+  mainCycle(max);
+};
 
 module.exports = async () => {
   const dev = process.env.NODE_ENV === 'development';
@@ -16,55 +74,71 @@ module.exports = async () => {
     'getUser'
   ));
 
-  wonder.query('user').findOne({
-    username: 'asdfasdf',
-    password: 'asdfasdf'
-  }).then(user => 'ye');
+  if (process.env.SERIAL_PORT_NAME) {
+    wonder.query('tree').count().then(mainCycle);
+  } else {
+    wonder.query('tree').find().then(allDevices => {
+      setInterval(() => {
+        const date = new Date();
+        // date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
+        // по идее, надо бы записывать время по Гринвичу, но js+knex настолько умный,
+        // что достаёт потом это время в местном формате и в строчку превращает
+        // как надо, так что... всё ок :)
 
-  wonder.query('tree').find().then(allDevices => {
-    setInterval(() => {
-      const date = new Date();
-      // date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
-      // по идее, надо бы записывать время по Гринвичу, но js+knex настолько умный,
-      // что достаёт потом это время в местном формате и в строчку превращает
-      // как надо, так что... всё ок :)
+        for (const device of allDevices) {
+          const userCache = wonder
+            .cache
+            .connectedUsers
+          [device.user_id];
 
-      for (const device of allDevices) {
-        const userCache = wonder
-          .cache
-          .connectedUsers
-        [device.user_id];
+          if (userCache) {
+            const value = randomInt(0, 501);
 
-        if (userCache) {
-          const value = randomInt(0, 501);
+            if (value <= 100) {
+              wonder.query('value').findOne({
+                tree_id: device.id
+              }).then(lastRow => {
+                let isOnline = false;
+                const lastSum = lastRow ? lastRow.sum : 0;
+                const sum = lastSum + value;
 
-          if (value <= 100) {
-            let isOnline = false;
+                for (const key in userCache) {
+                  if (userCache[key].has(device.id)) {
+                    isOnline = true;
 
-            for (const key in userCache) {
-              if (userCache[key].has(device.id)) {
-                isOnline = true;
+                    io.to(key).emit('newReadouts', {
+                      deviceId: device.id,
+                      lastRecord: value,
+                      sum
+                    });
+                  }
+                }
 
-                io.to(key).emit('newReadouts', {
-                  deviceId: device.id,
-                  value
-                });
-              }
-            }
-
-            if (!dev || isOnline) {
-              wonder.query('value').create({
-                tree_id: device.id,
-                time_stamp_db: date,
-                power: value,
-                energy: value
+                if (!dev || isOnline) {
+                  if (lastRow) {
+                    wonder.query('value').update({
+                      id: lastRow.id
+                    }, {
+                      time_stamp_db: new Date(),
+                      last_record: value,
+                      sum: lastRow.sum + value
+                    });
+                  } else {
+                    wonder.query('value').create({
+                      time_stamp_db: new Date(),
+                      tree_id: device.id,
+                      last_record: value,
+                      sum: value
+                    });
+                  }
+                }
               });
             }
           }
         }
-      }
-    }, 3000);
-  });
+      }, 3000);
+    });
+  }
 
   io.on('connection', socket => {
     const cookies = cookie.parse(socket.handshake.headers.cookie);
