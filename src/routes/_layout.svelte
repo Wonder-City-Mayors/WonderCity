@@ -4,13 +4,13 @@
   import { stores } from "@sapper/app";
 
   import {
-    mdiAccountStar,
     mdiStar,
     mdiSchool,
     mdiHelp,
     mdiAccountCircle,
     mdiCast,
-    mdiAccountCheck
+    mdiAccountCheck,
+    mdiCreation
   } from '@mdi/js';
 
   import Tab, { Label } from "@smui/tab";
@@ -190,6 +190,10 @@
     overflow-x: hidden;
   }
 
+  #light-animated {
+    opacity: .4;
+  }
+
   .layout-header {
     @include small_box_shadow_primary;
 
@@ -275,6 +279,10 @@
       font-size: calc(1vw + 1vh);
     }
   }
+
+  @keyframes broken-lamp-animation {
+    
+  }
 </style>
 
 <header class="layout-header">
@@ -282,9 +290,9 @@
     <a href="/">
       <Button color="primary" class="top-nav-logo">
         <div class="top-nav-logo-icon">
-          <Icon icon={mdiAccountStar} />
+          <Icon icon={mdiCreation} />
         </div>
-        WonderWaffle
+        Wunderwaffe<span id="light-animated">l</span>
       </Button>
     </a>
     <TabBar

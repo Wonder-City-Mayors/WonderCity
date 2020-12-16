@@ -13,7 +13,6 @@
     overflow: visible;
 
     path {
-
       fill: var(--icon-component-color, $color-primary);
     }
   }
