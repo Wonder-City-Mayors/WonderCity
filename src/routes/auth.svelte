@@ -62,43 +62,36 @@
 
     --icon-component-color: white
 
-    :global(form)
-      width: 100%
-      padding: .5rem
-      text-align: right
-      color: $mdc-theme-secondary
-
-      &:not(.active)
-        position: absolute
-        top: 0
-        left: 0
-
-      &.active
-        position: static
-
-      :global(.fields)
-        display: flex
-        flex-wrap: wrap
+    :global
+      form
         width: 100%
-
-        :global(.textfield-container)
-          flex: 1 0 15rem
-
-      :global(.submit)
-        display: inline-block
-        margin: .25rem .5rem
-
-      :global(p.error)
-        text-align: center
-        color: $mdc-theme-error
-        font-size: .8rem
-        width: 85%
-        margin: .25rem auto
-
-      :global(p.await)
+        padding: .5rem
         text-align: right
-        color: $mdc-theme-primary
-        margin: .25rem .5rem
+        color: $color-secondary
+
+        .fields
+          display: flex
+          flex-wrap: wrap
+          width: 100%
+
+          .textfield-container
+            flex: 1 0 15rem
+
+        .submit
+          display: inline-block
+          margin: .25rem .5rem
+
+        p.error
+          text-align: center
+          color: $mdc-theme-error
+          font-size: .8rem
+          width: 85%
+          margin: .25rem auto
+
+        p.await
+          text-align: right
+          color: $mdc-theme-primary
+          margin: .25rem .5rem
 </style>
 
 <svelte:head>
@@ -138,11 +131,8 @@
       </Tab>
     </TabBar>
     <div class="authentication-forms-container">
-      {#if activeIndex === 0}
-        <SignIn on:signed={signed} bind:element={signInForm} />
-      {:else}
-        <SignUp on:signed={signed} bind:element={signUpForm} />
-      {/if}
+      <SignIn on:signed={signed} bind:element={signInForm} active={activeIndex === 0} />
+      <SignUp on:signed={signed} bind:element={signUpForm} active={activeIndex === 1} />
     </div>
   {/if}
 </TransitionWrapper>

@@ -11,6 +11,7 @@
   import { postApi } from "requests";
 
   export let element;
+  export let active;
 
   const dispatch = createEventDispatcher();
   const { session } = stores();
@@ -133,18 +134,31 @@
 </script>
 
 <style lang="scss">
-  @import "../../theme/global";
+  @import "colors";
 
-  form {
+  form.signup {
     display: flex;
     flex-wrap: wrap;
     color: $mdc-theme-secondary;
+    transition: opacity .3s ease, transform .3s ease;
+
+      &.active {
+        position: static;
+        transform: none;
+        opacity: 1;
+      }
+
+      &.unactive {
+        position: absolute;
+        transform: translateX(10rem);
+        opacity: 0;
+      }
   }
 </style>
 
 <form
   bind:this={element}
-  class="signup"
+  class="signup {active ? 'active' : 'unactive'}"
   on:submit|preventDefault={signup}
   transition:fly={{ x: 300, duration: 300 }}>
   <div class="fields">
