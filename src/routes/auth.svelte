@@ -53,12 +53,14 @@
 </script>
 
 <style lang="sass">
-  @import '../theme/global'
+  @import 'global'
 
   .authentication-forms-container
     position: relative
     margin: 0 auto
     max-width: 40rem
+
+    --icon-component-color: white
 
     :global(form)
       width: 100%

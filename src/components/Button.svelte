@@ -1,7 +1,8 @@
 <script>
   import { createEventDispatcher } from "svelte";
 
-  import Button, { Icon, Label } from "@smui/button";
+  import Button, { Label } from "@smui/button";
+  import Icon from "./Icon.svelte";
 
   let className, icon, label, disabled;
   export { className as class, icon, label, disabled };
@@ -30,7 +31,7 @@
   {variant}
   on:click={dispatchClick}>
   {#if icon}
-    <Icon class="material-icons button-component-icon">{icon}</Icon>
+    <Icon {icon} />
   {/if}
   {#if label}
     <Label class="button-component-label">{label}</Label>

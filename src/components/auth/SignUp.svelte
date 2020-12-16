@@ -3,10 +3,12 @@
   import { fly } from "svelte/transition";
   import { createEventDispatcher } from "svelte";
 
+  import { mdiLogin } from "@mdi/js";
+
   import Textfield from "../Textfield.svelte";
   import SubmitButton from "./SubmitButton.svelte";
 
-  import { postApi } from "../../../utils/requests.js";
+  import { postApi } from "requests";
 
   export let element;
 
@@ -177,9 +179,9 @@
       <p class="error">
         Этот логин уже занят.
       </p>
-      <SubmitButton disabled icon="how_to_reg" label="регистрация" />
+      <SubmitButton disabled icon={ mdiLogin } label="регистрация" />
     {:else}
-      <SubmitButton {disabled} icon="how_to_reg" label="регистрация" />
+      <SubmitButton {disabled} icon={ mdiLogin } label="регистрация" />
     {/if}
   {/if}
 </form>

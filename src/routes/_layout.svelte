@@ -3,7 +3,18 @@
   import { writable } from "svelte/store";
   import { stores } from "@sapper/app";
 
-  import Tab, { Icon, Label } from "@smui/tab";
+  import {
+    mdiAccountStar,
+    mdiStar,
+    mdiSchool,
+    mdiHelp,
+    mdiAccountCircle,
+    mdiCast,
+    mdiAccountCheck
+  } from '@mdi/js';
+
+  import Tab, { Label } from "@smui/tab";
+  import Icon from "Icon.svelte";
   import Button from "@smui/button";
   import TabBar from "@smui/tab-bar";
 
@@ -69,7 +80,7 @@
     if (user.isAuthenticated) {
       index =
         newIconTabs.push({
-          icon: "cast",
+          icon: mdiCast,
           label: "Отслеживание",
           path: "/monit/1",
         }) - 1;
@@ -78,7 +89,7 @@
 
       index =
         newIconTabs.push({
-          icon: "account_circle",
+          icon: mdiAccountCircle,
           label: "Профиль",
           path: "/profile",
         }) - 1;
@@ -87,7 +98,7 @@
     } else {
       index =
         newIconTabs.push({
-          icon: "how_to_reg",
+          icon: mdiAccountCheck,
           label: "Авторизация",
           path: "/auth",
         }) - 1;
@@ -102,13 +113,13 @@
 
   let iconTabs = [
     {
-      icon: "school",
+      icon: mdiSchool,
       label: "О SQBit",
       path: "/about",
       index: 0,
     },
     {
-      icon: "help",
+      icon: mdiHelp,
       label: "FAQ",
       path: "/faq",
       index: 1,
@@ -205,16 +216,15 @@
         display: flex;
         padding: 0.25rem 0.5rem;
         height: 100%;
+        font-weight: 700;
+        font-size: 1.5rem;
 
         &-icon {
-          width: 2.5rem;
-          font-size: 2.5rem;
-          margin-right: 0.5rem;
-        }
+          display: inline-block;
 
-        &-caption {
-          font-weight: 700;
-          font-size: 1.5rem;
+          width: 2.4rem;
+          height: 1.8rem;
+          margin-right: 0.2em;
         }
       }
 
@@ -241,6 +251,14 @@
           height: 100%;
           font-family: defaultFont, serif;
           font-weight: 700;
+          line-height: 1rem;
+
+          &-icon {
+            padding: 0;
+            font-size: 1rem;
+
+            margin-right: .4em;
+          }
         }
       }
     }
@@ -263,8 +281,10 @@
   <nav class="top-nav">
     <a href="/">
       <Button color="primary" class="top-nav-logo">
-        <span class="material-icons top-nav-logo-icon">insights</span>
-        <span class="top-nav-logo-caption">ВундерВафля</span>
+        <div class="top-nav-logo-icon">
+          <Icon icon={mdiAccountStar} />
+        </div>
+        WonderWaffle
       </Button>
     </a>
     <TabBar
@@ -278,7 +298,9 @@
           minWidth
           class="top-nav-tabs-tab"
           bind:this={tabsElements[tab.index]}>
-          <Icon class="material-icons">{tab.icon}</Icon>
+          <div class="top-nav-tabs-tab-icon">
+            <Icon icon={tab.icon} />
+          </div>
           <Label>{tab.label}</Label>
         </Tab>
       </a>

@@ -6,7 +6,7 @@
   import Textfield from "../Textfield.svelte";
   import SubmitButton from "./SubmitButton.svelte";
 
-  import { postApi } from "../../../utils/requests.js";
+  import { postApi } from "requests";
 
   export let element;
 

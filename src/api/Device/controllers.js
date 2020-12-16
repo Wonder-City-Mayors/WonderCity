@@ -39,9 +39,17 @@ export default {
               tree_id: tree.id,
               _sort: 'time_stamp_db:desc'
             }).then(value => {
-              if (!value) value = {};
-
-              return Object.assign(value, {id: tree.id});
+              return Object.assign((
+                value ?
+                  {
+                    timeStamp: value.time_stamp_db,
+                    sum: value.sum,
+                    lastRecord: value.last_record
+                  } :
+                  {}
+              ), {
+                id: tree.id
+              });
             })
           )));
 

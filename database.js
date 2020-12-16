@@ -295,9 +295,11 @@ class KnexManageModel {
     }
 
     return (
-      this.prepareArgs(args)
-        .then(args => this.parseArgs(this.knex(this.specs.tableName), where))
-        .update(set)
+      this.prepareArgs(where)
+        .then(args => this.parseArgs(
+          this.knex(this.specs.tableName).update(set),
+          args
+        ))
         .then(result => result)
     );
   }
@@ -349,11 +351,15 @@ const initializeColumn = (table, name, column) => {
     case 'password':
       return table.binary(name, 60);
 
-    case 'string':
     case 'binary':
-      return table[column.type](name, column.length);
+      return table.binary(name, column.length);
+
+    case 'string':
+    case 'varchar':
+      return table.string(name, column.length);
 
     case 'int':
+    case 'integer':
       return table.integer(name);
 
     case 'float':
@@ -367,6 +373,7 @@ const initializeColumn = (table, name, column) => {
     case 'time':
       return table.time(name, column.precision);
 
+    case 'enumerable':
     case 'enum':
     case 'enu':
       return table.enu(name, column.values, column.options);

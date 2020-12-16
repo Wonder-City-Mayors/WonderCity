@@ -19,6 +19,7 @@
 <script>
   import { getContext } from "svelte";
   import { format, register } from "timeago.js";
+  import Device from "DeviceInfo.svelte";
 
   export let devices = [];
 
@@ -89,7 +90,8 @@
       socket.on("newReadouts", (details) => {
         for (const device of devices) {
           if (device.id === details.deviceId) {
-            device.power = details.value;
+            device.lastRecord = details.lastRecord;
+            device.sum = details.sum;
             device.date = new Date();
             device.active = true;
 
@@ -105,17 +107,17 @@
 
     for (let i = 0; i < devices.length; i += 1) {
       devicesIds.push(devices[i].id);
-      devices[i].active = devices[i].hasOwnProperty("power");
+      devices[i].active = devices[i].hasOwnProperty("sum");
 
       if (!devices[i].hasOwnProperty("date") && devices[i].active) {
         devices[i].date = new Date(
-          parseInt(devices[i].time_stamp_db.substring(0, 4), 10),
-          parseInt(devices[i].time_stamp_db.substring(5, 7), 10) - 1,
-          parseInt(devices[i].time_stamp_db.substring(8, 10), 10),
-          parseInt(devices[i].time_stamp_db.substring(11, 13), 10),
-          parseInt(devices[i].time_stamp_db.substring(14, 16), 10),
-          parseInt(devices[i].time_stamp_db.substring(17, 19), 10),
-          parseInt(devices[i].time_stamp_db.substring(20, 23), 10)
+          parseInt(devices[i].timeStamp.substring(0, 4), 10),
+          parseInt(devices[i].timeStamp.substring(5, 7), 10) - 1,
+          parseInt(devices[i].timeStamp.substring(8, 10), 10),
+          parseInt(devices[i].timeStamp.substring(11, 13), 10),
+          parseInt(devices[i].timeStamp.substring(14, 16), 10),
+          parseInt(devices[i].timeStamp.substring(17, 19), 10),
+          parseInt(devices[i].timeStamp.substring(20, 23), 10)
         );
 
         devices[i].date.setTime(
@@ -134,37 +136,10 @@
 </script>
 
 <style lang="scss">
-  @import "colors";
-
-  p {
-    margin: 0.4rem 0.5rem;
-    text-align: center;
-
-    &.active {
-      color: $mdc-theme-primary;
-    }
-
-    &.unactive {
-      color: $mdc-theme-secondary;
-    }
-
-    h2,
-    h3 {
-      display: inline;
-    }
-  }
 </style>
 
 {#if devices.length > 0}
   {#each mutableDevices as device (device.id)}
-    <p class={device.active ? 'active' : 'unactive'}>
-      Девайс с идентификатором
-      {#if device.active}
-        <h3>{device.id}</h3>
-        получил показания
-        <h2>{device.power}</h2>
-        {format(device.date, 'ru')}.
-      {:else}{device.id} ещё ни разу не получал показаний.{/if}
-    </p>
+    <Device {device} {format} />
   {/each}
 {:else}Произошла какая-то досадная оплошность. Агась.{/if}

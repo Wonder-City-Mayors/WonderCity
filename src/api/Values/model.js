@@ -7,12 +7,14 @@ module.exports = {
       type: 'datetime'
     },
 
-    power: {
-      type: 'float'
+    last_record: {
+      type: 'float',
+      default: 0
     },
 
-    energy: {
-      type: 'float'
+    sum: {
+      type: 'float',
+      default: 0
     }
   },
 
