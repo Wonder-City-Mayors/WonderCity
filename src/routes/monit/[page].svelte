@@ -3,7 +3,7 @@
 
   export async function preload(page, session) {
     const devices = await getPreloadApiResponse(
-      `${session.apiUrl}/devices/getReadouts`,
+      `/api/devices/getReadouts`,
       {
         page: page.params.page,
       },
@@ -107,7 +107,7 @@
 
     for (let i = 0; i < devices.length; i += 1) {
       devicesIds.push(devices[i].id);
-      devices[i].active = devices[i].hasOwnProperty("sum");
+      devices[i].active = devices[i].hasOwnProperty("lastRecord");
 
       if (!devices[i].hasOwnProperty("date") && devices[i].active) {
         devices[i].date = new Date(

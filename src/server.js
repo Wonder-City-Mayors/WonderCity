@@ -37,7 +37,7 @@ const knex = new Knex({
 });
 
 // environment
-const { PORT, NODE_ENV, API_URL = 'http://localhost:3000/api' } = process.env;
+const { PORT, NODE_ENV, API_URL = '/api' } = process.env;
 const dev = NODE_ENV === 'development';
 
 // working with filesystem

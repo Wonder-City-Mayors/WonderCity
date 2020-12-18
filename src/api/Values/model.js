@@ -10,11 +10,6 @@ module.exports = {
     last_record: {
       type: 'float',
       default: 0
-    },
-
-    sum: {
-      type: 'float',
-      default: 0
     }
   },
 

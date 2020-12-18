@@ -25,18 +25,24 @@ const mainCycle = async max => {
     } else {
       const value = parseInt(data, 10);
 
-      wonder.query('value').findOne({
-        tree_id: currentId
-      }).then(lastRow => {
-        const difference = value - lastRow.last_record;
-
-        wonder.query('value').update({
-          id: lastRow.id
-        }, {
-          last_record: value,
-          sum: lastRow.sum + difference
-        });
+      wonder.query('value').create({
+        tree_id: currentId,
+        last_record: value,
+        time_stamp_db: new Date()
       });
+
+      // wonder.query('value').findOne({
+      //   tree_id: currentId
+      // }).then(lastRow => {
+      //   const difference = value - lastRow.last_record;
+
+      //   wonder.query('value').update({
+      //     id: lastRow.id
+      //   }, {
+      //     last_record: value,
+      //     sum: lastRow.sum + difference
+      //   });
+      // });
     }
 
     resolveCurrent();
@@ -95,44 +101,26 @@ module.exports = async () => {
             const value = randomInt(0, 501);
 
             if (value <= 100) {
-              wonder.query('value').findOne({
-                tree_id: device.id
-              }).then(lastRow => {
-                let isOnline = false;
-                const lastSum = lastRow ? lastRow.sum : 0;
-                const sum = lastSum + value;
+              let isOnline = false;
 
-                for (const key in userCache) {
-                  if (userCache[key].has(device.id)) {
-                    isOnline = true;
+              for (const key in userCache) {
+                if (userCache[key].has(device.id)) {
+                  isOnline = true;
 
-                    io.to(key).emit('newReadouts', {
-                      deviceId: device.id,
-                      lastRecord: value,
-                      sum
-                    });
-                  }
+                  io.to(key).emit('newReadouts', {
+                    deviceId: device.id,
+                    lastRecord: value
+                  });
                 }
+              }
 
-                if (!dev || isOnline) {
-                  if (lastRow) {
-                    wonder.query('value').update({
-                      id: lastRow.id
-                    }, {
-                      time_stamp_db: new Date(),
-                      last_record: value,
-                      sum: lastRow.sum + value
-                    });
-                  } else {
-                    wonder.query('value').create({
-                      time_stamp_db: new Date(),
-                      tree_id: device.id,
-                      last_record: value,
-                      sum: value
-                    });
-                  }
-                }
-              });
+              if (!dev || isOnline) {
+                wonder.query('value').create({
+                  time_stamp_db: new Date(),
+                  tree_id: device.id,
+                  last_record: value
+                });
+              }
             }
           }
         }

@@ -4,7 +4,7 @@
   export async function preload(page, session) {
     try {
       const count = await getPreloadApiResponse(
-        `${session.apiUrl}/devices/countMine`,
+        `/api/devices/countMine`,
         {},
         this
       );
@@ -88,7 +88,7 @@
     margin: .25rem .5rem
     text-align: center
 
-  @media (orientation: landscape)
+  @media (min-aspect-ratio: 23/18)
     .wrapper
       .switcher,
       .filler

@@ -1,10 +1,12 @@
 <script>
-  import { slide } from 'svelte/transition';
+  import { slide } from "svelte/transition";
 
-  import { mdiChevronDown } from '@mdi/js';
+  import { mdiChevronDown } from "@mdi/js";
 
   import Icon from "Icon.svelte";
   import Window from "monit/Window.svelte";
+
+  import { shiftForward } from "arrays";
 
   // ----------------------------------
 
@@ -14,12 +16,58 @@
   // ----------------------------------
 
   let opened = false;
+  let dayStats = null;
+  let monthStats = null;
+  let yearStats = null;
+  let chosenStats = 'day';
+
+  const lastDate = new Date();
 
   const handleClick = () => {
     if (device.active) {
-      opened = !opened;
+      if (opened) {
+        opened = false;
+      } else {
+        opened = true;
+      }
     }
   };
+
+  const updateStats = () => {
+    if (dayStats) {
+      if (newDate.getHours() !== lastDate.getHours()) {
+        shiftForward(dayStats, 0);
+      } else {
+        dayStats[0] += device.lastRecord;
+      }
+    }
+
+    if (monthStats) {
+      if (newDate.getDate() !== lastDate.getDate()) {
+        shiftForward(monthStats, 0);
+      } else {
+        monthStats[0] += device.lastRecord;
+      }
+    }
+
+    if (yearStats) {
+      if (newDate.getMonth() !== lastDate.getMonth()) {
+        shiftForward(yearStats, 0);
+      } else {
+        yearStats[0] += device.lastRecord;
+      }
+    }
+  };
+
+  $: {
+    const newDate = new Date();
+
+    if (device.lastRecord) {
+      updateStats();
+    }
+
+    lastDate.setTime(newDate.getTime());
+  }
 </script>
 
 <style lang="scss">
@@ -31,8 +79,8 @@
     .device {
       display: flex;
       align-items: center;
-      padding: .5rem;
-      border-width: .2rem;
+      padding: 0.5rem;
+      border-width: 0.2rem;
       border-style: solid;
 
       &.opened {
@@ -50,9 +98,9 @@
       }
 
       &.active {
-        border-color: rgba($color-primary, .2);
-        background-color: rgba($color-primary, .1);
-        transition: transform .3s ease;
+        border-color: rgba($color-primary, 0.2);
+        background-color: rgba($color-primary, 0.1);
+        transition: transform 0.3s ease;
 
         &:hover {
           cursor: pointer;
@@ -60,8 +108,8 @@
       }
 
       &.unactive {
-        border-color: rgba($color-secondary, .2);
-        background-color: rgba($color-secondary, .1);
+        border-color: rgba($color-secondary, 0.2);
+        background-color: rgba($color-secondary, 0.1);
       }
 
       .divider {
@@ -74,7 +122,7 @@
       }
 
       .icon {
-        transition: transform .3s ease;
+        transition: transform 0.3s ease;
         transform-origin: center center;
       }
     }
@@ -82,7 +130,7 @@
     .statistics {
       width: 80%;
       margin: auto;
-      padding: .25em .5em;
+      padding: 0.25em 0.5em;
     }
   }
 </style>
@@ -91,8 +139,7 @@
   <div
     class:opened
     class="device {device.active ? 'active' : 'unactive'}"
-    on:click={handleClick}
-  >
+    on:click={handleClick}>
     <Window title="Идентификатор" value={device.id} />
     {#if device.active}
       <div class="divider" />
@@ -104,15 +151,26 @@
       </div>
     {:else}
       <div class="divider" />
-      <h3 class="device-unactive">
-        Девайс неактивен  
-      </h3>
+      <h3 class="device-unactive">Девайс неактивен</h3>
     {/if}
   </div>
 
   {#if opened}
     <div class="statistics" transition:slide>
-      Сумма: {device.sum}
+      <label>
+        <input type="radio" bind:group={chosenStats} value="day" />
+        День (24 часа)
+      </label>
+
+      <label>
+        <input type="radio" bind:group={chosenStats} value="month" />
+        30 дней
+      </label>
+
+      <label>
+        <input type="radio" bind:group={chosenStats} value="year" />
+        Год (12 месяцев)
+      </label>
     </div>
   {/if}
 </div>

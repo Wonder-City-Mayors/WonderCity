@@ -43,7 +43,6 @@ export default {
                 value ?
                   {
                     timeStamp: value.time_stamp_db,
-                    sum: value.sum,
                     lastRecord: value.last_record
                   } :
                   {}

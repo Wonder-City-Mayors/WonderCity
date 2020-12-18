@@ -3,9 +3,9 @@
   let title;
 
   if (caption) {
-    title = `${caption} • ВундерВафля ре...борн? чё?`;
+    title = `${caption} • Wunderwaffel`;
   } else {
-    title = 'WonderCity';
+    title = 'Wunderwaffel';
   }
 </script>
 
