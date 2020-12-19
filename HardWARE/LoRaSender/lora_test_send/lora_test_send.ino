@@ -19,7 +19,8 @@ void loop() {
   
   if (Serial.available())
   {
-    id=Serial.parseInt();
+    while(Serial.available())
+      id=id*10+Serial.read()-'0';
     LoRa.beginPacket();
     LoRa.print(id);
     LoRa.endPacket();
@@ -34,14 +35,15 @@ void loop() {
   }
   if(message!=0)
   {
-    Serial.println(message);
+    Serial.print(message);
+    Serial.print("#");
     message=0;
     id=0;
     fl=false;
   }
-  else if(fl&&millis()-timer>=5000)
+  else if(fl&&millis()-timer>=7500)
   {
-    Serial.println("error");
+    Serial.print("error#");
     message=0;
     id=0;
     fl=false;
