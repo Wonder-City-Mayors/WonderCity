@@ -1,10 +1,10 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-const int id=5;
+const int id = 5;
 int message;
 bool fl;
-int value=1000;
+int value = 1000;
 void setup() {
   Serial.begin(9600);
   if (!LoRa.begin(433E6)) {
@@ -16,28 +16,27 @@ void setup() {
 }
 
 void loop() {
-  
-  if(LoRa.parsePacket())
+
+  if (LoRa.parsePacket())
   {
-     Serial.println(LoRa.parsePacket());
+    Serial.println(LoRa.parsePacket());
     while (LoRa.available()) {
-      message=LoRa.parseInt();
+      message = LoRa.parseInt();
     }
-    
     Serial.println(message);
-    if(id==message)
+    if (id == message)
     {
-      //delay(3000);
+      delay(2000);
       Serial.println("i send");
       LoRa.beginPacket();
-      LoRa.print(value*(rand()%7));
+      LoRa.print(value * (rand() % 7));
       LoRa.endPacket();
-      message=0;
-      digitalWrite(3,1);
+      message = 0;
+      digitalWrite(3, 1);
     }
     else
     {
-      message=0;
+      message = 0;
     }
   }
 }
