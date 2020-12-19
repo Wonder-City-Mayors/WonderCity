@@ -1,6 +1,5 @@
 import { addHours, addDays, addMonths } from 'date-and-time';
 
-
 const functionConstructor = (readoutsCount, reduceFunction, toSave) =>
   async (req, res) => {
     if (req.query.deviceId) {
@@ -8,9 +7,9 @@ const functionConstructor = (readoutsCount, reduceFunction, toSave) =>
         id: req.query.deviceId
       });
 
-      const timezone = Math.abs(req.query.timezoneOffset || 0);
+      const timezone = req.query.timezoneOffset || 0;
 
-      if (device && timezone <= 720 && timezone % 15 === 0) {
+      if (device && Math.abs(timezone) <= 720 && timezone % 15 === 0) {
         if (device.user_id === req.user.id) {
           const upperThreshold = new Date();
           const lowerThreshold = new Date(
@@ -26,11 +25,17 @@ const functionConstructor = (readoutsCount, reduceFunction, toSave) =>
           const resultArray = [];
 
           for (let i = 0; i < readoutsCount; i += 1) {
-            resultArray.push(await wonder.query('value').sum('power', {
-              tree_id: device.id,
-              time_stamp_db_gte: lowerThreshold,
-              time_stamp_db_lt: upperThreshold
-            }));
+            resultArray.push({
+              value: await wonder.query('value').sum('last_record', {
+                tree_id: device.id,
+                time_stamp_db_gte: lowerThreshold,
+                time_stamp_db_lt: upperThreshold
+              }),
+              timeStamp: new Date(
+                lowerThreshold.getTime() -
+                  timezone * 60000
+              ).toISOString()
+            });
 
             upperThreshold.setTime(lowerThreshold.getTime());
             lowerThreshold.setTime(reduceFunction(lowerThreshold, -1).getTime());

@@ -9,21 +9,13 @@ export default async (req, res) => {
     );
 
     req.user =  await getUser(auth);
-
-    if (req.user) return;
-  }
-
-  if (req.cookies.jwt) {
+  } else if (req.cookies.jwt) {
     req.user =  await getUser(req.cookies.jwt);
-
-    if (req.user) return;
-  }
-
-  if (req.method === 'GET' && req.query.jwt) {
+  } else if (req.query && req.query.jwt) {
     req.user = await getUser(req.query.jwt);
-
-    if (req.user) return;
+  } else if (req.body && req.body.jwt) {
+    req.user = await getUser(req.body.jwt);
   }
 
-  res.throw(401);
+  if (!req.user) res.throw(401);
 };

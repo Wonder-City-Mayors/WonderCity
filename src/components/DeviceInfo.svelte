@@ -1,12 +1,16 @@
 <script>
   import { slide } from "svelte/transition";
+  import { stores } from "@sapper/app";
+  import { parse } from 'date-and-time';
 
   import { mdiChevronDown } from "@mdi/js";
 
   import Icon from "Icon.svelte";
   import Window from "monit/Window.svelte";
+  import Graph from "monit/Graph.svelte";
 
   import { shiftForward } from "arrays";
+  import { getApiResponse } from "requests";
 
   // ----------------------------------
 
@@ -16,12 +20,11 @@
   // ----------------------------------
 
   let opened = false;
-  let dayStats = null;
-  let monthStats = null;
-  let yearStats = null;
-  let chosenStats = 'day';
+  let chosenStat = "Day";
 
-  const lastDate = new Date();
+  const stats = {};
+  const { session } = stores();
+  const lastDate = device.date;
 
   const handleClick = () => {
     if (device.active) {
@@ -34,39 +37,71 @@
   };
 
   const updateStats = () => {
-    if (dayStats) {
-      if (newDate.getHours() !== lastDate.getHours()) {
-        shiftForward(dayStats, 0);
+    if (stats.Day) {
+      if (device.date.getHours() !== lastDate.getHours()) {
+        shiftForward(stats.Day, {
+          value: 0,
+          timeStamp: device.date
+        });
       } else {
-        dayStats[0] += device.lastRecord;
+        stats.Day[0].value += device.lastRecord;
       }
     }
 
-    if (monthStats) {
-      if (newDate.getDate() !== lastDate.getDate()) {
-        shiftForward(monthStats, 0);
+    if (stats.Month) {
+      if (device.date.getDate() !== lastDate.getDate()) {
+        shiftForward(stats.Month, {
+          value: 0,
+          timeStamp: device.date
+        });
       } else {
-        monthStats[0] += device.lastRecord;
+        stats.Month[0].value += device.lastRecord;
       }
     }
 
-    if (yearStats) {
-      if (newDate.getMonth() !== lastDate.getMonth()) {
-        shiftForward(yearStats, 0);
+    if (stats.Year) {
+      if (device.date.getMonth() !== lastDate.getMonth()) {
+        shiftForward(stats.Year, {
+          value: 0,
+          timeStamp: device.date
+        });
       } else {
-        yearStats[0] += device.lastRecord;
+        stats.Year[0].value += device.lastRecord;
       }
     }
   };
 
+  const checkStats = () => {
+    stats[chosenStat] = getApiResponse(
+      `${$session.apiUrl}/values/stat${chosenStat}`,
+      {
+        deviceId: device.id,
+        timezoneOffset: device.date.getTimezoneOffset()
+      },
+      true
+    ).then((data) => {
+      const resp = data.response;
+
+      for (const stat of resp) {
+        stat.timeStamp = parse(stat.timeStamp, 'YYYY MM DD HH mm ss     ');
+      }
+
+      stats[chosenStat] = resp;
+    });
+  };
+
   $: {
-    const newDate = new Date();
+    const time = device.date.getTime();
 
-    if (device.lastRecord) {
+    if (time !== lastDate.getTime()) {
       updateStats();
-    }
 
-    lastDate.setTime(newDate.getTime());
+      lastDate.setTime(time);
+    }
+  }
+
+  $: if (opened && !stats.hasOwnProperty(chosenStat)) {
+    checkStats();
   }
 </script>
 
@@ -158,19 +193,29 @@
   {#if opened}
     <div class="statistics" transition:slide>
       <label>
-        <input type="radio" bind:group={chosenStats} value="day" />
+        <input type="radio" bind:group={chosenStat} value="Day" />
         День (24 часа)
       </label>
 
       <label>
-        <input type="radio" bind:group={chosenStats} value="month" />
+        <input type="radio" bind:group={chosenStat} value="Month" />
         30 дней
       </label>
 
       <label>
-        <input type="radio" bind:group={chosenStats} value="year" />
+        <input type="radio" bind:group={chosenStat} value="Year" />
         Год (12 месяцев)
       </label>
+
+      <div class="statistics-content">
+        {#await stats[chosenStat]}
+          Загрузка...
+        {:then stat}
+          <Graph data={stats[chosenStat]} />
+        {:catch error}
+          Ошибка.
+        {/await}
+      </div>
     </div>
   {/if}
 </div>
