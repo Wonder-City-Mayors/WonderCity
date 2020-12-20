@@ -16,6 +16,7 @@
 
   export let device;
   export let format;
+  export let locale;
 
   // ----------------------------------
 
@@ -211,7 +212,7 @@
         {#await stats[chosenStat]}
           Загрузка...
         {:then stat}
-          <Graph data={stats[chosenStat]} />
+          <Graph data={stats[chosenStat]} {locale} />
         {:catch error}
           Ошибка.
         {/await}
