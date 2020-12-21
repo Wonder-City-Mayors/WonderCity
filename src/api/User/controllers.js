@@ -1,6 +1,5 @@
 const pick = require('lodash/pick');
 const bcrypt = require('bcrypt');
-const { merge } = require('lodash');
 
 const parsePermissions = array => {
   return array.map(obj => obj.name);
@@ -117,5 +116,33 @@ module.exports = {
     res.throw(400);
   
     return;
+  },
+
+  addDevice: async (req, res) => {
+    if (req.query.id) {
+      const id = parseInt(req.query.id, 10);
+
+      if (id) {
+        const device = await wonder.query('tree').findOne({ id });
+
+        if (device) {
+          if (device.user_id === null) {
+            wonder.query('tree').update({
+              id: id
+            }, {
+              user_id: req.user.id
+            });
+
+            res.send('OK');
+            return;
+          }
+  
+          res.throw(403);
+          return;
+        }
+      }
+    }
+
+    res.throw(400);
   }
 };

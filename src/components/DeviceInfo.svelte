@@ -91,7 +91,7 @@
     });
   };
 
-  $: {
+  $: if (device.active) {
     const time = device.date.getTime();
 
     if (time !== lastDate.getTime()) {

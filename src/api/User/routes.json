@@ -8,5 +8,13 @@
     "method": "POST",
     "path": "/signup",
     "handler": "signUp"
+  },
+  {
+    "method": "GET",
+    "path": "/addDevice",
+    "handler": "addDevice",
+    "config": {
+      "policies": ["userStrict"]
+    }
   }
 ]
