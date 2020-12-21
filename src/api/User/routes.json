@@ -16,5 +16,13 @@
     "config": {
       "policies": ["userStrict"]
     }
+  },
+  {
+    "method": "GET",
+    "path": "/addName",
+    "handler": "addName",
+    "config": {
+      "policies": ["userStrict"]
+    }
   }
 ]

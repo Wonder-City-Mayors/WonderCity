@@ -1,6 +1,6 @@
 module.exports = {
   tableName: 'user',
-  hasTimestamps: true,
+  hasTimestamps: false,
 
   columns: {
     first_name: {

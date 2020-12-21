@@ -17,7 +17,7 @@ module.exports = {
     ) {
       const potentiallyExistingUser = await wonder
         .query('user')
-        .findOne({username});
+        .findOne({ username });
 
       if (!potentiallyExistingUser) {
         const userId = await wonder.knex.transaction(trx => {
@@ -31,8 +31,8 @@ module.exports = {
                 password: hash,
                 username
               })
-              .into('user')
-              .then(userId => userId[0])
+                .into('user')
+                .then(userId => userId[0])
             ));
         });
 
@@ -58,15 +58,15 @@ module.exports = {
 
       return;
     }
-  
+
     res.throw(400);
-  
+
     return;
   },
 
   signIn: async (req, res) => {
     const { username, password } = req.body;
-  
+
     if (
       password &&
       username &&
@@ -74,7 +74,7 @@ module.exports = {
       !/[^0-9a-zA-Z#$*_]/.test(username)
     ) {
       const user = await wonder.query('user').findOne({ username });
-      
+
       if (
         user &&
         await bcrypt.compare(password, String(user.password))
@@ -82,7 +82,7 @@ module.exports = {
         const jwt = wonder.services.jwt.issue({
           id: user.id
         });
-  
+
         const permissions = user.role_id ?
           parsePermissions(
             await wonder.knex
@@ -96,7 +96,7 @@ module.exports = {
               .where('permission_role.role_id', user.role_id)
           ) :
           [];
-  
+
         res.send({
           jwt,
           data: Object.assign({
@@ -104,17 +104,17 @@ module.exports = {
             permissions,
           }, pick(user, ['first_name', 'last_name', 'username']))
         });
-  
+
         return;
       }
-  
+
       res.throw(401);
-  
+
       return;
     }
-  
+
     res.throw(400);
-  
+
     return;
   },
 
@@ -136,7 +136,7 @@ module.exports = {
             res.send('OK');
             return;
           }
-  
+
           res.throw(403);
           return;
         }
@@ -144,5 +144,16 @@ module.exports = {
     }
 
     res.throw(400);
+  },
+  addName: async (req, res) => {
+    req.query.name
+    if
+      (req.query.name) {
+      wonder.query("user").update({ id: req.user.id }, { first_name: req.query.name })
+      res.send("Ок")
+      return
+    }
+    res.throw(400)
   }
 };
+
