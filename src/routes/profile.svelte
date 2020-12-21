@@ -5,6 +5,7 @@
   import { getApiResponse } from "requests";
 
   let deviceId;
+  let newName;
 
   const addDevice = () => {
     getApiResponse('/api/users/addDevice', {
@@ -15,6 +16,16 @@
       alert('Ты чё?');
     });
   };
+
+  function changeName () {
+    getApiResponse('/api/users/addName', {
+      name: newName
+    }, true).then(gut => {
+      alert('Всё готово!');
+    }, bad => {
+      alert('Пипец.');
+    });
+  }
 </script>
 
 <style>
@@ -55,8 +66,8 @@
   <div id="d">
     <input bind:value={deviceId} placeholder="Идентификатор датчика" id="f" />
     <button id="but" on:click={addDevice}>Нажми меня</button>
-    <input placeholder="Имя" id="f" />
-    <button id="but">Нажми меня</button>
+    <input bind:value={newName} placeholder="Имя" id="f" />
+    <button id="but" on:click={changeName}>Нажми меня</button>
     <br />
     <input placeholder="Фамилия" id="f" />
     <button id="but">Нажми меня</button>
