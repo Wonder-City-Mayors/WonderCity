@@ -24,10 +24,10 @@ void loop() {
     if(LoRa.available()) {
       if(LoRa.read())
       {
-        Serial.print("button was pressed ");
-        Serial.print(counter);
-        Serial.println(" times");
-        counter++;
+        Serial.println("button was pressed ");
+        //Serial.print(counter);
+        //Serial.println(" times");
+        //counter++;
       }
     }
   }
