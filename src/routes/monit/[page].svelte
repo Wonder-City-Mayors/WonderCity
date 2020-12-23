@@ -139,11 +139,10 @@
         for (const device of devices) {
           if (device.id === details.deviceId) {
             device.lastRecord = details.lastRecord;
-            device.sum = details.sum;
             device.date = new Date();
             device.active = true;
 
-            break;
+            return; 
           }
         }
       });

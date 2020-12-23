@@ -1,7 +1,7 @@
 <script>
   import { slide } from "svelte/transition";
   import { stores } from "@sapper/app";
-  import { parse } from 'date-and-time';
+  import { parse } from "date-and-time";
 
   import { mdiChevronDown } from "@mdi/js";
 
@@ -25,7 +25,7 @@
 
   const stats = {};
   const { session } = stores();
-  const lastDate = device.date;
+  const lastDate = device.date || new Date(NaN);
 
   const handleClick = () => {
     if (device.active) {
@@ -42,7 +42,7 @@
       if (device.date.getHours() !== lastDate.getHours()) {
         shiftForward(stats.Day, {
           value: 0,
-          timeStamp: device.date
+          timeStamp: device.date,
         });
       } else {
         stats.Day[0].value += device.lastRecord;
@@ -53,7 +53,7 @@
       if (device.date.getDate() !== lastDate.getDate()) {
         shiftForward(stats.Month, {
           value: 0,
-          timeStamp: device.date
+          timeStamp: device.date,
         });
       } else {
         stats.Month[0].value += device.lastRecord;
@@ -64,7 +64,7 @@
       if (device.date.getMonth() !== lastDate.getMonth()) {
         shiftForward(stats.Year, {
           value: 0,
-          timeStamp: device.date
+          timeStamp: device.date,
         });
       } else {
         stats.Year[0].value += device.lastRecord;
@@ -77,14 +77,14 @@
       `${$session.apiUrl}/values/stat${chosenStat}`,
       {
         deviceId: device.id,
-        timezoneOffset: device.date.getTimezoneOffset()
+        timezoneOffset: device.date.getTimezoneOffset(),
       },
       true
     ).then((data) => {
       const resp = data.response;
 
       for (const stat of resp) {
-        stat.timeStamp = parse(stat.timeStamp, 'YYYY MM DD HH mm ss     ');
+        stat.timeStamp = parse(stat.timeStamp, "YYYY MM DD HH mm ss     ");
       }
 
       stats[chosenStat] = resp;
