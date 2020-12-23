@@ -14,19 +14,21 @@ void setup() {
     while (1);
   }
   pinMode(6, INPUT_PULLUP);
+  pinMode(3, OUTPUT);
 }
 
 void loop() {
   // send packet
-  /*if(!digitalRead(6))
+  if(!digitalRead(6))
   {
     LoRa.beginPacket();
     LoRa.print(true);
     LoRa.endPacket();
     delay(100);
-  }*/
-  LoRa.beginPacket();
+    //digitalWrite(3, HIGH);
+  }
+  /*LoRa.beginPacket();
     LoRa.print(true);
     LoRa.endPacket();
-    delay(500);
+    delay(500);*/
 }
