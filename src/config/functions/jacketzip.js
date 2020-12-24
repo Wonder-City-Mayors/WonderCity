@@ -83,8 +83,8 @@ module.exports = async () => {
   if (process.env.SERIAL_PORT_NAME) {
     wonder.query('tree').count().then(mainCycle);
   } else {
-    wonder.query('tree').find().then(allDevices => {
-      setInterval(() => {
+    setInterval(() => {
+      wonder.query('tree').find().then(allDevices => {
         const date = new Date();
         // date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
         // по идее, надо бы записывать время по Гринвичу, но js+knex настолько умный,
@@ -124,8 +124,8 @@ module.exports = async () => {
             }
           }
         }
-      }, 3000);
-    });
+      });
+    }, 3000);
   }
 
   io.on('connection', socket => {
@@ -165,7 +165,7 @@ module.exports = async () => {
     });
 
     socket.on('disconnect', () => {
-      if (user) {
+      if (user && wonder.cache.connectedUsers.hasOwnProperty(user.id)) {
         delete wonder.cache.connectedUsers[user.id][socket.id];
 
         if (size(wonder.cache.connectedUsers[user.id]) === 0) {

@@ -94,36 +94,23 @@
   $: disabled = usernameError || passwordError || passwordRepeatError;
 
   const signup = () => {
-    if (
-      usernameEntered &&
-      passwordEntered &&
-      passwordRepeatEntered
-    )  {
+    if (usernameEntered && passwordEntered && passwordRepeatEntered) {
       if (!disabled) {
-        promise = new Promise((resolve, reject) => {
-          postApi($session.apiUrl + "/users/signup", {
-            username,
-            password
-          }).then(res => {
-            if (res.ok) {
-              res.json().then(
-                (json) => resolve(json),
-                (e) => reject(e)
-              );
-            } else {
-              reject(res);
-            }
-          });
+        promise = postApi($session.apiUrl + "/users/signup", {
+          username,
+          password,
         });
 
-        promise.then(json => {
-          dispatch("signed", json);
-        }, e => {
-          if (e.status === 403) {
-            promise = null;
-            wrongUsername = true;
-          }
-        });
+        promise
+          .then((json) => {
+            dispatch("signed", json);
+          })
+          .catch((e) => {
+            if (e.status === 403) {
+              promise = null;
+              wrongUsername = true;
+            }
+          });
       }
     } else {
       usernameEntered = true;
@@ -140,19 +127,19 @@
     display: flex;
     flex-wrap: wrap;
     color: $mdc-theme-secondary;
-    transition: opacity .3s ease, transform .3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 
-      &.active {
-        position: static;
-        transform: none;
-        opacity: 1;
-      }
+    &.active {
+      position: static;
+      transform: none;
+      opacity: 1;
+    }
 
-      &.unactive {
-        position: absolute;
-        transform: translateX(10rem);
-        opacity: 0;
-      }
+    &.unactive {
+      position: absolute;
+      transform: translateX(10rem);
+      opacity: 0;
+    }
   }
 </style>
 
@@ -183,19 +170,14 @@
       <p class="await">Перенаправляем...</p>
     {:catch e}
       <p class="error">
-        К сожалению, произошла какая-то&nbsp;
-        ошибка. Пожалуйста, попробуйте снова через&nbsp;
-        пару минут или обратитесь к администратору.
+        К сожалению, произошла какая-то&nbsp; ошибка. Пожалуйста, попробуйте
+        снова через&nbsp; пару минут или обратитесь к администратору.
       </p>
     {/await}
+  {:else if wrongUsername}
+    <p class="error">Этот логин уже занят.</p>
+    <SubmitButton disabled icon={mdiLogin} label="регистрация" />
   {:else}
-    {#if wrongUsername}
-      <p class="error">
-        Этот логин уже занят.
-      </p>
-      <SubmitButton disabled icon={ mdiLogin } label="регистрация" />
-    {:else}
-      <SubmitButton {disabled} icon={ mdiLogin } label="регистрация" />
-    {/if}
+    <SubmitButton {disabled} icon={mdiLogin} label="регистрация" />
   {/if}
 </form>

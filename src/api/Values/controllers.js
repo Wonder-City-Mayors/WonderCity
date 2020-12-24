@@ -1,6 +1,11 @@
 import { addHours, addDays, addMonths } from 'date-and-time';
 
-const functionConstructor = (readoutsCount, reduceFunction, toSave) =>
+const functionConstructor = (
+  readoutsCount,
+  reduceFunction,
+  toSave,
+  reduceCount = -1
+) =>
   async (req, res) => {
     if (req.query.deviceId) {
       const device = await wonder.query('tree').findOne({
@@ -33,12 +38,14 @@ const functionConstructor = (readoutsCount, reduceFunction, toSave) =>
               }),
               timeStamp: new Date(
                 lowerThreshold.getTime() -
-                  timezone * 60000
+                timezone * 60000
               ).toISOString()
             });
 
             upperThreshold.setTime(lowerThreshold.getTime());
-            lowerThreshold.setTime(reduceFunction(lowerThreshold, -1).getTime());
+            lowerThreshold.setTime(
+              reduceFunction(lowerThreshold, reduceCount
+            ).getTime());
           }
 
           res.send(resultArray);

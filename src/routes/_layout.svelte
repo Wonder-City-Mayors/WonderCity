@@ -292,7 +292,7 @@
         <div class="top-nav-logo-icon">
           <Icon icon={mdiCreation} />
         </div>
-        Wunderwaffe<span id="light-animated">l</span>
+        Wonder City
       </Button>
     </a>
     <TabBar

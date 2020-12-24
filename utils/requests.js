@@ -32,7 +32,7 @@ export const getApiResponse = async (path, query, auth) => {
     headers: {
       'Authentication': auth || ''
     }
-  }); 
+  });
 
   if (response.ok) {
     return await response.json();
@@ -54,29 +54,25 @@ export const getPreloadApiResponse = async (path, query, sapperInstance) => {
     response;
 };
 
-export const postApi = async (path, query, auth) => {
+export const postApi = (path, query, auth) => {
   if (auth === true) {
     auth = getCookie('jwt');
   }
 
-  const response = await fetch(path, {
+  return fetch(path, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authentication': auth || ''
     },
     body: JSON.stringify(query)
-  });
-
-  if (response.ok) {
-    const parsed = await response.json();
-
-    return (
-      parsed.hasOwnProperty('response') ?
-        parsed.response :
-        parsed
-    );
-  } else {
-    throw response;
-  }
+  }).then(response => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw response;
+    }
+  }).then(jsoned => (
+    jsoned.hasOwnProperty('response') ? jsoned.response : jsoned
+  ));
 };

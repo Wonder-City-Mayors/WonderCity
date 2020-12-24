@@ -127,7 +127,7 @@ module.exports = {
 
         if (device) {
           if (device.user_id === null) {
-            wonder.query('tree').update({
+            await wonder.query('tree').update({
               id: id
             }, {
               user_id: req.user.id
@@ -145,6 +145,7 @@ module.exports = {
 
     res.throw(400);
   },
+  
   addName: async (req, res) => {
     req.query.name
     if

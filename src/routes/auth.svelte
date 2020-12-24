@@ -4,6 +4,7 @@
   import Tab, { Label } from "@smui/tab";
   import TabBar from "@smui/tab-bar";
 
+  import Title from "Title.svelte";
   import Button from "Button.svelte";
   import TransitionWrapper from "TransitionWrapper.svelte";
   import SignIn from "auth/SignIn.svelte";
@@ -94,9 +95,7 @@
           margin: .25rem .5rem
 </style>
 
-<svelte:head>
-  <title>Авторизация • WonderCity Reborn</title>
-</svelte:head>
+<Title caption="Авторизация" />
 
 <TransitionWrapper>
   {#if user.isAuthenticated}
