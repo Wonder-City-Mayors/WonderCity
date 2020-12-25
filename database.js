@@ -29,7 +29,7 @@ class KnexManageModel {
 
     if (model.specs.hasOwnProperty('relations')) {
       const relation = model.specs.relations[
-        relatedModelName + ',' + model.specs.origin
+        `${relatedModelName},${model.specs.origin}`
       ];
 
       if (relation) {
@@ -104,14 +104,16 @@ class KnexManageModel {
           const relatedEntity = await relatedModel
             .findOne(searchObject);
 
-          set(
-            entity,
-            ['_relations', relatedModelName],
-            relatedEntity
-          );
+          if (relatedEntity) {
+            set(
+              entity,
+              ['_relations', relatedModelName],
+              relatedEntity
+            );
 
-          if (next) {
-            await this._findRelated(relatedEntity, next, relatedModel);
+            if (next) {
+              await this._findRelated(relatedEntity, next, relatedModel);
+            }
           }
         }
       }
@@ -231,7 +233,7 @@ class KnexManageModel {
 
     result = result.limit(limit);
     result = result.offset(offset);
-    
+
     return result;
   };
 
@@ -659,7 +661,7 @@ function __default(knex, models, printReady = true) {
               _models[model.origin][model.suffixTableName] = {};
             }
 
-            _models[model.origin][model.suffixTableName] = 
+            _models[model.origin][model.suffixTableName] =
               new KnexManageModel(knex, model);
 
             resolve();

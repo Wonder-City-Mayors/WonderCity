@@ -4,7 +4,7 @@
     "handler": "getReadouts",
     "method": "GET",
     "config": {
-      "policies": ["userFromCookies"]
+      "policies": ["userStrict"]
     }
   },
   {
@@ -12,7 +12,7 @@
     "handler": "count",
     "method": "GET",
     "config": {
-      "policies": ["userFromCookies"]
+      "policies": ["jwtPayloadStrict"]
     }
   }
 ]

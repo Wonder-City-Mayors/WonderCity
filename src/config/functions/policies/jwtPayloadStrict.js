@@ -1,6 +1,4 @@
-import getUser from 'getUser';
-
-export default async (req, res) => {
+module.exports = async (req, res) => {
   const sources = [
     (
       req.headers.authorization ?
@@ -17,9 +15,9 @@ export default async (req, res) => {
   ];
 
   for (const jwt of sources) {
-    req.user = await getUser(jwt);
+    req.jwtPayload = await wonder.services.jwt.verify(jwt);
 
-    if (req.user) return;
+    if (req.jwtPayload) return;
   }
 
   res.throw(401);

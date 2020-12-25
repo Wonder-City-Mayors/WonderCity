@@ -1,1 +1,0 @@
-module.exports = array => array.map(obj => obj.name);

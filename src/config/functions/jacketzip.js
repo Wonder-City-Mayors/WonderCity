@@ -1,73 +1,16 @@
 const size = require('lodash/size');
-let port;
-
-if (process.env.SERIAL_PORT_NAME) {
-  const SerialPort = require('serialport');
-
-  port = SerialPort(process.env.SERIAL_PORT_NAME, {
-    baudRate: process.env.SERIAL_PORT_BAUD_RATE || 9600
-  });
-}
+const port = (
+  process.env.SERIAL_PORT_NAME ?
+    require('serialport')(process.env.SERIAL_PORT_NAME, {
+      baudRate: process.env.SERIAL_PORT_BAUD_RATE || 9600
+    }) :
+    undefined
+);
 
 const randomInt = (start, end) => parseInt(
   Math.random() * (end - start) + start,
   10
 );
-
-const mainCycle = async max => {
-  let resolveCurrent, currentId;
-
-  port.on('data', data => {
-    data = data.toString();
-
-    if (data === 'error') {
-      console.log('blin' + currentId);
-    } else {
-      const value = parseInt(data, 10);
-
-      wonder.query('value').create({
-        tree_id: currentId,
-        last_record: value,
-        time_stamp_db: new Date()
-      });
-
-      // wonder.query('value').findOne({
-      //   tree_id: currentId
-      // }).then(lastRow => {
-      //   const difference = value - lastRow.last_record;
-
-      //   wonder.query('value').update({
-      //     id: lastRow.id
-      //   }, {
-      //     last_record: value,
-      //     sum: lastRow.sum + difference
-      //   });
-      // });
-    }
-
-    resolveCurrent();
-  });
-
-  for (let number = 0; number < max; number += 1) {
-    await wonder.query('tree').findOne({
-      _skip: number
-    }).then(device => {
-      currentId = device.id;
-
-      port.write(currentId, err => {
-        if (err) {
-          console.log('афигеть');
-        }
-      });
-
-      return new Promise((resolve, reject) => {
-        resolveCurrent = resolve;
-      });
-    });
-  }
-
-  mainCycle(max);
-};
 
 module.exports = async () => {
   const dev = process.env.NODE_ENV === 'development';
@@ -80,8 +23,101 @@ module.exports = async () => {
     'getUser'
   ));
 
-  if (process.env.SERIAL_PORT_NAME) {
-    wonder.query('tree').count().then(mainCycle);
+  if (port) {
+    let resolveCurrent, rejectCurrent;
+    let currentId;
+    let currentData = '';
+
+    port.on('data', data => {
+      data = data.toString();
+
+      for (let i = 0; i < data.length; i += 1) {
+        if (data[i] === '#') {
+          currentData += data.substring(0, i);
+
+          if (currentData === 'error') {
+            rejectCurrent(`Блин, ошибка у ${currentId}!`);
+          } else {
+            const value = parseInt(currentData, 10);
+
+            resolveCurrent(value);
+
+            // wonder.query('value').findOne({
+            //   tree_id: currentId
+            // }).then(lastRow => {
+            //   const difference = value - lastRow.last_record;
+
+            //   wonder.query('value').update({
+            //     id: lastRow.id
+            //   }, {
+            //     last_record: value,
+            //     sum: lastRow.sum + difference
+            //   });
+            // });
+          }
+
+
+          currentData = '';
+          return;
+        }
+      }
+
+      currentData += data;
+    });
+
+    const mainCycle = async max => {
+      for (let number = 0; number < max; number += 1) {
+        await wonder.query('tree').findOne({
+          _skip: number,
+          _sort: 'id:asc'
+        }).then(device => {
+          currentId = device.id;
+
+          port.write(currentId, err => {
+            if (err) {
+              console.log('афигеть');
+            }
+          });
+
+          return new Promise((resolve, reject) => {
+            resolveCurrent = resolve;
+            rejectCurrent = reject;
+          }).then(value => {
+            const userCache = wonder
+              .cache
+              .connectedUsers
+            [device.user_id];
+
+            wonder.query('value').create({
+              tree_id: currentId,
+              last_record: value,
+              time_stamp_db: new Date()
+            });
+
+            if (userCache) {
+              for (const key in userCache) {
+                if (userCache[key].has(device.id)) {
+                  io.to(key).emit('newReadouts', {
+                    deviceId: device.id,
+                    lastRecord: value
+                  });
+                }
+              }
+            }
+          }, console.log);
+        });
+      }
+
+      mainCycle(max);
+    };
+
+    wonder.query('tree').count().then(count => {
+      setTimeout(() => {
+        mainCycle(count);
+
+        console.log('Hardware cycle started!');
+      }, 5000);
+    });
   } else {
     setInterval(() => {
       wonder.query('tree').find().then(allDevices => {
