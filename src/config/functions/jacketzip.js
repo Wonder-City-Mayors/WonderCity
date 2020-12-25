@@ -34,13 +34,21 @@ module.exports = async () => {
       for (let i = 0; i < data.length; i += 1) {
         if (data[i] === '#') {
           currentData += data.substring(0, i);
+          let value;
 
           if (currentData === 'error') {
-            rejectCurrent(`Блин, ошибка у ${currentId}!`);
+            console.log(`Блин, ошибка у ${currentId}!`);
+            value = 0;
           } else {
-            const value = parseInt(currentData, 10);
+            value = parseInt(currentData, 10);
+            console.log(value);
+          }
 
-            resolveCurrent(value);
+            setTimeout(() => {
+              console.log(`Отпускаю ${currentId} в светлый путь...`);
+              currentData = '';
+              resolveCurrent(value);
+            }, 5000);
 
             // wonder.query('value').findOne({
             //   tree_id: currentId
@@ -54,10 +62,6 @@ module.exports = async () => {
             //     sum: lastRow.sum + difference
             //   });
             // });
-          }
-
-
-          currentData = '';
           return;
         }
       }
@@ -73,7 +77,7 @@ module.exports = async () => {
         }).then(device => {
           currentId = device.id;
 
-          port.write(currentId, err => {
+          port.write(String(5), err => {
             if (err) {
               console.log('афигеть');
             }
@@ -95,6 +99,8 @@ module.exports = async () => {
             });
 
             if (userCache) {
+              console.log(userCache);
+              
               for (const key in userCache) {
                 if (userCache[key].has(device.id)) {
                   io.to(key).emit('newReadouts', {
