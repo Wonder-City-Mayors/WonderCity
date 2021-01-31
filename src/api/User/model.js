@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   tableName: 'user',
   hasTimestamps: false,
 
@@ -23,6 +23,11 @@ module.exports = {
     password: {
       type: 'password',
       notNull: true
+    },
+
+    email: {
+      type: 'string',
+      length: 256
     }
   },
 

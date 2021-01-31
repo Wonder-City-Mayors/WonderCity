@@ -24,5 +24,29 @@
     "config": {
       "policies": ["userStrict"]
     }
+  },
+  {
+    "method": "POST",
+    "path": "/changeLastName",
+    "handler": "changeLastName",
+    "config": {
+      "policies": ["userStrict"]
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/changeEmail",
+    "handler": "changeEmail",
+    "config": {
+      "policies": ["userStrict"]
+    }
+  },
+  {
+    "method": "POST",
+    "path": "/changePassword",
+    "handler": "changePassword",
+    "config": {
+      "policies": ["userStrict"]
+    }
   }
 ]

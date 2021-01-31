@@ -6,8 +6,11 @@
 
   let deviceId;
   let newName;
+  let newLastName;
+  let newEmail;
+  let newPassword;
 
-  const addDevice = () => {
+  function addDevice() {
     getApiResponse('/api/users/addDevice', {
       id: deviceId
     }, true).then(gut => {
@@ -15,9 +18,9 @@
     }, bad => {
       alert('Ты чё?');
     });
-  };
+  }
 
-  function changeName () {
+  function changeName() {
     getApiResponse('/api/users/addName', {
       name: newName
     }, true).then(gut => {
@@ -25,6 +28,30 @@
     }, bad => {
       alert('Пипец.');
     });
+  }
+
+  /**
+   * Обработчик клика на кнопку, который отправляет запрос для
+   * смены фамилии
+   */
+  function changeLastName() {
+    // Тело функции
+  }
+
+  /**
+   * Обработчик клика на кнопку, который отправляет запрос для
+   * смены электронной почты
+   */
+  function changeEmail() {
+    // Тело функции
+  }
+
+  /**
+   * Обработчик клика на кнопку, который отправляет запрос для
+   * смены пароля
+   */
+  function changePassword() {
+    // Тело функции
   }
 </script>
 
@@ -69,17 +96,14 @@
     <input bind:value={newName} placeholder="Имя" id="f" />
     <button id="but" on:click={changeName}>Нажми меня</button>
     <br />
-    <input placeholder="Фамилия" id="f" />
-    <button id="but">Нажми меня</button>
+    <input bind:value={newLastName} placeholder="Фамилия" id="f" />
+    <button id="but" on:click={changeLastName}>Нажми меня</button>
     <br />
-    <input placeholder="Адрес" id="f" />
-    <button id="but">Нажми меня</button>
+    <input bind:value={newEmail} placeholder="Электронная почта" id="f" />
+    <button id="but" on:click={changeEmail}>Нажми меня</button>
     <br />
-    <input placeholder="Электронная почта" id="f" />
-    <button id="but">Нажми меня</button>
-    <br />
-    <input placeholder="Пароль" id="f" />
-    <button id="but">Нажми меня</button>
+    <input bind:value={newPassword} placeholder="Пароль" id="f" />
+    <button id="but" on:click={changePassword}>Нажми меня</button>
     <br />
   </div>
 </TransitionWrapper>

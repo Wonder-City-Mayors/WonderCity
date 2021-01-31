@@ -155,6 +155,40 @@ module.exports = {
       return
     }
     res.throw(400)
+  },
+
+  /**
+   * Обработчик, который меняет фамилию пользователя
+   * 
+   * @throws 400
+   * 
+   * @param {ExpressRequest} req 
+   * @param {ExpressResponse} res 
+   */
+  changeLastName: async (req, res) => {
+    // Тело функции
+  },
+
+  /**
+   * Обработчик, который меняет электронную почту пользователю
+   * 
+   * @throws 400
+   * 
+   * @param {ExpressRequest} req 
+   * @param {ExpressResponse} res 
+   */
+  changeEmail: async (req, res) => {
+    // Тело функции    
+  },
+
+  /**
+   * Обработчик, который меняет пароль пользователю
+   * 
+   * @param {ExpressRequest} req 
+   * @param {ExpressResponse} res 
+   */
+  changePassword: async (req, res) => {
+    // Тело функции
   }
 };
 
