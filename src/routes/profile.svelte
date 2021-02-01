@@ -35,7 +35,13 @@
    * смены фамилии
    */
   function changeLastName() {
-    // Тело функции
+    getApiRespone("/api/users/changeLastName", {
+	  lastName: newLastName
+	  }, true).then(gut => {
+	    alert("НУ вроде ОК");
+    }, bad => {
+	  alert("Неа, не сменил");
+	  });
   }
 
   /**
