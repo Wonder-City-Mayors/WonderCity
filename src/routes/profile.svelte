@@ -35,7 +35,7 @@
    * смены фамилии
    */
   function changeLastName() {
-    getApiRespone("/api/users/changeLastName", {
+    getApiResponse("/api/users/changeLastName", {
 	  lastName: newLastName
 	  }, true).then(gut => {
 	    alert("НУ вроде ОК");
@@ -49,7 +49,13 @@
    * смены электронной почты
    */
   function changeEmail() {
-    // Тело функции
+    getApiResponse("/api/users/changeEmail", {
+      email: newemail
+    }, true).then(gut => {
+       alert("НЕ ссы, спама не будет");
+    }, bad => {
+      alert("Старая осталась");
+    });
   }
 
   /**
@@ -57,7 +63,13 @@
    * смены пароля
    */
   function changePassword() {
-    // Тело функции
+    getApiResponse("/api/users/changePassword", {
+      password: newPassword
+    }, true).then(gut => {
+      alert("Новый не забудь как старый");
+    }, bad => {
+      alert("Старый вспоминай");
+    });
   }
 </script>
 
