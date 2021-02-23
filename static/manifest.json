@@ -1,0 +1,11 @@
+{
+    "name": "Wonder City",
+    "short_name": "Wonder City",
+    "start_url": "/",
+    "icons": [
+    ],
+    "theme_color": "#5E34FB",
+    "background_color": "#FFFFFF",
+    "display": "standalone",
+    "orientation": "portrait"
+  }

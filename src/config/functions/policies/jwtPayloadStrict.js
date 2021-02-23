@@ -1,3 +1,5 @@
+const get = require('lodash/get');
+
 module.exports = async (req, res) => {
   const sources = [
     (
@@ -9,9 +11,9 @@ module.exports = async (req, res) => {
         ) :
         undefined
     ),
-    req.cookies?.jwt,
-    req.query?.jwt,
-    req.body?.jwt
+    get(req, ['cookies', 'jwt']),
+    get(req, ['query', 'jwt']),
+    get(req, ['body', 'jwt']),
   ];
 
   for (const jwt of sources) {

@@ -1,4 +1,5 @@
 import getUser from 'getUser';
+import get from 'lodash/get';
 
 export default async (req, res) => {
   const sources = [
@@ -11,9 +12,9 @@ export default async (req, res) => {
         ) :
         undefined
     ),
-    req.cookies?.jwt,
-    req.query?.jwt,
-    req.body?.jwt
+    get(req, ['cookies', 'jwt']),
+    get(req, ['query', 'jwt']),
+    get(req, ['body', 'jwt']),
   ];
 
   for (const jwt of sources) {
