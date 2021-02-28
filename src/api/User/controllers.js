@@ -1,9 +1,4 @@
-import pick from 'lodash/pick';
 import bcrypt from 'bcrypt';
-
-const parsePermissions = array => {
-    return array.map(obj => obj.name);
-};
 
 export default {
     signUp: async (req, res) => {
