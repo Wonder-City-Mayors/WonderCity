@@ -147,15 +147,26 @@ export default {
      * 
      * @throws 400
      * 
-     * @param {ExpressRequest} req 
-     * @param {ExpressResponse} res 
+     * @param {ExpressRequest} request 
+     * @param {ExpressResponse} response 
      */
-    changeLastName: async (req, res) => {
-        // Тело функции
+    changeLastName: async (request, response) => {
+        const lastName = String(request.body.lastName);
+
+        if (!lastName || /[^А-яёЁ]/.test(lastName)) {
+            response.throw(400, "Некорректная фамилия");
+            return;
+        }
+
+        await wonder.knex('user')
+            .update('last_name', lastName)
+            .where('id', req.user.id);
+
+        response.status(200).send();
     },
 
     /**
-     * Обработчик, который меняет электронную почту пользователю
+     * Обработчик, который меняет электронную почту пользователя
      * 
      * @throws 400
      * 
@@ -167,7 +178,7 @@ export default {
     },
 
     /**
-     * Обработчик, который меняет пароль пользователю
+     * Обработчик, который меняет пароль пользователя
      * 
      * @param {ExpressRequest} req 
      * @param {ExpressResponse} res 

@@ -1,7 +1,5 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-
-  import { arrayOf } from "arrays";
+  import { arrayOf } from "utils/arrays";
 
   export let count;
   export let current;

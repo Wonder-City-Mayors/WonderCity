@@ -1,8 +1,8 @@
 <script>
   import { stores } from "@sapper/app";
   
-  import TransitionWrapper from "TransitionWrapper.svelte";
-  import Title from "Title.svelte";
+  import TransitionWrapper from "components/TransitionWrapper.svelte";
+  import Title from "components/Title.svelte";
 
   const { session } = stores();
 </script>

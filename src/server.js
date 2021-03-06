@@ -14,13 +14,13 @@ import addModels, * as db from '../database';
 
 // filesystem
 import path from 'path';
-import { readFile, access, readdir } from 'filesystem';
+import { readFile, access, readdir } from 'utils/filesystem';
 import fs from 'fs';
 
 // utilities
 import _ from 'lodash';
-import getUser from 'getUser';
-import getRouteName from 'getRouteName';
+import getUser from 'utils/getUser';
+import getRouteName from 'utils/getRouteName';
 
 dotenv.config();
 

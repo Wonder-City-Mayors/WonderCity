@@ -3,8 +3,6 @@ const _ = require('lodash');
 
 module.exports = {
     issue: (payload, jwtOptions = {}) => {
-        console.log(wonder.config);
-
         return jwt.sign(
             _.clone(payload),
             _.get(wonder, ['config', 'jwtSecret']),

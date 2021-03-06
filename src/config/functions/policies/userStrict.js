@@ -1,4 +1,4 @@
-import getUser from 'getUser';
+import getUser from 'utils/getUser';
 import get from 'lodash/get';
 
 export default async (req, res) => {

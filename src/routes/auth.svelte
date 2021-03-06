@@ -4,13 +4,13 @@
     import Tab, { Label } from "@smui/tab";
     import TabBar from "@smui/tab-bar";
 
-    import Title from "Title.svelte";
-    import Button from "Button.svelte";
-    import TransitionWrapper from "TransitionWrapper.svelte";
-    import SignIn from "auth/SignIn.svelte";
-    import SignUp from "auth/SignUp.svelte";
+    import Title from "components/Title.svelte";
+    import Button from "components/Button.svelte";
+    import TransitionWrapper from "components/TransitionWrapper.svelte";
+    import SignIn from "components/auth/SignIn.svelte";
+    import SignUp from "components/auth/SignUp.svelte";
 
-    import { setCookie } from "cookies";
+    import { setCookie } from "utils/cookies";
 
     const { page, session } = stores();
     const user = $session.user;

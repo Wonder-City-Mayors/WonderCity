@@ -1,5 +1,5 @@
 <script context="module">
-  import { getPreloadApiResponse } from "requests";
+  import { getPreloadApiResponse } from "utils/requests";
 
   export async function preload(page, session) {
     try {
@@ -30,10 +30,10 @@
 
   import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
 
-  import TransitionWrapper from "TransitionWrapper.svelte";
-  import Icon from "Icon.svelte";
-  import Title from "Title.svelte";
-  import Switchers from "Switchers.svelte";
+  import TransitionWrapper from "components/TransitionWrapper.svelte";
+  import Icon from "components/Icon.svelte";
+  import Title from "components/Title.svelte";
+  import Switchers from "components/Switchers.svelte";
 
   // -------------------------------------------------
 

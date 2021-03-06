@@ -10,7 +10,7 @@
     "handler": "signUp"
   },
   {
-    "method": "GET",
+    "method": "POST",
     "path": "/addDevice",
     "handler": "addDevice",
     "config": {
@@ -18,9 +18,9 @@
     }
   },
   {
-    "method": "GET",
-    "path": "/addName",
-    "handler": "addName",
+    "method": "POST",
+    "path": "/changeName",
+    "handler": "changeName",
     "config": {
       "policies": ["userStrict"]
     }

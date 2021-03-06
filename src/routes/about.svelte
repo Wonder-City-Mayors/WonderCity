@@ -1,6 +1,6 @@
 <script>
-  import TransitionWrapper from "TransitionWrapper.svelte";
-  import Title from "Title.svelte";
+  import TransitionWrapper from "components/TransitionWrapper.svelte";
+  import Title from "components/Title.svelte";
 </script>
 
 <Title caption="О SQBit" />

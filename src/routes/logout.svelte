@@ -1,5 +1,5 @@
 <script>
-  import { deleteCookie } from "cookies";
+  import { deleteCookie } from "utils/cookies";
   import { onMount } from "svelte";
   import { stores, goto } from "@sapper/app";
 

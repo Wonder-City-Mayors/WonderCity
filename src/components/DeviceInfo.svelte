@@ -5,12 +5,12 @@
 
   import { mdiChevronDown } from "@mdi/js";
 
-  import Icon from "Icon.svelte";
-  import Window from "monit/Window.svelte";
-  import Graph from "monit/Graph.svelte";
+  import Icon from "./Icon.svelte";
+  import Window from "./monit/Window.svelte";
+  import Graph from "./monit/Graph.svelte";
 
-  import { shiftForward } from "arrays";
-  import { getApiResponse } from "requests";
+  import { shiftForward } from "utils/arrays";
+  import { getApiResponse } from "utils/requests";
 
   // ----------------------------------
 

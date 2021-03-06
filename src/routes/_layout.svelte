@@ -13,7 +13,7 @@
     } from "@mdi/js";
 
     import Tab, { Label } from "@smui/tab";
-    import Icon from "Icon.svelte";
+    import Icon from "components/Icon.svelte";
     import Button from "@smui/button";
     import TabBar from "@smui/tab-bar";
 

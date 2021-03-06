@@ -1,5 +1,5 @@
 <script context="module">
-  import { getPreloadApiResponse } from "requests";
+  import { getPreloadApiResponse } from "utils/requests";
 
   export async function preload(page, session) {
     const devices = await getPreloadApiResponse(
@@ -19,7 +19,7 @@
 <script>
   import { getContext } from "svelte";
   import { format, register } from "timeago.js";
-  import Device from "DeviceInfo.svelte";
+  import Device from "components/DeviceInfo.svelte";
 
   export let devices = [];
 
