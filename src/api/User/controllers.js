@@ -104,8 +104,8 @@ export default {
     },
 
     addDevice: async (req, res) => {
-        if (req.query.id) {
-            const id = parseInt(req.query.id, 10);
+        if (req.body.id) {
+            const id = parseInt(req.body.id, 10);
 
             if (id) {
                 const device = await wonder.query('tree').findOne({ id });
