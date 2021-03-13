@@ -34,7 +34,7 @@ export const getApiResponse = async (path, query, auth) => {
     });
 
     if (response.ok) {
-        return await response.json();
+        return await response.json().catch(() => null);
     } else {
         throw response;
     }
@@ -46,9 +46,9 @@ export const getPreloadApiResponse = async (path, query, sapperInstance) => {
         await sapperInstance.fetch(url, {
             credentials: 'include'
         })
-    ).json();
+    ).json().then(a => a, () => null);
 
-    return response.hasOwnProperty('response') ?
+    return (response && 'response' in response) ?
         response.response :
         response;
 };
@@ -66,10 +66,10 @@ export const postApi = (path, query, auth) => {
         body: JSON.stringify(query)
     }).then(response => {
         if (response.ok)
-            return response.json();
+            return response.json().then(a => a, () => null);
         else
             throw response;
     }).then(jsoned => (
-        jsoned.hasOwnProperty('response') ? jsoned.response : jsoned
+        (jsoned && 'response' in jsoned) ? jsoned.response : jsoned
     ));
 };

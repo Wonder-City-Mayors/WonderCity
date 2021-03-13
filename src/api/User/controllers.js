@@ -160,7 +160,7 @@ export default {
 
         await wonder.knex('user')
             .update('last_name', lastName)
-            .where('id', req.user.id);
+            .where('id', request.user.id);
 
         response.status(200).send();
     },
@@ -174,17 +174,35 @@ export default {
      * @param {ExpressResponse} res 
      */
     changeEmail: async (req, res) => {
-        // Тело функции    
+        if (/^\w+@\w+\.\w+$/.test(req.body.email)) {
+            await wonder.knex('user')
+                .update('email', req.body.email)
+                .where('id', req.user.id);
+            res.status(200).end();
+        }
+        else {
+            res.throw(400, 'Insert normal email')
+        }
     },
 
     /**
      * Обработчик, который меняет пароль пользователя
+     * 
+     * @throws 400
      * 
      * @param {ExpressRequest} req 
      * @param {ExpressResponse} res 
      */
     changePassword: async (req, res) => {
         // Тело функции
+        if (!req.body.password || req.body.password.length < 8) {
+            res.throw(400);
+            return;
+        }
+        await wonder.knex('user')
+            .update('password', await bcrypt.hash(req.body.password, 10))
+            .where('id', req.user.id);
+        res.status(200).end();
     }
 };
 
