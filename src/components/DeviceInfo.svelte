@@ -71,7 +71,16 @@
             }
         }
 
-        
+        if ('Prediction' in stats) {
+            if (device.date.getDate() !== lastDate.getDate()) {
+                shiftForward(stats.Prediction, {
+                    value: 0,
+                    timeStamp: device.date
+                });
+            } else {
+                stats.Prediction[0].value += device.lastRecord;
+            }
+        }
     };
 
     const checkStats = () => {

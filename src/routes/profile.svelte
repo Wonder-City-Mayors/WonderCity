@@ -1,6 +1,8 @@
 <script>
     import TransitionWrapper from "components/TransitionWrapper.svelte";
     import Title from "components/Title.svelte";
+    import Input from "components/TextField.svelte";
+    import Btn from "components/Btn.svelte";
 
     import { postApi } from "utils/requests";
 
@@ -112,6 +114,8 @@
 
 <TransitionWrapper>
     <div id="d">
+        <Input rt="как это делать"/>
+        <Btn>Кто прочитал тот гачимучник</Btn>
         <input
             bind:value={deviceId}
             placeholder="Идентификатор датчика"

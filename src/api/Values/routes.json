@@ -22,5 +22,13 @@
     "config": {
       "policies": ["userStrict"]
     }
+  },
+  {
+    "method": "GET",
+    "path": "/statPrediction",
+    "handler": "statPrediction",
+    "config": {
+      "policies": ["userStrict"]
+    }
   }
 ]
