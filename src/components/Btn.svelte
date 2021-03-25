@@ -1,4 +1,4 @@
-<button>
+<button on:click>
     <slot />
 </button>
 
@@ -7,14 +7,14 @@
         font-size: .75rem;
         display: block;
         text-align: center;
-        height: 10px;
-        width: 30px;
-        margin: 20px auto;
+        height: 20px;
+        width: 130px;
+        margin: 3px auto;
         line-height: 50px;
         padding-left: 38px;
         position: relative;
-        background: rgb(41, 127, 184);
-        color: rgb(17, 15, 15);
+        background: rgb(197, 231, 43);
+        color: #b82ca0;
         text-decoration: none;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -36,8 +36,8 @@
     }
     a.button:hover span,
     .button.active span {
-        background: #fff;
-        border-right: 1px solid rgba(0, 0, 0, 0.3);
-        color: #297fb8;
+        background: rgb(47, 226, 226);
+        border-right: 1px solid rgb(46, 208, 219);
+        color: #e09034;
     }
 </style>

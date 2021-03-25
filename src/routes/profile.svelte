@@ -115,24 +115,24 @@
 <TransitionWrapper>
     <div id="d">
         <Input rt="как это делать"/>
-        <Btn>Кто прочитал тот гачимучник</Btn>
+        <Btn>Тыкни сюда</Btn>
         <input
             bind:value={deviceId}
             placeholder="Идентификатор датчика"
             id="f"
         />
-        <button id="but" on:click={addDevice}>Нажми меня</button>
+        <Btn on:click={addDevice}>Нажми меня</Btn>
         <input bind:value={newName} placeholder="Имя" id="f" />
-        <button id="but" on:click={changeName}>Нажми меня</button>
+        <Btn on:click={changeName}>Нажми меня</Btn>
         <br />
         <input bind:value={newLastName} placeholder="Фамилия" id="f" />
-        <button id="but" on:click={changeLastName}>Нажми меня</button>
+        <Btn on:click={changeLastName}>Нажми меня</Btn>
         <br />
         <input bind:value={newEmail} placeholder="Электронная почта" id="f" />
-        <button id="but" on:click={changeEmail}>Нажми меня</button>
+        <Btn on:click={changeEmail}>Нажми меня</Btn>
         <br />
         <input bind:value={newPassword} placeholder="Пароль" id="f" />
-        <button id="but" on:click={changePassword}>Нажми меня</button>
+        <Btn on:click={changePassword}>Нажми меня</Btn>
         <br />
     </div>
 </TransitionWrapper>
@@ -147,15 +147,6 @@
         background-color: #0bdb38;
         border-color: black;
     }
-    #but {
-        background-color: #2abfda;
-        border-top: none;
-        border-left: none;
-        border-right: 1px solid rgba(0, 0, 0, 0.5);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-        outline: none;
-    }
-
     #but:hover {
         background-color: #d4e20c;
     }
