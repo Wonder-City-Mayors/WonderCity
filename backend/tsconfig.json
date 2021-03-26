@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "esnext",
+        "baseUrl": "./",
+        "paths": {
+            "@utils/*": [
+                "lib/utils/*",
+                "../utils/*"
+            ],
+
+            "@policies/*": [
+                "lib/policies/*"
+            ],
+
+            "@lifecycle/*": [
+                "lib/lifecycle/*"
+            ],
+
+            "@config/*": [
+                "lib/config/*"
+            ],
+            "@config": [
+                "lib/config"
+            ],
+            
+            "@lib/*": [
+                "lib/*"
+            ]
+        }
+    },
+    "exclude": [
+        "node_modules",
+        "config"
+    ],
+}

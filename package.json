@@ -1,73 +1,25 @@
 {
-  "name": "wondercity",
-  "description": "Kalashnikov Academy project. That's it.",
-  "version": "0.0.1",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Wonder-City-Mayors/Wonder-City"
+  "name": "wc",
+  "version": "1.0.0",
+  "description": "Синергия датчиков для сбора показаний считывающих устройств и приложения для отображения информации и оплаты коммунальных услуг.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
   },
   "scripts": {
-    "dev": "sapper dev",
-    "build": "sapper build --legacy",
-    "export": "sapper export --legacy",
-    "start": "node __sapper__/build",
-    "cy:run": "cypress run",
-    "cy:open": "cypress open",
-    "test": "run-p --race dev cy:run"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wonder-City-Mayors/Wonder-City.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Wonder-City-Mayors/Wonder-City/issues"
+  },
+  "homepage": "https://github.com/Wonder-City-Mayors/Wonder-City#readme",
   "dependencies": {
-    "bcrypt": "^5.0.0",
-    "body-parser": "^1.19.0",
-    "compression": "^1.7.4",
-    "cookie": "^0.4.1",
-    "d3-array": "^2.9.1",
-    "d3-axis": "^2.0.0",
-    "d3-scale": "^3.2.3",
-    "d3-selection": "^2.0.0",
-    "d3-shape": "^2.0.0",
-    "date-and-time": "^0.14.2",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
-    "knex": "^0.21.5",
-    "lodash": "^4.17.20",
-    "mysql": "^2.18.1",
-    "socket.io": "^3.0.3",
-    "socket.io-client": "^3.0.3",
-    "timeago.js": "^4.0.2",
-    "timsort": "^0.3.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-syntax-dynamic-import": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/runtime": "^7.0.0",
-    "@mdi/js": "^5.8.55",
-    "@rollup/plugin-alias": "^3.1.1",
-    "@rollup/plugin-babel": "^5.0.0",
-    "@rollup/plugin-commonjs": "^14.0.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^8.0.0",
-    "@rollup/plugin-replace": "^2.2.0",
-    "autoprefixer": "^9.8.6",
-    "colors": "^1.4.0",
-    "glob": "^7.1.6",
-    "node-sass": "^4.14.1",
-    "npm-run-all": "^4.1.5",
-    "random-hash": "^4.0.1",
-    "rollup": "^2.3.4",
-    "rollup-plugin-includepaths": "^0.2.4",
-    "rollup-plugin-postcss": "^3.1.8",
-    "rollup-plugin-svelte": "^6.0.0",
-    "rollup-plugin-terser": "^7.0.0",
-    "sapper": "^0.28.0",
-    "sass": "^1.26.10",
-    "svelte": "^3.17.3",
-    "svelte-material-ui": "^1.0.0",
-    "svelte-preprocess": "^4.2.1"
-  },
-  "optionalDependencies": {
-    "serialport": "^9.0.3"
+    "lodash": "^4.17.21"
   }
 }
