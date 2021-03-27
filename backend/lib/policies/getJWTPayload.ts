@@ -1,3 +1,5 @@
+import { verify } from '@lib/jwt';
+
 export default async function (req, res) {
     const sources = [
         (
@@ -15,7 +17,7 @@ export default async function (req, res) {
     ];
 
     for (const jwt of sources) {
-        req.jwtPayload = await wonder.services.jwt.verify(jwt);
+        req.jwtPayload = await verify(jwt);
 
         if (req.jwtPayload) return true;
     }

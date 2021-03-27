@@ -65,24 +65,5 @@ export default {
     statMonth: functionConstructor(30, addDays, 3),
     statYear: functionConstructor(12, addMonths, 2),
     statPrediction: async (req, res) => {
-        const IdCounter = parseInt(req.query.deviceId, 10);
-        if (isNaN(IdCounter)) {
-            res.throw(400);
-            return;
-        }
-        const Counter = await wonder.knex.raw("select * from tree where id = ?", IdCounter);
-        if (Counter.length == 0) {
-            res.throw(400);
-            return;
-        }
-        if (req.user.id != Counter[0].user_id) {
-            res.throw(403);
-            return;
-        }
-        const value = await wonder.knex.raw(
-            "select avg(nice) as average from (select datediff(now(), time_stamp_db) as time," +
-            " sum(last_record) as nice from value where tree_id = ? group by time having time" +
-            " mod 7 = 0) as val;", IdCounter
-        );
     }
 };

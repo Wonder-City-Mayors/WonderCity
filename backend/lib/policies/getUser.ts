@@ -1,6 +1,7 @@
-import getUser from 'utils/getUser';
+import getUser from '@utils/getUser';
+import { Request } from 'express';
 
-export default async (req, res) => {
+export default async (req: Request) => {
     const sources = [
         (
             req.headers.authorization ?

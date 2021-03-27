@@ -9,7 +9,7 @@ interface Permission {
 };
 
 function parsePermissions(permissionsArray: Permission[]): {} | true {
-    if (permissionsArray[0]?.type == '*')
+    if (permissionsArray.length > 0 && permissionsArray[0].type == '*')
         return true;
 
     const permissionObject = {};

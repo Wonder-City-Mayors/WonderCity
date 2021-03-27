@@ -11,11 +11,6 @@ dotenvConfig();
 const { PORT = 3000 } = process.env;
 
 /**
- * Express.js
- */
-import express from 'express';
-
-/**
  * Разноцветная консоль :Р
  */
 import * as colors from 'colors/safe';
@@ -23,7 +18,7 @@ import * as colors from 'colors/safe';
 /**
  * Инициализация базы данных
  */
-import { init as initializeDatabase } from '@lib/database';
+import { init as initializeDatabase, db } from '@lib/database';
 initializeDatabase();
 
 /**
@@ -37,6 +32,11 @@ import jacketzip from '@lifecycle/jacketzip';
  * Express-приложение
  */
 import app from '@lib/app';
+
+/**
+ * Политики))
+ */
+import getUser from '@policies/getUser';
 
 /**
  * Загрузка и логгинг и всякая фигня
@@ -86,3 +86,52 @@ bootstrap()
 
         console.log(e);
     });
+
+app.get('/values/statPrediction', async (req, res) => {
+    if (!getUser(req)) {
+        res.status(401).end();
+
+        return;
+    }
+
+    if (typeof req.query.deviceId !== "string") {
+        res.status(400).end();
+
+        return;
+    }
+
+    const IdCounter = parseInt(req.query.deviceId, 10);
+
+    if (isNaN(IdCounter)) {
+        res.status(400).end();
+
+        return;
+    }
+
+    const Counter = await db.first('*').from('tree').where('id', IdCounter);
+
+    if (!Counter) {
+        res.status(400).end();
+
+        return;
+    }
+
+    // if (req.user.id != Counter.user_id) {
+    //     res.status(403).end();
+
+    //     return;
+    // }
+
+    const Valuess = [];
+    const Time = new Date();
+    for (let i = 0; i != 30; i++) {
+        const value = await db.raw(
+            "select avg(nice) as average from (select datediff(?, time_stamp_db) as time," +
+            " sum(last_record) as nice from value where tree_id = ? group by time having time" +
+            " mod 7 = 0) as val;", [Time, IdCounter]
+        );
+        Time.setTime(86400000 + Time.getTime())
+        Valuess.push(value[0].average);
+    }
+    res.send(Valuess);
+});
