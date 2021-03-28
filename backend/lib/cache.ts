@@ -1,13 +1,13 @@
 interface ServerCache {
     connectedUsers: {
         [key: string]: {
-            [key: string]: Set<number>
-        }
-    }
+            [key: string]: Set<number>;
+        };
+    };
 }
 
 const cache: ServerCache = {
-    connectedUsers: {}
+    connectedUsers: {},
 };
 
 export default cache;

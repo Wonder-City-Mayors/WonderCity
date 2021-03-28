@@ -4,35 +4,40 @@
         "moduleResolution": "node",
         "target": "es2019",
         "allowSyntheticDefaultImports": true,
+        "allowJs": true,
+        "experimentalDecorators": true,
         "baseUrl": "./",
         "paths": {
-            "@utils/*": [
-                "lib/utils/*",
-                "../utils/*"
-            ],
+            "@utils/*": ["lib/utils/*", "../utils/*"],
 
-            "@policies/*": [
-                "lib/policies/*"
-            ],
+            "@policies/*": ["lib/policies/*"],
 
-            "@lifecycle/*": [
-                "lib/lifecycle/*"
-            ],
+            "@lifecycle/*": ["lib/lifecycle/*"],
 
-            "@config/*": [
-                "lib/config/*"
-            ],
-            "@config": [
-                "lib/config"
-            ],
-            
-            "@lib/*": [
-                "lib/*"
-            ]
+            "@interfaces/*": ["lib/interfaces/*"],
+
+            "@exceptions/*": ["lib/exceptions/*"],
+
+            "@middlewares/*": ["lib/middlewares/*"],
+
+            "@controllers/*": ["lib/controllers/*"],
+
+            "@routes/*": ["lib/routes/*"],
+
+            "@services/*": ["lib/services/*"],
+
+            "@dtos/*": ["lib/services/*"],
+
+            "@models/*": ["lib/models/*"],
+
+            "@database/*": ["lib/database/*"],
+            "@database": ["lib/database"],
+
+            "@config/*": ["lib/config/*"],
+            "@config": ["lib/config"],
+
+            "@lib/*": ["lib/*"]
         }
     },
-    "exclude": [
-        "node_modules",
-        "config"
-    ],
+    "exclude": ["node_modules", "config"]
 }
