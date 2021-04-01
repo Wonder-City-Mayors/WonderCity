@@ -1,14 +1,22 @@
 {
     "compilerOptions": {
+        "allowUnreachableCode": false,
+        "alwaysStrict": true,
         "module": "esnext",
         "moduleResolution": "node",
-        "target": "es2019",
+        "target": "esnext",
         "allowSyntheticDefaultImports": true,
-        "allowJs": true,
         "experimentalDecorators": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "esModuleInterop": true,
         "baseUrl": "./",
+        "rootDir": "./",
+        "outDir": "dist",
         "paths": {
-            "@utils/*": ["lib/utils/*", "../utils/*"],
+            "@utils/*": ["lib/utils/*"],
+
+            "@commonUtils/*": ["../utils/*"],
 
             "@policies/*": ["lib/policies/*"],
 
@@ -30,6 +38,8 @@
 
             "@models/*": ["lib/models/*"],
 
+            "@objection": ["lib/database/objection"],
+
             "@database/*": ["lib/database/*"],
             "@database": ["lib/database"],
 
@@ -39,5 +49,6 @@
             "@lib/*": ["lib/*"]
         }
     },
-    "exclude": ["node_modules", "config"]
+    "include": ["index.ts", "lib/**/*.ts", "lib/database/knexfile.js"],
+    "exclude": ["node_modules", "config", "dist", ".vscode"]
 }

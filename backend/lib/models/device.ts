@@ -1,38 +1,8 @@
-import DeviceInterface from "@interfaces/device";
 import { Model } from "objection";
 import User from "./user";
 import Value from "./value";
 
-/**
- * Модель датчика в базе данных.
- */
-export default class Device extends Model implements DeviceInterface {
-    static get tableName() {
-        return "device";
-    }
-
-    static get relationMappings() {
-        return {
-            user: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: User,
-                join: {
-                    from: this.tableName + ".userId",
-                    to: User.tableName + ".id",
-                },
-            },
-
-            values: {
-                relation: Model.HasManyRelation,
-                modelClass: Value,
-                join: {
-                    from: this.tableName + ".id",
-                    to: Value.tableName + ".deviceId",
-                },
-            },
-        };
-    }
-
+interface Device {
     /**
      * Уникальный идентификатор датчика.
      */
@@ -94,3 +64,36 @@ export default class Device extends Model implements DeviceInterface {
      */
     userId?: number;
 }
+
+/**
+ * Модель датчика в базе данных.
+ */
+class Device extends Model {
+    static get tableName() {
+        return "device";
+    }
+
+    static get relationMappings() {
+        return {
+            user: {
+                relation: this.BelongsToOneRelation,
+                modelClass: User,
+                join: {
+                    from: this.tableName + ".userId",
+                    to: User.tableName + ".id",
+                },
+            },
+
+            values: {
+                relation: this.HasManyRelation,
+                modelClass: Value,
+                join: {
+                    from: this.tableName + ".id",
+                    to: Value.tableName + ".deviceId",
+                },
+            },
+        };
+    }
+}
+
+export default Device;

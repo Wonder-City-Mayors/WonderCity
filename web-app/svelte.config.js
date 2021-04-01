@@ -1,26 +1,26 @@
 module.exports = {
-    preprocess: require('svelte-preprocess')({
+    preprocess: require("svelte-preprocess")({
         scss: {
-            includePaths: ['./src/theme'],
+            includePaths: ["./src/theme"],
         },
 
         postcss: {
-            plugins: [require('autoprefixer')],
+            plugins: [require("autoprefixer")],
         },
 
         babel: {
             presets: [
                 [
-                    '@babel/preset-env',
+                    "@babel/preset-env",
                     {
                         loose: true,
                         modules: false,
                         targets: {
-                            esmodules: true
-                        }
-                    }
-                ]
-            ]
-        }
+                            esmodules: true,
+                        },
+                    },
+                ],
+            ],
+        },
     }),
 };

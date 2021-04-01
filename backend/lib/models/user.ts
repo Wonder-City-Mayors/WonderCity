@@ -1,38 +1,8 @@
-import { UserInterface } from "@interfaces/user";
 import { Model } from "objection";
 import Device from "./device";
 import Role from "./role";
 
-/**
- * Модель пользователя в базе данных.
- */
-export default class User extends Model implements UserInterface {
-    static get tableName() {
-        return "user";
-    }
-
-    static get relationMappings() {
-        return {
-            role: {
-                relation: Model.HasOneRelation,
-                modelClass: Role,
-                join: {
-                    from: this.tableName + ".roleId",
-                    to: Role.tableName + ".id",
-                },
-            },
-
-            devices: {
-                relation: Model.HasManyRelation,
-                modelClass: Device,
-                join: {
-                    from: this.tableName + ".id",
-                    to: Device.tableName + ".userId",
-                },
-            },
-        };
-    }
-
+interface User {
     /**
      * Логин пользователя.
      */
@@ -84,3 +54,36 @@ export default class User extends Model implements UserInterface {
      */
     email?: string;
 }
+
+/**
+ * Модель пользователя в базе данных.
+ */
+class User extends Model {
+    static get tableName() {
+        return "user";
+    }
+
+    static get relationMappings() {
+        return {
+            role: {
+                relation: this.HasOneRelation,
+                modelClass: Role,
+                join: {
+                    from: this.tableName + ".roleId",
+                    to: Role.tableName + ".id",
+                },
+            },
+
+            devices: {
+                relation: this.HasManyRelation,
+                modelClass: Device,
+                join: {
+                    from: this.tableName + ".id",
+                    to: Device.tableName + ".userId",
+                },
+            },
+        };
+    }
+}
+
+export default User;

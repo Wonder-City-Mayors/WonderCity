@@ -1,36 +1,8 @@
-import PermissionInterface from "@interfaces/permission";
 import { Model } from "objection";
 import PermissionRoleJunction from "./permissionRole.junction";
 import Role from "./role";
 
-/**
- * Модель разрешения в базе данных.
- */
-export default class Permission extends Model implements PermissionInterface {
-    static get tableName() {
-        return "permission";
-    }
-
-    static get relationMappings() {
-        return {
-            roles: {
-                relation: Model.ManyToManyRelation,
-                modelClass: Role,
-                join: {
-                    from: this.tableName + ".id",
-
-                    through: {
-                        from:
-                            PermissionRoleJunction.tableName + ".permissionId",
-                        to: PermissionRoleJunction.tableName + ".roleId",
-                    },
-
-                    to: Role.tableName + ".id",
-                },
-            },
-        };
-    }
-
+interface Permission {
     /**
      * Уникальный идентификатор разрешения.
      */
@@ -67,3 +39,34 @@ export default class Permission extends Model implements PermissionInterface {
      */
     target?: string;
 }
+
+/**
+ * Модель разрешения в базе данных.
+ */
+class Permission extends Model {
+    static get tableName() {
+        return "permission";
+    }
+
+    static get relationMappings() {
+        return {
+            roles: {
+                relation: this.ManyToManyRelation,
+                modelClass: Role,
+                join: {
+                    from: this.tableName + ".id",
+
+                    through: {
+                        from:
+                            PermissionRoleJunction.tableName + ".permissionId",
+                        to: PermissionRoleJunction.tableName + ".roleId",
+                    },
+
+                    to: Role.tableName + ".id",
+                },
+            },
+        };
+    }
+}
+
+export default Permission;

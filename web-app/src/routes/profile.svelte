@@ -114,26 +114,32 @@
 
 <TransitionWrapper>
     <div id="d">
-        <Input rt="как это делать"/>
+        <Input placeholder="как это делать"/>
         <Btn>Тыкни сюда</Btn>
-        <input
+
+        <Input
             bind:value={deviceId}
             placeholder="Идентификатор датчика"
             id="f"
         />
+        
         <Btn on:click={addDevice}>Нажми меня</Btn>
-        <input bind:value={newName} placeholder="Имя" id="f" />
+      
+            <Input bind:value={newName} placeholder="Имя" id="f" />
+      
         <Btn on:click={changeName}>Нажми меня</Btn>
-        <br />
-        <input bind:value={newLastName} placeholder="Фамилия" id="f" />
+        
+        <Input bind:value={newLastName} placeholder="Фамилия" id="f" />
+        
         <Btn on:click={changeLastName}>Нажми меня</Btn>
-        <br />
-        <input bind:value={newEmail} placeholder="Электронная почта" id="f" />
+        
+        <Input bind:value={newEmail} placeholder="Электронная почта" id="f" />
+       
         <Btn on:click={changeEmail}>Нажми меня</Btn>
-        <br />
-        <input bind:value={newPassword} placeholder="Пароль" id="f" />
+
+        <Input bind:value={newPassword} placeholder="Пароль" id="f" />
+        
         <Btn on:click={changePassword}>Нажми меня</Btn>
-        <br />
     </div>
 </TransitionWrapper>
 

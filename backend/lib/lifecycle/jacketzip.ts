@@ -6,6 +6,8 @@ import size from "lodash/size";
 import getUser from "@utils/getUser";
 import { db } from "@database";
 import cache from "@lib/cache";
+import Device from "@models/device";
+import Value from "@models/value";
 
 function randomInt(start: number, end: number) {
     return Math.trunc(Math.random() * (end - start) + start);
@@ -60,12 +62,12 @@ export default async function (server: httpServer) {
 
         const mainCycle = async (max) => {
             for (let number = 0; number < max; number += 1) {
-                await db("tree")
-                    .select("*")
+                Device.query()
+                    .first()
                     .offset(number)
                     .limit(1)
                     .orderBy("id", "asc")
-                    .first()
+
                     .then((device) => {
                         currentId = device.id;
 
@@ -80,12 +82,13 @@ export default async function (server: httpServer) {
                             rejectCurrent = reject;
                         }).then((value) => {
                             const userCache =
-                                cache.connectedUsers[device.user_id];
+                                device.userId &&
+                                cache.connectedUsers[device.userId];
 
-                            db("value").insert({
-                                tree_id: currentId,
-                                last_record: value,
-                                time_stamp_db: new Date(),
+                            Value.query().insert({
+                                deviceId: currentId,
+                                record: value,
+                                timestamp: new Date(),
                             });
 
                             if (userCache) {
@@ -107,7 +110,8 @@ export default async function (server: httpServer) {
             mainCycle(max);
         };
 
-        db("tree")
+        Device.query()
+            .first()
             .count("*")
             .then((count) => {
                 setTimeout(() => {
@@ -118,50 +122,47 @@ export default async function (server: httpServer) {
             });
     } else {
         setInterval(() => {
-            db("tree")
-                .select("*")
-                .then((allDevices) => {
-                    const date = new Date();
-                    date.setTime(
-                        date.getTime() + date.getTimezoneOffset() * 60000,
-                    );
+            Device.query().then((allDevices) => {
+                const date = new Date();
+                date.setTime(date.getTime() + date.getTimezoneOffset() * 60000);
 
-                    for (const device of allDevices) {
-                        const userCache = cache.connectedUsers[device.user_id];
+                for (const device of allDevices) {
+                    const userCache =
+                        device.userId && cache.connectedUsers[device.userId];
 
-                        if (userCache) {
-                            const value = randomInt(0, 501);
+                    if (userCache) {
+                        const value = randomInt(0, 501);
 
-                            if (value <= 100) {
-                                let isOnline = false;
+                        if (value <= 100) {
+                            let isOnline = false;
 
-                                for (const key in userCache) {
-                                    if (userCache[key].has(device.id)) {
-                                        isOnline = true;
+                            for (const key in userCache) {
+                                if (userCache[key].has(device.id)) {
+                                    isOnline = true;
 
-                                        io.to(key).emit("newReadouts", {
-                                            deviceId: device.id,
-                                            lastRecord: value,
-                                        });
-                                    }
-                                }
-
-                                if (!process.env.DEV || isOnline) {
-                                    db("value").insert({
-                                        time_stamp_db: new Date(),
-                                        tree_id: device.id,
-                                        last_record: value,
+                                    io.to(key).emit("newReadouts", {
+                                        deviceId: device.id,
+                                        lastRecord: value,
                                     });
                                 }
                             }
+
+                            if (!process.env.DEV || isOnline) {
+                                Value.query().insert({
+                                    timestamp: new Date(),
+                                    deviceId: device.id,
+                                    record: value,
+                                });
+                            }
                         }
                     }
-                });
+                }
+            });
         }, 3000);
     }
 
     io.on("connection", (socket: Socket) => {
-        const cookies = cookie.parse(socket.handshake.headers.cookie);
+        const cookies = cookie.parse(socket.handshake.headers.cookie || "");
         let user;
 
         getUser(cookies.jwt).then((result) => {
@@ -176,13 +177,12 @@ export default async function (server: httpServer) {
 
         socket.on("newDevices", (devices) => {
             if (user) {
-                db("tree")
-                    .select("*")
+                Device.query()
                     .whereIn("id", devices)
                     .then((dbDevices) => {
                         if (socket.connected) {
                             for (const device of dbDevices) {
-                                if (device.user_id !== user.id) {
+                                if (device.userId !== user.id) {
                                     return;
                                 }
                             }

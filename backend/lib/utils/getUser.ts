@@ -1,6 +1,7 @@
 import { get, has, set } from "lodash";
 import { verify } from "@lib/jwt";
 import { db } from "@database";
+import User from "@models/user";
 
 interface Permission {
     type: string;
@@ -48,27 +49,16 @@ function parsePermissions(permissionsArray: Permission[]): {} | true {
     return permissionObject;
 }
 
-export default async function getUser(jwt: string): Promise<{}> {
+export default async function getUser(jwt: string): Promise<{} | null> {
     if (jwt) {
         const payload = await verify(jwt);
 
         if (payload) {
-            const user = await db("user")
-                .select("*")
-                .where("id", payload.id)
-                .first();
+            const user = await User.query()
+                .findById(payload.id)
+                .joinRelated("role.permissions");
 
-            user.permissions = parsePermissions(
-                await db
-                    .select("permission.*")
-                    .from("permission")
-                    .innerJoin(
-                        "permission_role",
-                        "permission_role.permission_id",
-                        "permission.id",
-                    )
-                    .where("permission_role.role_id", user.role_id),
-            );
+            console.log(user);
 
             return user;
         }

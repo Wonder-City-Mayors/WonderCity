@@ -1,15 +1,15 @@
-import { init } from "@database";
+import "@database/init";
+
 import App from "@lib/app";
-import { logger } from "@utils/logger";
+import User from "@models/user";
 import validateEnv from "@utils/validateEnv";
 
-init();
+validateEnv();
 
-// validateEnv();
+const app = new App([]);
 
-// const app = new App([]);
+User.query().first().then(console.log);
 
 // app.bootstrap()
 //     .then(() => app.jacketzip())
-//     .then(() => logger.info("Сервер запущен!"))
 //     .catch((e) => console.error("Произошла ошибка."));

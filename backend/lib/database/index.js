@@ -1,9 +1,10 @@
-import knex from "knex";
-import type { Knex } from "knex";
-
+const knex = require("knex");
+const { config } = require("dotenv");
 const { knexSnakeCaseMappers } = require("objection");
 
-let db: Knex<any, unknown[]> = null;
+config();
+
+let db;
 
 function init() {
     db = knex({
@@ -26,4 +27,7 @@ function init() {
     });
 }
 
-export { db, init };
+module.exports = {
+    db,
+    init,
+};

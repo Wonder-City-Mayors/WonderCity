@@ -16,6 +16,8 @@
     const user = $session.user;
     const tabs = ["Вход", "Регистрация"];
 
+    const text = "text";
+
     let signInForm, signUpForm;
 
     let activeIndex = 0;

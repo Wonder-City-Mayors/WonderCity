@@ -1,13 +1,24 @@
-import RoleInterface from "@interfaces/role";
 import { Model } from "objection";
 import Permission from "./permission";
 import PermissionRoleJunction from "./permissionRole.junction";
 import User from "./user";
 
+interface Role {
+    /**
+     * Уникальный идентификатор роли.
+     */
+    id: number;
+
+    /**
+     * Название роли.
+     */
+    name: string;
+}
+
 /**
  * Модель роли в базе данных.
  */
-export default class Role extends Model implements RoleInterface {
+class Role extends Model {
     static get tableName() {
         return "role";
     }
@@ -15,7 +26,7 @@ export default class Role extends Model implements RoleInterface {
     static get relationMappings() {
         return {
             users: {
-                relation: Model.HasManyRelation,
+                relation: this.HasManyRelation,
                 modelClass: User,
                 join: {
                     from: this.tableName + ".id",
@@ -24,7 +35,7 @@ export default class Role extends Model implements RoleInterface {
             },
 
             permissions: {
-                relation: Model.ManyToManyRelation,
+                relation: this.ManyToManyRelation,
                 modelClass: Permission,
                 join: {
                     from: this.tableName + ".id",
@@ -39,14 +50,6 @@ export default class Role extends Model implements RoleInterface {
             },
         };
     }
-
-    /**
-     * Уникальный идентификатор роли.
-     */
-    id: number;
-
-    /**
-     * Название роли.
-     */
-    name: string;
 }
+
+export default Role;

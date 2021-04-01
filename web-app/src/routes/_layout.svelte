@@ -213,7 +213,7 @@
     }
 
     html {
-        font-size: calc(1vw + 2vh);
+        font-size: calc(1vw + 1vh + 5px);
         font-family: defaultFont, serif;
         height: 100%;
     }
@@ -309,7 +309,7 @@
 
     @media all and (orientation: landscape) {
         html {
-            font-size: calc(1vw + 1vh);
+            font-size: calc(1vw + .5vh + 5px);
         }
     }
 

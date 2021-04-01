@@ -12,12 +12,6 @@ const dev = NODE_ENV === 'development';
 
 const app = polka();
 
-app.use(
-    compression({ threshold: 0 }),
-    sirv('static', { dev }),
-    sapper.middleware()
-);
-
 if (dev) {
     app.use(async (req, res, next) => {
         const start = new Date();
@@ -52,6 +46,24 @@ if (dev) {
         next();
     });
 }
+
+app.use(
+    compression({ threshold: 0 }),
+    sirv('static', { dev })
+);
+
+app.use(async function (req, res, next) {
+
+
+    sapper.middleware({
+        session: () => ({
+            apiUrl: API_URL,
+            user: {
+                isAuthenticated: false
+            }
+        })
+    })(req, res, next);
+});
 
 app.listen(PORT, err => {
     if (err) {

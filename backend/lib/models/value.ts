@@ -1,28 +1,7 @@
-import ValueInterface from "@interfaces/value";
 import { Model } from "objection";
 import Device from "./device";
 
-/**
- * Модель показания в базе данных.
- */
-export default class Value extends Model implements ValueInterface {
-    static get tableName() {
-        return "value";
-    }
-
-    static get relationMappings() {
-        return {
-            device: {
-                relation: Model.BelongsToOneRelation,
-                modelClass: Device,
-                join: {
-                    from: this.tableName + ".deviceId",
-                    to: Device.tableName + ".id",
-                },
-            },
-        };
-    }
-
+interface Value {
     /**
      * Время получения показания сервером.
      */
@@ -43,3 +22,27 @@ export default class Value extends Model implements ValueInterface {
      */
     deviceId: number;
 }
+
+/**
+ * Модель показания в базе данных.
+ */
+class Value extends Model {
+    static get tableName() {
+        return "value";
+    }
+
+    static get relationMappings() {
+        return {
+            device: {
+                relation: this.BelongsToOneRelation,
+                modelClass: Device,
+                join: {
+                    from: this.tableName + ".deviceId",
+                    to: Device.tableName + ".id",
+                },
+            },
+        };
+    }
+}
+
+export default Value;

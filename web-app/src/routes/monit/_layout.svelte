@@ -25,7 +25,7 @@
 </script>
 
 <script>
-  import { onDestroy, onMount, setContext } from 'svelte';
+  import { onDestroy, setContext } from 'svelte';
   import { readable } from 'svelte/store';
 
   import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
