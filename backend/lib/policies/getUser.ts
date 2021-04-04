@@ -1,9 +1,7 @@
+import { ModifiedRequest } from "@lib/types"
 import getUser from "@utils/getUser"
-import { Request } from "express"
 
-import "expressRequest"
-
-export default async (req: Request) => {
+export default async (req: ModifiedRequest) => {
     const sources = [
         req.headers.authorization
             ? req.headers.authorization.substring(0, 6) === "Bearer"
@@ -16,7 +14,7 @@ export default async (req: Request) => {
     ]
 
     for (const jwt of sources) {
-        req.user = (await getUser(jwt)) || undefined
+        req.user = await getUser(jwt)
 
         if (req.user) return true
     }

@@ -1,15 +1,12 @@
-import "@database/init";
+import "@database/init"
+import "@utils/validateEnv"
 
-import App from "@lib/app";
-import User from "@models/user";
-import validateEnv from "@utils/validateEnv";
+import App from "@lib/app"
+import AuthRoute from "@routes/auth"
+import UserRoute from "@routes/user"
 
-validateEnv();
+const app = new App(new AuthRoute(), new UserRoute())
 
-const app = new App([]);
-
-User.query().first().then(console.log);
-
-// app.bootstrap()
-//     .then(() => app.jacketzip())
-//     .catch((e) => console.error("Произошла ошибка."));
+app.bootstrap()
+    .then(() => app.jacketzip())
+    .catch((e) => console.error("Произошла ошибка."))

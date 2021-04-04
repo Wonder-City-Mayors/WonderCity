@@ -12,9 +12,17 @@ const output = {
 
 module.exports = {
     mode: "development",
+
     entry: resolve(process.cwd(), "index.ts"),
     output,
+
     devtool: false,
+
+    watch: true,
+    watchOptions: {
+        ignored: /node_modules/,
+    },
+
     module: {
         rules: [
             {
@@ -24,21 +32,27 @@ module.exports = {
             },
         ],
     },
+
     resolve: {
         alias: {},
         extensions: [".js", ".jsx", ".ts", ".tsx"],
         plugins: [new TsconfigPathsPlugin({})],
     },
+
     plugins: [
         new ESLintPlugin(),
         {
             apply(compiler) {
-                compiler.hooks.done.tap("AfterEmitPlugin", function () {
-                    const child = spawn(
-                        `node ${join(output.path, output.filename)}`,
-                    )
+                let child
 
-                    child.on("spawn")
+                compiler.hooks.done.tap("DonePlugin", function () {
+                    child = spawn(
+                        "node",
+                        [join(output.path, output.filename)],
+                        {
+                            env: process.env,
+                        },
+                    )
 
                     child.stdout.on("data", function (data) {
                         process.stdout.write(data)
@@ -48,8 +62,17 @@ module.exports = {
                         process.stderr.write(data)
                     })
                 })
+
+                compiler.hooks.watchRun.tap("WatchRunPlugin", function () {
+                    if (child) {
+                        console.log("Rebuilding...")
+
+                        child.kill("SIGINT")
+                    }
+                })
             },
         },
     ],
+
     externals: [nodeExternals()],
 }

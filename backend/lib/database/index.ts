@@ -1,10 +1,9 @@
-const knex = require("knex");
-const { config } = require("dotenv");
-const { knexSnakeCaseMappers } = require("objection");
+import "dotenv/config"
 
-config();
+import { knexSnakeCaseMappers, Model } from "objection"
+import knex, { Knex } from "knex"
 
-let db;
+let db: Knex<any[], unknown>
 
 function init() {
     db = knex({
@@ -24,10 +23,9 @@ function init() {
         },
 
         ...knexSnakeCaseMappers(),
-    });
+    })
+
+    Model.knex(db)
 }
 
-module.exports = {
-    db,
-    init,
-};
+export { db, init }

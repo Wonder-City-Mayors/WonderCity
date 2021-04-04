@@ -1,12 +1,13 @@
-import { Model } from "objection";
-import Device from "./device";
-import Role from "./role";
+import { ResponseUser } from "@interfaces/response"
+import { Model } from "objection"
+import Device from "./device"
+import Role from "./role"
 
 interface User {
     /**
      * Логин пользователя.
      */
-    username: string;
+    username: string
 
     /**
      * Имя пользователя.
@@ -14,7 +15,7 @@ interface User {
      * @remarks
      * Может отсутствовать.
      */
-    firstName?: string;
+    firstName?: string
 
     /**
      * Фамилия пользователя.
@@ -22,20 +23,20 @@ interface User {
      * @remarks
      * Может отсутствовать.
      */
-    lastName?: string;
+    lastName?: string
 
     /**
      * Пароль пользователя.
      *
      * @remarks
-     * Хеш-строка длиной 60 символов.
+     * Хеш-буффер длиной 60 символов.
      */
-    password: string;
+    password: Buffer
 
     /**
      * Уникальный идентификатор пользователя.
      */
-    id: number;
+    id: number
 
     /**
      * Уникальный идентификатор роли пользователя.
@@ -44,7 +45,7 @@ interface User {
      * Внешний ключ.
      * Может отсутствовать.
      */
-    roleId?: number;
+    roleId?: number
 
     /**
      * Адрес электронной почты пользователя.
@@ -52,7 +53,7 @@ interface User {
      * @remarks
      * Может отсутствовать.
      */
-    email?: string;
+    email?: string
 }
 
 /**
@@ -60,7 +61,7 @@ interface User {
  */
 class User extends Model {
     static get tableName() {
-        return "user";
+        return "user"
     }
 
     static get relationMappings() {
@@ -82,8 +83,20 @@ class User extends Model {
                     to: Device.tableName + ".userId",
                 },
             },
-        };
+        }
+    }
+
+    toResponseUser = () => {
+        const responseUser: ResponseUser = {
+            id: this.id,
+            username: this.username,
+            firstName: this.firstName,
+            lastName: this.lastName,
+            email: this.email,
+        }
+
+        return responseUser
     }
 }
 
-export default User;
+export default User

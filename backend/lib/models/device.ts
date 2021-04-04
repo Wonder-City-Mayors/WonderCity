@@ -1,12 +1,12 @@
-import { Model } from "objection";
-import User from "./user";
-import Value from "./value";
+import { Model } from "objection"
+import User from "./user"
+import Value from "./value"
 
 interface Device {
     /**
      * Уникальный идентификатор датчика.
      */
-    id: number;
+    id: number
 
     /**
      * Понятия не имею, что это.
@@ -14,7 +14,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    currId?: string;
+    currId?: string
 
     /**
      * Понятия не имею, что это.
@@ -22,7 +22,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    parent?: string;
+    parent?: string
 
     /**
      * Понятия не имею, что это.
@@ -30,7 +30,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    text?: string;
+    text?: string
 
     /**
      * Понятия не имею, что это.
@@ -38,7 +38,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    type?: number;
+    type?: number
 
     /**
      * Понятия не имею, что это.
@@ -46,7 +46,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    snC?: number;
+    snC?: number
 
     /**
      * Понятия не имею, что это.
@@ -54,7 +54,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    snM?: string;
+    snM?: string
 
     /**
      * Уникальный идентификатор пользователя, владеющего датчиком.
@@ -62,7 +62,7 @@ interface Device {
      * @remarks
      * Может отсутствовать.
      */
-    userId?: number;
+    userId?: number
 }
 
 /**
@@ -70,7 +70,7 @@ interface Device {
  */
 class Device extends Model {
     static get tableName() {
-        return "device";
+        return "device"
     }
 
     static get relationMappings() {
@@ -92,8 +92,8 @@ class Device extends Model {
                     to: Value.tableName + ".deviceId",
                 },
             },
-        };
+        }
     }
 }
 
-export default Device;
+export default Device

@@ -1,21 +1,21 @@
+import Route from "@interfaces/route"
+import bootstrap from "@lifecycle/bootstrap"
+import jacketzip from "@lifecycle/jacketzip"
+import errorMiddleware from "@middlewares/error"
+import { DEV } from "@utils/environment"
+import { logger } from "@utils/logger"
+import compression from "compression"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 import express from "express"
 import helmet from "helmet"
 import hpp from "hpp"
-import compression from "compression"
-import Route from "@interfaces/route"
-import errorMiddleware from "@middlewares/error"
-import { logger } from "@utils/logger"
-import bootstrap from "@lifecycle/bootstrap"
-import jacketzip from "@lifecycle/jacketzip"
-import { DEV } from "@utils/environment"
 
 export default class App {
     public app: express.Application
     public port: number
 
-    constructor(routes: Route[]) {
+    constructor(...routes: Route[]) {
         this.app = express()
         this.port = parseInt(process.env.PORT || "", 10)
 
@@ -62,7 +62,7 @@ export default class App {
 
     private initializeRoutes(routes: Route[]) {
         for (let i = 0; i < routes.length; i++)
-            this.app.use("/", routes[i].router)
+            this.app.use(routes[i].path || "/", routes[i].router)
     }
 
     private initializeErrorHandling() {

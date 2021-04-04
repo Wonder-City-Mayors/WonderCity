@@ -1,2 +1,1 @@
-export default async function bootstrap() {
-}
+export default async function bootstrap() {}

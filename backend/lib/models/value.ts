@@ -1,26 +1,26 @@
-import { Model } from "objection";
-import Device from "./device";
+import { Model } from "objection"
+import Device from "./device"
 
 interface Value {
     /**
      * Время получения показания сервером.
      */
-    timestamp: string;
+    timestamp: string
 
     /**
      * Значение показания.
      */
-    record: number;
+    record: number
 
     /**
      * Уникальный идентификатор показания.
      */
-    id: number;
+    id: number
 
     /**
      * Уникальный идентификатор датчика показания.
      */
-    deviceId: number;
+    deviceId: number
 }
 
 /**
@@ -28,7 +28,7 @@ interface Value {
  */
 class Value extends Model {
     static get tableName() {
-        return "value";
+        return "value"
     }
 
     static get relationMappings() {
@@ -41,8 +41,8 @@ class Value extends Model {
                     to: Device.tableName + ".id",
                 },
             },
-        };
+        }
     }
 }
 
-export default Value;
+export default Value

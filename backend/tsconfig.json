@@ -15,6 +15,7 @@
         "outDir": "dist",
         "paths": {
             "@utils/*": ["lib/utils/*"],
+            "@utils": ["lib/utils"],
 
             "@commonUtils/*": ["../utils/*"],
 
@@ -34,7 +35,7 @@
 
             "@services/*": ["lib/services/*"],
 
-            "@dtos/*": ["lib/services/*"],
+            "@dtos/*": ["lib/dtos/*"],
 
             "@models/*": ["lib/models/*"],
 

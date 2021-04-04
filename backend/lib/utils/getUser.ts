@@ -1,19 +1,18 @@
-import { get, has, set } from "lodash";
-import { verify } from "@lib/jwt";
-import { db } from "@database";
-import User from "@models/user";
+import { verify } from "@lib/jwt"
+import User from "@models/user"
+import { has, set } from "lodash"
 
 interface Permission {
-    type: string;
-    operation?: string;
-    target?: string;
+    type: string
+    operation?: string
+    target?: string
 }
 
 function parsePermissions(permissionsArray: Permission[]): {} | true {
     if (permissionsArray.length > 0 && permissionsArray[0].type == "*")
-        return true;
+        return true
 
-    const permissionObject = {};
+    const permissionObject = {}
 
     for (const permission of permissionsArray) {
         if (permission.operation) {
@@ -26,43 +25,41 @@ function parsePermissions(permissionsArray: Permission[]): {} | true {
                 ) {
                     permissionObject[permission.type][
                         permission.operation
-                    ].push(permission.target);
+                    ].push(permission.target)
                 } else {
                     set(
                         permissionObject,
                         [permission.type, permission.operation],
                         [permission.target],
-                    );
+                    )
                 }
             } else {
                 set(
                     permissionObject,
                     [permission.type, permission.operation],
                     true,
-                );
+                )
             }
         } else {
-            set(permissionObject, permission.type, true);
+            set(permissionObject, permission.type, true)
         }
     }
 
-    return permissionObject;
+    return permissionObject
 }
 
-export default async function getUser(jwt: string): Promise<{} | null> {
+export default async function getUser(jwt: string): Promise<User | undefined> {
     if (jwt) {
-        const payload = await verify(jwt);
+        const payload = await verify(jwt)
 
         if (payload) {
             const user = await User.query()
                 .findById(payload.id)
-                .joinRelated("role.permissions");
+                .joinRelated("role.permissions")
 
-            console.log(user);
-
-            return user;
+            return user
         }
     }
 
-    return null;
+    return undefined
 }

@@ -1,12 +1,12 @@
-import { Model } from "objection";
-import PermissionRoleJunction from "./permissionRole.junction";
-import Role from "./role";
+import { Model } from "objection"
+import PermissionRoleJunction from "./permissionRole.junction"
+import Role from "./role"
 
 interface Permission {
     /**
      * Уникальный идентификатор разрешения.
      */
-    id: number;
+    id: number
 
     /**
      * Тип разрешения.
@@ -15,7 +15,7 @@ interface Permission {
      * Может принимать значение "*".
      * В таком случае считается, что у роли есть все разрешения.
      */
-    type: string;
+    type: string
 
     /**
      * Действие разрешения.
@@ -27,7 +27,7 @@ interface Permission {
      *
      * @see {@link type | Тип}
      */
-    operation?: string;
+    operation?: string
 
     /**
      * Цель, на которую направлено действие разрешения.
@@ -37,24 +37,22 @@ interface Permission {
      * В таком случае считается, что текущей роли
      * позволено осуществлять действия над любыми целями.
      */
-    target?: string;
+    target?: string
 }
 
 /**
  * Модель разрешения в базе данных.
  */
 class Permission extends Model {
-    static get tableName() {
-        return "permission";
-    }
+    static tableName = "permission"
 
     static get relationMappings() {
         return {
             roles: {
-                relation: this.ManyToManyRelation,
+                relation: Model.ManyToManyRelation,
                 modelClass: Role,
                 join: {
-                    from: this.tableName + ".id",
+                    from: Permission.tableName + ".id",
 
                     through: {
                         from:
@@ -65,8 +63,8 @@ class Permission extends Model {
                     to: Role.tableName + ".id",
                 },
             },
-        };
+        }
     }
 }
 
-export default Permission;
+export default Permission
