@@ -1,5 +1,5 @@
 import { ModifiedRequest } from "@lib/types"
-import getUser from "@utils/getUser"
+import { getUser } from "@utils"
 
 export default async (req: ModifiedRequest) => {
     const sources = [

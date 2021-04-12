@@ -1,14 +1,12 @@
 <script>
-    import { stores } from "@sapper/app";
-    import { fly } from "svelte/transition";
-    import { createEventDispatcher } from "svelte";
-
     import { mdiLogin } from "@mdi/js";
-
+    import { stores } from "@sapper/app";
+    import { createEventDispatcher } from "svelte";
+    import { fly } from "svelte/transition";
+    import { postApi } from "utils/requests";
     import Textfield from "../Textfield.svelte";
     import SubmitButton from "./SubmitButton.svelte";
 
-    import { postApi } from "utils/requests";
 
     export let element;
     export let active;
@@ -97,7 +95,7 @@
     const signup = () => {
         if (usernameEntered && passwordEntered && passwordRepeatEntered) {
             if (!disabled) {
-                promise = postApi($session.apiUrl + "/users/signup", {
+                promise = postApi($session.apiUrl + "/auth/signUp", {
                     username,
                     password,
                 });
@@ -107,7 +105,7 @@
                         dispatch("signed", json);
                     })
                     .catch((e) => {
-                        if (e.status === 403) {
+                        if (e.status === 409) {
                             promise = null;
                             wrongUsername = true;
                         }

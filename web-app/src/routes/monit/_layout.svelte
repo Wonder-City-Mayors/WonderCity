@@ -1,77 +1,105 @@
-<script context="module">
-  import { getPreloadApiResponse } from "utils/requests";
+<script context="module" lang="ts">
+    import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";
+    import Icon from "components/Icon.svelte";
+    import Switchers from "components/Switchers.svelte";
+    import Title from "components/Title.svelte";
+    import { onDestroy, setContext } from "svelte";
+    import { readable } from "svelte/store";
+    import { getPreloadApiResponse } from "utils/requests";
 
-  export async function preload(page, session) {
-    try {
-      const count = await getPreloadApiResponse(
-        `/api/devices/countMine`,
-        {},
-        this
-      );
+    export async function preload(page, session) {
+        try {
+            const count = await getPreloadApiResponse(
+                session.apiUrl + "/device/count",
+                {},
+                this
+            );
 
-      return {
-        count,
-      };
-    } catch (e) {
-      await this.redirect(301, "/auth");
+            return {
+                count,
+            };
+        } catch (e) {
+            await this.redirect(301, "/auth");
 
-      console.log(e);
+            console.log(e);
 
-      return {
-        count: false,
-      };
+            return {
+                count: false,
+            };
+        }
     }
-  }
 </script>
 
-<script>
-  import { onDestroy, setContext } from 'svelte';
-  import { readable } from 'svelte/store';
+<script lang="ts">
+    import { io } from "socket.io-client";
 
-  import { mdiChevronLeft, mdiChevronRight } from '@mdi/js';
+    // -------------------------------------------------
 
-  import TransitionWrapper from "components/TransitionWrapper.svelte";
-  import Icon from "components/Icon.svelte";
-  import Title from "components/Title.svelte";
-  import Switchers from "components/Switchers.svelte";
+    export let count;
+    export let segment;
 
-  // -------------------------------------------------
+    // -------------------------------------------------
 
-  export let count;
-  export let segment;
+    let socket;
 
-  // -------------------------------------------------
+    const socketStore = readable(null, (set) => {
+        const interval = setInterval(() => {
+            if (typeof io !== "undefined") {
+                clearInterval(interval);
 
-  let socket;
+                socket = io();
 
-  const socketStore = readable(null, set => {
-    const interval = setInterval(() => {
-      if (typeof io !== 'undefined') {
-        clearInterval(interval);
+                set(socket);
+            }
+        });
 
-        socket = io();
-
-        set(socket);
-      }
+        return () => 0;
     });
 
-    return () => 0;
-  });
+    setContext("socket", socketStore);
 
-  setContext('socket', socketStore);
+    $: current = parseInt(segment, 10);
 
-  $: current = parseInt(segment, 10);
-
-  onDestroy(() => {
-    if ($socketStore) {
-      $socketStore.disconnect();
-    }
-  });
+    onDestroy(() => {
+        if ($socketStore) {
+            $socketStore.disconnect();
+        }
+    });
 </script>
 
-<svelte:head>
-  <script src="/socket.io/socket.io.min.js"></script>
-</svelte:head>
+<Title caption="Отслеживание показаний" />
+
+{#if count > 0}
+    <div class="wrapper">
+        {#if segment !== "1"}
+            <a class="switcher left" href="/monit/{current - 1}">
+                <Icon icon={mdiChevronLeft} />
+            </a>
+        {:else}
+            <div class="filler left">
+                <Icon icon={mdiChevronLeft} />
+            </div>
+        {/if}
+        <div class="readouts">
+            <slot />
+        </div>
+        {#if count > current * 10}
+            <a class="switcher right" href="/monit/{current + 1}">
+                <Icon icon={mdiChevronRight} />
+            </a>
+        {:else}
+            <div class="filler right">
+                <Icon icon={mdiChevronRight} />
+            </div>
+        {/if}
+
+        <Switchers {count} {current} baseUrl="/monit" />
+    </div>
+{:else}
+    <h2 class="no-devices">
+        К сожалению, у Вас нет зарегистрированных считывающих устройств.
+    </h2>
+{/if}
 
 <style lang="sass">
   @import "colors"
@@ -123,39 +151,3 @@
         max-width: 36rem
         margin: 0 auto
 </style>
-
-<Title caption="Отслеживание показаний" />
-
-<TransitionWrapper>
-  {#if count > 0}
-    <div class="wrapper">
-      {#if segment !== '1'}
-        <a class="switcher left" href="/monit/{current - 1}">
-          <Icon icon={mdiChevronLeft} />
-        </a>
-      {:else}
-        <div class="filler left">
-          <Icon icon={mdiChevronLeft} />
-        </div>
-      {/if}
-      <div class="readouts">
-        <slot />
-      </div>
-      {#if count - (parseInt(current, 10) * 10) > 0}
-        <a class="switcher right" href="/monit/{current + 1}">
-          <Icon icon={mdiChevronRight} />
-        </a>
-      {:else}
-        <div class="filler right">
-          <Icon icon={mdiChevronRight} />
-        </div>
-      {/if}
-
-      <Switchers {count} {current} baseUrl="/monit" />
-    </div>
-  {:else}
-    <h2 class="no-devices">
-      К сожалению, у Вас нет зарегистрированных считывающих устройств.
-    </h2>
-  {/if}
-</TransitionWrapper>

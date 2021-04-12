@@ -1,5 +1,5 @@
-<script>
-    import TransitionWrapper from "components/TransitionWrapper.svelte";
+<script lang="ts">
+    import { stores } from "@sapper/app";
     import Title from "components/Title.svelte";
     import Input from "components/TextField.svelte";
     import Btn from "components/Btn.svelte";
@@ -12,9 +12,11 @@
     let newEmail;
     let newPassword;
 
+    const { session } = stores();
+
     function addDevice() {
         postApi(
-            "/api/users/addDevice",
+            $session.apiUrl + "/user/addDevice",
             {
                 id: deviceId,
             },
@@ -31,7 +33,7 @@
 
     function changeName() {
         postApi(
-            "/api/users/changeName",
+            $session.apiUrl + "/user/changeName",
             {
                 name: newName,
             },
@@ -52,7 +54,7 @@
      */
     function changeLastName() {
         postApi(
-            "/api/users/changeLastName",
+            $session.apiUrl + "/user/changeLastName",
             {
                 lastName: newLastName,
             },
@@ -73,9 +75,9 @@
      */
     function changeEmail() {
         postApi(
-            "/api/users/changeEmail",
+            $session.apiUrl + "/user/changeEmail",
             {
-                email: newemail,
+                email: newEmail,
             },
             true
         ).then(
@@ -94,7 +96,7 @@
      */
     function changePassword() {
         postApi(
-            "/api/users/changePassword",
+            $session.apiUrl + "/user/changePassword",
             {
                 password: newPassword,
             },
@@ -112,56 +114,31 @@
 
 <Title caption="Профиль" />
 
-<TransitionWrapper>
-    <div id="d">
-        <Input placeholder="как это делать"/>
-        <Btn>Тыкни сюда</Btn>
+<div id="d">
+    <Input bind:value={deviceId} placeholder="Идентификатор датчика" />
 
-        <Input
-            bind:value={deviceId}
-            placeholder="Идентификатор датчика"
-            id="f"
-        />
-        
-        <Btn on:click={addDevice}>Нажми меня</Btn>
-      
-            <Input bind:value={newName} placeholder="Имя" id="f" />
-      
-        <Btn on:click={changeName}>Нажми меня</Btn>
-        
-        <Input bind:value={newLastName} placeholder="Фамилия" id="f" />
-        
-        <Btn on:click={changeLastName}>Нажми меня</Btn>
-        
-        <Input bind:value={newEmail} placeholder="Электронная почта" id="f" />
-       
-        <Btn on:click={changeEmail}>Нажми меня</Btn>
+    <Btn on:click={addDevice}>Нажми меня</Btn>
 
-        <Input bind:value={newPassword} placeholder="Пароль" id="f" />
-        
-        <Btn on:click={changePassword}>Нажми меня</Btn>
-    </div>
-</TransitionWrapper>
+    <Input bind:value={newName} placeholder="Имя" />
+
+    <Btn on:click={changeName}>Нажми меня</Btn>
+
+    <Input bind:value={newLastName} placeholder="Фамилия" />
+
+    <Btn on:click={changeLastName}>Нажми меня</Btn>
+
+    <Input bind:value={newEmail} placeholder="Электронная почта" />
+
+    <Btn on:click={changeEmail}>Нажми меня</Btn>
+
+    <Input bind:value={newPassword} placeholder="Пароль" />
+
+    <Btn on:click={changePassword}>Нажми меня</Btn>
+</div>
 
 <style>
     #d {
         margin: auto;
         width: 10rem;
-    }
-    #f {
-        border-radius: 30px 30px 30px 30px;
-        background-color: #0bdb38;
-        border-color: black;
-    }
-    #but:hover {
-        background-color: #d4e20c;
-    }
-
-    #but:active {
-        background-color: #c22257;
-        border-top: 1px solid rgba(0, 0, 0, 0.5);
-        border-left: 1px solid rgba(0, 0, 0, 0.5);
-        border-bottom: none;
-        border-right: none;
     }
 </style>

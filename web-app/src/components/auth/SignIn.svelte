@@ -1,12 +1,11 @@
 <script>
     import { stores } from "@sapper/app";
-    import { fly } from "svelte/transition";
     import { createEventDispatcher } from "svelte";
-
+    import { fly } from "svelte/transition";
+    import { postApi } from "utils/requests";
     import Textfield from "../Textfield.svelte";
     import SubmitButton from "./SubmitButton.svelte";
 
-    import { postApi } from "utils/requests";
 
     export let element;
     export let active;
@@ -76,7 +75,7 @@
     const signin = (e) => {
         if (passwordEntered && usernameEntered) {
             if (!disabled) {
-                promise = postApi($session.apiUrl + "/users/signin", {
+                promise = postApi($session.apiUrl + "/auth/signIn", {
                     username,
                     password,
                 });

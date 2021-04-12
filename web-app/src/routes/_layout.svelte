@@ -1,7 +1,6 @@
-<script>
-    import { setContext } from "svelte";
-    import { writable } from "svelte/store";
+<script lang="ts">
     import { stores } from "@sapper/app";
+    import { cubicIn, quadInOut } from "svelte/easing";
 
     import {
         mdiSchool,
@@ -10,168 +9,177 @@
         mdiCast,
         mdiAccountCheck,
         mdiCreation,
+        mdiArrowUp,
     } from "@mdi/js";
 
-    import Tab, { Label } from "@smui/tab";
+    import Main from "components/TransitionedMain.svelte";
     import Icon from "components/Icon.svelte";
-    import Button from "@smui/button";
-    import TabBar from "@smui/tab-bar";
 
-    export let segment;
+    export let segment: string | undefined;
 
     const { page, session } = stores();
-    const tabsElements = [];
-    const pathRegEx = /^(.+?)(\?|\/)/;
 
+    let navOpened = false;
     let loaded = false;
     let activeIndex = -1;
-
-    const setActive = (newSegment) => {
-        if (typeof newSegment !== "string") {
-            if (loaded) newSegment = "/";
-            else newSegment = $page.path;
-        } else if (!loaded) {
-            loaded = true;
-        }
-
-        if (newSegment[0] !== "/") newSegment = "/" + newSegment;
-
-        for (let i = 0; i < iconTabs.length; i += 1) {
-            const path = pathRegEx.exec(iconTabs[i].path);
-
-            if (
-                (path && newSegment === path[1]) ||
-                newSegment === iconTabs[i].path
-            ) {
-                if (activeIndex !== -1) {
-                    transitionDirection.set(i - activeIndex);
-                }
-
-                try {
-                    tabsElements[activeIndex].deactivate();
-                } catch (e) {}
-
-                try {
-                    tabsElements[i].activate();
-                } catch (e) {}
-
-                activeIndex = i;
-                return;
-            }
-        }
-
-        transitionDirection.set(0);
-        activeIndex = -1;
-
-        for (let i = 0; i < tabsElements.length; i += 1) {
-            try {
-                tabsElements[i].deactivate();
-            } catch (e) {}
-        }
-    };
-
-    const updateIconTabs = (user) => {
-        const newIconTabs = iconTabs.slice(0, initialTabsLength);
-        let index;
-
-        if (user.isAuthenticated) {
-            index =
-                newIconTabs.push({
-                    icon: mdiCast,
-                    label: "Отслеживание",
-                    path: "/monit/1",
-                }) - 1;
-
-            newIconTabs[index].index = index;
-
-            index =
-                newIconTabs.push({
-                    icon: mdiAccountCircle,
-                    label: "Профиль",
-                    path: "/profile",
-                }) - 1;
-
-            newIconTabs[index].index = index;
-        } else {
-            index =
-                newIconTabs.push({
-                    icon: mdiAccountCheck,
-                    label: "Авторизация",
-                    path: "/auth",
-                }) - 1;
-
-            newIconTabs[index].index = index;
-        }
-
-        iconTabs = newIconTabs;
-
-        setActive(segment);
-    };
-
+    let activeHref = "";
     let iconTabs = [
         {
+            icon: mdiCreation,
+            label: "Главная",
+            path: "/",
+        },
+        {
             icon: mdiSchool,
-            label: "О SQBit",
+            label: "О WCM",
             path: "/about",
-            index: 0,
         },
         {
             icon: mdiHelp,
             label: "FAQ",
             path: "/faq",
-            index: 1,
         },
     ];
+
     const initialTabsLength = iconTabs.length;
-    let transitionDirection = writable(0);
 
-    setContext("transitionDirection", transitionDirection);
+    function slide(node: Element, { duration = 300 }) {
+        const initialWidth = node.clientWidth;
 
-    $: if (tabsElements.length > 0) {
-        setActive(segment);
+        return {
+            duration,
+            css: (t: number) => {
+                const eased = cubicIn(t);
+
+                return `
+                    width: ${initialWidth * eased}px;
+                    transform: scaleX(${t});
+                    transform-origin: left;
+                `;
+            },
+        };
     }
+
+    function translateSlide(node: Element, { duration = 300 }) {
+        return {
+            duration,
+            css: (t: number) => {
+                const eased = quadInOut(t);
+
+                return `
+                    transform: translateY(${100 * (1 - eased)}%);
+                `;
+            },
+        };
+    }
+
+    function setActiveTab() {
+        activeHref = segment;
+
+        if (typeof activeHref !== "string") {
+            if (loaded) activeHref = "/";
+            else activeHref = $page.path;
+        } else if (!loaded) {
+            loaded = true;
+        }
+
+        if (activeHref[0] !== "/") activeHref = "/" + activeHref;
+
+        for (let i = 0; i < iconTabs.length; i++) {
+            if (iconTabs[i].path === activeHref) {
+                activeIndex = i;
+                return;
+            }
+        }
+    }
+
+    $: if (typeof segment) {
+        setActiveTab();
+    }
+
+    const updateIconTabs = (user) => {
+        const newIconTabs = iconTabs.slice(0, initialTabsLength);
+
+        if (user.isAuthenticated) {
+            newIconTabs.push(
+                {
+                    icon: mdiCast,
+                    label: "Отслеживание",
+                    path: "/monit/1",
+                },
+                {
+                    icon: mdiAccountCircle,
+                    label: "Профиль",
+                    path: "/profile",
+                }
+            );
+        } else {
+            newIconTabs.push({
+                icon: mdiAccountCheck,
+                label: "Авторизация",
+                path: "/auth",
+            });
+        }
+
+        iconTabs = newIconTabs;
+
+        setActiveTab();
+    };
 
     $: updateIconTabs($session.user);
 </script>
 
-<header class="layout-header">
-    <nav class="top-nav">
-        <a href="/">
-            <Button color="primary" class="top-nav-logo">
-                <div class="top-nav-logo-icon">
-                    <Icon icon={mdiCreation} />
-                </div>
-                Wonder City
-            </Button>
-        </a>
-        <TabBar
-            tabs={iconTabs}
-            class="top-nav-tabs"
-            let:tab
-            active={iconTabs[activeIndex]}
-        >
-            <a href={tab.path}>
-                <Tab
-                    {tab}
-                    minWidth
-                    class="top-nav-tabs-tab"
-                    bind:this={tabsElements[tab.index]}
+<nav class:opened={navOpened}>
+    {#if navOpened}
+        <div class="extended" transition:translateSlide>
+            {#each iconTabs as iconTab, i (i)}
+                <a
+                    class="activatable nav-tile"
+                    class:active={activeIndex === i}
+                    href={iconTab.path}
                 >
-                    <div class="top-nav-tabs-tab-icon">
-                        <Icon icon={tab.icon} />
+                    <div class="icon-container">
+                        <Icon icon={iconTab.icon} />
                     </div>
-                    <Label>{tab.label}</Label>
-                </Tab>
-            </a>
-        </TabBar>
-    </nav>
-</header>
-<main>
-    <slot />
-</main>
+                    <p class="nav-tile-title">
+                        {iconTab.label}
+                    </p>
+                </a>
+            {/each}
+        </div>
+    {/if}
+    <div class="little">
+        <div
+            class="activatable trigger icon-container"
+            class:active={navOpened}
+            on:click={() => (navOpened = !navOpened)}
+        >
+            <Icon icon={mdiArrowUp} />
+        </div>
+        {#if !navOpened}
+            {#each iconTabs as iconTab, i (i)}
+                <a
+                    class="activatable nav-tile icon-container"
+                    class:active={activeIndex === i}
+                    href={iconTab.path}
+                    transition:slide
+                >
+                    <Icon icon={iconTab.icon} />
+                </a>
+            {/each}
+        {/if}
+    </div>
+</nav>
+{#key segment}
+    <Main>
+        <slot />
+    </Main>
+{/key}
 
 <style global lang="scss">
     @import "global";
+
+    $aside-side: 3rem;
 
     @font-face {
         font-family: defaultFont;
@@ -212,8 +220,8 @@
         box-sizing: border-box;
     }
 
-    html {
-        font-size: calc(1vw + 1vh + 5px);
+    :root {
+        font-size: calc(0.5vw + 1vh + 10px);
         font-family: defaultFont, serif;
         height: 100%;
     }
@@ -223,96 +231,105 @@
         overflow-x: hidden;
     }
 
-    #light-animated {
-        opacity: 0.4;
-    }
+    nav {
+        .little,
+        .extended {
+            position: fixed;
+            width: 100%;
+            left: 0;
+            color: $color-primary;
+            font-size: 1.5rem;
+            background: $color-surface;
 
-    .layout-header {
-        @include small_box_shadow_primary;
+            border-top: 0.15rem solid $color-primary;
+        }
 
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 3rem;
-        background: white;
-        z-index: 2;
+        .little {
+            bottom: 0;
+            z-index: 5;
+            display: flex;
+
+            .nav-tile {
+                width: $aside-side;
+            }
+        }
+
+        .extended {
+            bottom: $aside-side;
+            z-index: 4;
+
+            .nav-tile {
+                display: flex;
+
+                &-title {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    font-size: 1.5rem;
+                    margin-left: 0.5rem;
+                }
+            }
+        }
+
+        .activatable {
+            transition: background 0.3s, color 0.3s;
+
+            &:hover {
+                background: rgba($color-primary, 0.2);
+            }
+
+            &.active {
+                background: $color-primary;
+                color: $color-surface;
+
+                --icon-component-color: #{$color-surface};
+            }
+        }
+
+        .icon-container {
+            width: $aside-side;
+            height: $aside-side;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-size: calc(#{$aside-side} * 0.667);
+        }
 
         a {
             text-decoration: none;
+            color: inherit;
+
+            &:link,
+            &:visited,
+            &:focus,
+            &:hover {
+                color: inherit;
+            }
         }
 
-        .top-nav {
-            display: flex;
-            height: 100%;
-
-            &-logo {
-                font-family: defaultFont, serif;
-                order: 1;
-                flex: 0 0 auto;
-                display: flex;
-                padding: 0.25rem 0.5rem;
-                height: 100%;
-                font-weight: 700;
-                font-size: 1.5rem;
-
-                &-icon {
-                    display: inline-block;
-
-                    width: 2.4rem;
-                    height: 1.8rem;
-                    margin-right: 0.2em;
-                }
+        .trigger {
+            svg {
+                transition: 0.3s;
             }
 
-            &::before {
-                content: "";
-                order: 2;
-                flex: 1;
+            &:hover {
+                cursor: pointer;
             }
 
-            &-tabs {
-                order: 3;
-                width: auto;
-                height: 102.5%;
-
-                *[class^="mdc-tab-scroller"] {
-                    height: 100%;
-                }
-
-                .mdc-tab-scroller__scroll-area--scroll {
-                    overflow-x: hidden;
-                }
-
-                &-tab {
-                    height: 100%;
-                    font-family: defaultFont, serif;
-                    font-weight: 700;
-                    line-height: 1rem;
-
-                    &-icon {
-                        padding: 0;
-                        font-size: 1rem;
-
-                        margin-right: 0.4em;
-                    }
-                }
+            &.active svg {
+                transform: rotate(180deg);
             }
         }
     }
 
     main {
-        position: relative;
-        padding-top: 3rem;
-        height: 100%;
+        padding-bottom: $aside-side;
     }
 
-    @media all and (orientation: landscape) {
-        html {
-            font-size: calc(1vw + .5vh + 5px);
+    @media all and (min-aspect-ratio: 7 / 5) {
+        :root {
+            font-size: calc(0.5vw + 0.5vh + 10px);
         }
-    }
-
-    @keyframes broken-lamp-animation {
     }
 </style>

@@ -1,29 +1,14 @@
-import { Server as HttpServer } from "http"
-import { Server, Socket } from "socket.io"
-import { sort } from "timsort"
-import * as cookie from "cookie"
-import size from "lodash/size"
-
-import getUser from "@utils/getUser"
 import cache from "@lib/cache"
 import Device from "@models/device"
 import Value from "@models/value"
-import Role from "@models/role"
-import { getAllRoles, parsePermissions } from "@utils"
+import { getAllRoles, getUser } from "@utils"
+import * as cookie from "cookie"
+import { Server as HttpServer } from "http"
+import size from "lodash/size"
+import { Server, Socket } from "socket.io"
 
 function randomInt(start: number, end: number) {
     return Math.trunc(Math.random() * (end - start) + start)
-}
-
-function parseAndSort(array: string[]) {
-    const retval: number[] = []
-
-    for (let i = 0; i < array.length; i += 1)
-        retval.push(parseInt(array[i], 10))
-
-    sort(retval, function comparator(a, b) {
-        return a - b
-    })
 }
 
 export default function jacketzip(server: HttpServer) {
@@ -35,8 +20,6 @@ export default function jacketzip(server: HttpServer) {
         for (let i = 0; i < roles.length; i += 1) {
             cache.roles[roles[i].id] = roles[i]
         }
-
-        console.log(cache)
     }
 
     const io = new Server(server)

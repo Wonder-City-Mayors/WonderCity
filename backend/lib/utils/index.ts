@@ -1,9 +1,12 @@
+import cache from "@lib/cache"
 import { verify } from "@lib/jwt"
 import {
     PermissionObject,
     PermissionRoleMerged,
+    ResponseUserWithRole,
     RoleWithPermissions,
     SimplePermission,
+    UserWithRole,
 } from "@lib/types"
 import Role from "@models/role"
 import User from "@models/user"
@@ -104,16 +107,34 @@ export function parsePermissions(
     return permissionObject
 }
 
-export async function getUser(jwt: string): Promise<User | undefined> {
+export async function getUser(jwt: string): Promise<UserWithRole | undefined> {
     if (jwt) {
         const payload = await verify(jwt)
 
         if (payload) {
-            const user = await User.query()
-                .findById(payload.id)
-                .joinRelated("role.permissions")
+            const user = await User.query().findById(payload.id)
 
-            return user
+            return Object.assign(user, {
+                role: cache.roles[user.roleId || 0],
+            })
+        }
+    }
+
+    return undefined
+}
+
+export async function getResponseUser(
+    jwt: string,
+): Promise<ResponseUserWithRole | undefined> {
+    if (jwt) {
+        const payload = await verify(jwt)
+
+        if (payload) {
+            const user = await User.query().findById(payload.id)
+
+            return Object.assign(user.toResponseUser(), {
+                role: cache.roles[user.roleId || 0],
+            })
         }
     }
 

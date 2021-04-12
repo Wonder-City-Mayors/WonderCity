@@ -10,13 +10,11 @@ const output = {
     filename: "bundle.js",
 }
 
-module.exports = {
-    mode: "development",
-
+module.exports = (env, argv) => ({
     entry: resolve(process.cwd(), "index.ts"),
     output,
 
-    devtool: false,
+    devtool: "eval-source-map",
 
     watch: true,
     watchOptions: {
@@ -43,36 +41,38 @@ module.exports = {
         new ESLintPlugin(),
         {
             apply(compiler) {
-                let child
+                if (argv.mode === "development") {
+                    let child
 
-                compiler.hooks.done.tap("DonePlugin", function () {
-                    child = spawn(
-                        "node",
-                        [join(output.path, output.filename)],
-                        {
-                            env: process.env,
-                        },
-                    )
+                    compiler.hooks.done.tap("DonePlugin", function () {
+                        child = spawn(
+                            "node",
+                            [join(output.path, output.filename)],
+                            {
+                                env: process.env,
+                            },
+                        )
 
-                    child.stdout.on("data", function (data) {
-                        process.stdout.write(data)
+                        child.stdout.on("data", function (data) {
+                            process.stdout.write(data)
+                        })
+
+                        child.stderr.on("data", function (data) {
+                            process.stderr.write(data)
+                        })
                     })
 
-                    child.stderr.on("data", function (data) {
-                        process.stderr.write(data)
+                    compiler.hooks.watchRun.tap("WatchRunPlugin", function () {
+                        if (child) {
+                            console.log("Rebuilding...")
+
+                            child.kill("SIGINT")
+                        }
                     })
-                })
-
-                compiler.hooks.watchRun.tap("WatchRunPlugin", function () {
-                    if (child) {
-                        console.log("Rebuilding...")
-
-                        child.kill("SIGINT")
-                    }
-                })
+                }
             },
         },
     ],
 
     externals: [nodeExternals()],
-}
+})

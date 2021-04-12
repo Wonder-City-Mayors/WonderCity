@@ -1,19 +1,26 @@
-<input placeholder={rt}
-bind:value={placeholder}/>
+<script lang="ts">
+    let placeholder: string;
+    let value: string = "";
+
+    export { placeholder, value };
+</script>
 
 <style lang="scss">
-    input{
-        background-color:aqua;
+    @import "colors";
+    input {
+        &::placeholder {
+            color: $color-primary;
+        }
+
+        background-color: rgb(255, 255, 255);
         border-radius: 50px;
-        border-width:3px ;
-        border-color: blue;
-        border-style:inset;
-        padding:8px;
+        border-width: 3px;
+        border-color: $color-primary;
+        border-style: inset;
+        padding: 8px;
         margin: 6px auto;
         display: block;
     }
 </style>
-<script>
-    export let placeholder;
-    export let rt;
-</script>
+
+<input {placeholder} bind:value />

@@ -1,6 +1,5 @@
 import { TokenPayload } from "@interfaces/jwt"
-import Permission from "@models/permission"
-import Role from "@models/role"
+import { ResponseUser } from "@interfaces/response"
 import User from "@models/user"
 import { Request } from "express"
 
@@ -37,4 +36,12 @@ export type RoleWithPermissions = {
     id: number
     name: string
     permissions: PermissionObject
+}
+
+export type UserWithRole = User & RoleWithPermissionsOwner
+
+export type ResponseUserWithRole = ResponseUser & RoleWithPermissionsOwner
+
+interface RoleWithPermissionsOwner {
+    role?: RoleWithPermissions
 }

@@ -1,23 +1,23 @@
-<script>
-  let d;
+<script lang="ts">
+    let d: string;
 
-  export { d as icon };
+    export { d as icon };
 </script>
 
-<style lang="scss">
-  @import "colors";
-
-  svg {
-    height: 1em;
-    width: 1em;
-    overflow: visible;
-
-    path {
-      fill: var(--icon-component-color, $color-primary);
-    }
-  }
-</style>
-
-<svg viewBox="0 0 20 20">
-  <path {d} />
+<svg viewBox="0 0 24 24">
+    <path {d} />
 </svg>
+
+<style lang="scss">
+    @import "colors";
+
+    svg {
+        height: 1em;
+        width: 1em;
+        overflow: visible;
+
+        path {
+            fill: var(--icon-component-color, $color-primary);
+        }
+    }
+</style>

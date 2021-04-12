@@ -1,14 +1,29 @@
 <script>
-  import {slide} from "svelte/transition";
-  import Textfield from "@smui/textfield";
+    import { slide } from "svelte/transition"
+    import Textfield from "@smui/textfield"
+    1
+    export let value = ""
+    export let error = false
+    export let label = "Введите текст..."
+    export let type = "text"
 
-  export let value = "";
-  export let error = false;
-  export let label = "Введите текст...";
-  export let type = "text";
-
-  $: smuiError = error ? true : false;
+    $: smuiError = error ? true : false
 </script>
+
+<div class="textfield-container">
+    <Textfield
+        class={error ? "error" : ""}
+        variant="standard"
+        {type}
+        bind:value
+        invalid={smuiError}
+        {label} />
+    {#if error}
+        <p class="textfield-container-error" transition:slide>
+            {error}
+        </p>
+    {/if}
+</div>
 
 <style lang="sass">
   @import "../theme/colors"
@@ -21,7 +36,7 @@
     &-error
       padding: .25rem
 
-    :global(*) 
+    :global(*)
       font-family: defaultFont
 
     :global(label)
@@ -37,18 +52,3 @@
         transition: color .3s ease
         color: $mdc-theme-secondary
 </style>
-
-<div class="textfield-container">
-  <Textfield
-    class={error ? 'error' : ''}
-    variant="standard"
-    {type}
-    bind:value
-    invalid={smuiError}
-    {label} />
-  {#if error}
-    <p class="textfield-container-error" transition:slide>
-      {error}
-    </p>
-  {/if}
-</div>

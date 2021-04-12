@@ -50,6 +50,6 @@
             "@lib/*": ["lib/*"]
         }
     },
-    "include": ["index.ts", "lib/**/*.ts", "lib/database/knexfile.js"],
+    "include": ["index.ts", "lib/**/*.ts", "lib/database/knexfile.ts"],
     "exclude": ["node_modules", "config", "dist", ".vscode"]
 }
