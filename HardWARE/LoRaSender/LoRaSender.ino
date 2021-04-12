@@ -3,26 +3,29 @@
 
 int counter = 0;
 
-void setup() {
-  //Serial.begin(9600);
- //////////////while (!Serial);
+void setup() {a
+  Serial.begin(9600);
+  while (!Serial);
 
-  //Serial.println("LoRa Sender");
+  Serial.println("LoRa Sender");
 
-  if (!LoRa.begin(433E6)) {
-   // Serial.println("Starting LoRa failed!");
+  if (!LoRa.begin(915E6)) {
+    Serial.println("Starting LoRa failed!");
     while (1);
   }
-  pinMode(6, INPUT_PULLUP);
-  pinMode(4, OUTPUT);
 }
 
 void loop() {
+  Serial.print("Sending packet: ");
+  Serial.println(counter);
+
   // send packet
-  
-    LoRa.beginPacket();
-    LoRa.print(true);
-    LoRa.endPacket();
-    delay(1000);
-   
+  LoRa.beginPacket();
+  LoRa.print("hello ");
+  LoRa.print(counter);
+  LoRa.endPacket();
+
+  counter++;
+
+  delay(5000);
 }
