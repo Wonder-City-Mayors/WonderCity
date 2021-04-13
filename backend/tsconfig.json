@@ -1,0 +1,55 @@
+{
+    "compilerOptions": {
+        "allowUnreachableCode": false,
+        "alwaysStrict": true,
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "esnext",
+        "allowSyntheticDefaultImports": true,
+        "experimentalDecorators": true,
+        "noImplicitThis": true,
+        "strictNullChecks": true,
+        "esModuleInterop": true,
+        "baseUrl": "./",
+        "rootDir": "./",
+        "outDir": "dist",
+        "paths": {
+            "@utils/*": ["lib/utils/*"],
+            "@utils": ["lib/utils"],
+
+            "@commonUtils/*": ["../utils/*"],
+
+            "@policies/*": ["lib/policies/*"],
+
+            "@lifecycle/*": ["lib/lifecycle/*"],
+
+            "@interfaces/*": ["lib/interfaces/*"],
+
+            "@exceptions/*": ["lib/exceptions/*"],
+
+            "@middlewares/*": ["lib/middlewares/*"],
+
+            "@controllers/*": ["lib/controllers/*"],
+
+            "@routes/*": ["lib/routes/*"],
+
+            "@services/*": ["lib/services/*"],
+
+            "@dtos/*": ["lib/dtos/*"],
+
+            "@models/*": ["lib/models/*"],
+
+            "@objection": ["lib/database/objection"],
+
+            "@database/*": ["lib/database/*"],
+            "@database": ["lib/database"],
+
+            "@config/*": ["lib/config/*"],
+            "@config": ["lib/config"],
+
+            "@lib/*": ["lib/*"]
+        }
+    },
+    "include": ["index.ts", "lib/**/*.ts", "lib/database/knexfile.ts"],
+    "exclude": ["node_modules", "config", "dist", ".vscode"]
+}

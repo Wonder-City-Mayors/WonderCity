@@ -1,75 +1,80 @@
-import { getCookie } from "./cookies";
+import { getCookie } from "./cookies"
 
 const createUrl = (path, query, auth) => {
     let keys,
-        queryString = '';
+        queryString = ""
 
     if (query) {
-        keys = Object.keys(query);
+        keys = Object.keys(query)
 
         if (keys.length > 0) {
-            queryString = `?${keys[0]}=${query[keys[0]]}`;
+            queryString = `?${keys[0]}=${query[keys[0]]}`
         }
     } else {
-        keys = new Array();
+        keys = new Array()
     }
 
     for (let i = 1; i < keys.length; i += 1) {
-        queryString += `&${keys[i]}=${query[keys[i]]}`;
+        queryString += `&${keys[i]}=${query[keys[i]]}`
     }
 
-    return encodeURI(path + queryString);
-};
+    return encodeURI(path + queryString)
+}
 
 export const getApiResponse = async (path, query, auth) => {
-    if (auth === true)
-        auth = getCookie('jwt');
+    if (auth === true) auth = getCookie("jwt")
 
-    const url = createUrl(path, query, auth);
+    const url = createUrl(path, query, auth)
     const response = await fetch(url, {
-        method: 'GET',
+        method: "GET",
         headers: {
-            'Authorization': auth || ''
-        }
-    });
+            Authorization: auth || "",
+        },
+    })
 
     if (response.ok) {
-        return await response.json().catch(() => null);
+        return await response.json().catch(() => null)
     } else {
-        throw response;
+        throw response
     }
-};
+}
 
 export const getPreloadApiResponse = async (path, query, sapperInstance) => {
-    const url = createUrl(path, query);
+    const url = createUrl(path, query)
     const response = await (
         await sapperInstance.fetch(url, {
-            credentials: 'include'
+            credentials: "include",
         })
-    ).json().then(a => a, () => null);
+    )
+        .json()
+        .then(
+            (a) => a,
+            () => null,
+        )
 
-    return (response && 'response' in response) ?
-        response.response :
-        response;
-};
+    return response && "response" in response ? response.response : response
+}
 
 export const postApi = (path, query, auth) => {
-    if (auth === true)
-        auth = getCookie('jwt');
+    if (auth === true) auth = getCookie("jwt")
 
     return fetch(path, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': auth || ''
+            "Content-Type": "application/json",
+            Authorization: auth || "",
         },
-        body: JSON.stringify(query)
-    }).then(response => {
-        if (response.ok)
-            return response.json().then(a => a, () => null);
-        else
-            throw response;
-    }).then(jsoned => (
-        (jsoned && 'response' in jsoned) ? jsoned.response : jsoned
-    ));
-};
+        body: JSON.stringify(query),
+    })
+        .then((response) => {
+            if (response.ok)
+                return response.json().then(
+                    (a) => a,
+                    () => null,
+                )
+            else throw response
+        })
+        .then((jsoned) =>
+            jsoned && "response" in jsoned ? jsoned.response : jsoned,
+        )
+}

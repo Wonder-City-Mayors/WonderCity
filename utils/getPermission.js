@@ -1,14 +1,14 @@
-const get = require('lodash/get');
+const get = require("lodash/get")
 
 module.exports = (permissions, required) => {
-  if (permissions['*']) return true;
+    if (permissions["*"]) return true
 
-  let i = 0;
-  let current = permissions[required[i++]];
+    let i = 0
+    let current = permissions[required[i++]]
 
-  while (required[i] && Boolean(current) && current.constructor === Object) {
-    current = current[required[i++]];
-  }
+    while (required[i] && Boolean(current) && current.constructor === Object) {
+        current = current[required[i++]]
+    }
 
-  return current;
-};
+    return current
+}

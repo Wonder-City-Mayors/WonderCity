@@ -1,35 +1,40 @@
-const has = require('lodash/has');
-const set = require('lodash/set');
+const has = require("lodash/has")
+const set = require("lodash/set")
 
 module.exports = (permissionsArray = []) => {
-    let permissionObject = new Object();
+    let permissionObject = new Object()
 
     for (const permission of permissionsArray) {
         if (permission.operation) {
             if (permission.target) {
-                if (has(
-                    permissionObject,
-                    [permission.type, permission.operation]
-                )) {
-                    permissionObject[type][operation].push(permission.target);
-                } else {
-                    set(permissionObject, [
+                if (
+                    has(permissionObject, [
                         permission.type,
-                        permission.operation
-                    ], [permission.target]);
+                        permission.operation,
+                    ])
+                ) {
+                    permissionObject[type][operation].push(permission.target)
+                } else {
+                    set(
+                        permissionObject,
+                        [permission.type, permission.operation],
+                        [permission.target],
+                    )
                 }
             } else {
-                set(permissionObject, [
-                    permission.type,
-                    permission.operation
-                ], true);
+                set(
+                    permissionObject,
+                    [permission.type, permission.operation],
+                    true,
+                )
             }
-        } if (permission.type === '*') {
-            return true;
+        }
+        if (permission.type === "*") {
+            return true
         } else {
-            set(permissionObject, permission.type, true);
+            set(permissionObject, permission.type, true)
         }
     }
 
-    return permissionObject;
-};
+    return permissionObject
+}
