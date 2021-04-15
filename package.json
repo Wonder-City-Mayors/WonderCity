@@ -7,7 +7,8 @@
     "doc": "docs"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "socket.io-client": "^4.0.1"
   },
   "devDependencies": {
     "eslint": "^7.23.0",

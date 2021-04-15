@@ -1,10 +1,4 @@
 <script context="module" lang="ts">
-    import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";
-    import Icon from "components/Icon.svelte";
-    import Switchers from "components/Switchers.svelte";
-    import Title from "components/Title.svelte";
-    import { onDestroy, setContext } from "svelte";
-    import { readable } from "svelte/store";
     import { getPreloadApiResponse } from "utils/requests";
 
     export async function preload(page, session) {
@@ -31,7 +25,13 @@
 </script>
 
 <script lang="ts">
-    import { io } from "socket.io-client";
+    import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";
+    import Icon from "components/Icon.svelte";
+    import Switchers from "components/Switchers.svelte";
+    import Title from "components/Title.svelte";
+    import { onDestroy, setContext } from "svelte";
+    import { readable } from "svelte/store";
+    import { io, Socket } from "socket.io-client";
 
     // -------------------------------------------------
 
@@ -40,18 +40,12 @@
 
     // -------------------------------------------------
 
-    let socket;
+    let socket: Socket;
 
     const socketStore = readable(null, (set) => {
-        const interval = setInterval(() => {
-            if (typeof io !== "undefined") {
-                clearInterval(interval);
+        socket = io();
 
-                socket = io();
-
-                set(socket);
-            }
-        });
+        set(socket);
 
         return () => 0;
     });

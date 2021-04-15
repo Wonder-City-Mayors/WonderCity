@@ -1,7 +1,0 @@
-{
-    "extends": "./tsconfig",
-    "compilerOptions": {
-        "module": "CommonJS",
-        "baseUrl": "/home/dev/wc/backend/"
-    }
-}
