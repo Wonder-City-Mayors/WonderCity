@@ -9,7 +9,7 @@ export default class UserController {
     service = new UserService()
 
     me = baseController(async (req: ModifiedRequest, res: Response) => {
-        res.status(201).json(
+        res.status(200).json(
             await this.service.me({
                 jwt: req.jwt || "",
             }),

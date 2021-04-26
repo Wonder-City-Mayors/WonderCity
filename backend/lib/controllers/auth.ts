@@ -1,4 +1,4 @@
-import { createUserDto } from "@dtos/auth.dto"
+import { createUserDto, signStationDto } from "@dtos/auth.dto"
 import AuthService from "@services/auth"
 import { NextFunction, Request, Response } from "express"
 import { baseController } from "."
@@ -16,5 +16,11 @@ export default class AuthController {
         const userData: createUserDto = req.body
 
         res.status(200).json(await this.service.signIn(userData))
+    })
+
+    signStation = baseController(async (req: Request, res: Response) => {
+        const stationData: signStationDto = req.body
+
+        res.status(200).json(await this.service.signStation(stationData))
     })
 }

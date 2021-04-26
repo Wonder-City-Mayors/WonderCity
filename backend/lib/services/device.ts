@@ -14,13 +14,14 @@ export default class DeviceService {
                             .first()
                             .where("deviceId", device.id)
                             .orderBy("timestamp", "desc")
-                            .then(
-                                (value) =>
+                            .then((value) => {
+                                return (
                                     value || {
                                         deviceId: device.id,
                                         record: null,
-                                    },
-                            ),
+                                    }
+                                )
+                            }),
                     ),
                 ),
             )

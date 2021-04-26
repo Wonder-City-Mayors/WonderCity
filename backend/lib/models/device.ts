@@ -63,6 +63,8 @@ interface Device {
      * Может отсутствовать.
      */
     userId?: number
+
+    stationId?: number
 }
 
 /**

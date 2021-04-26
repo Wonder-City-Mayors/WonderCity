@@ -1,7 +1,7 @@
 import HttpException from "@exceptions/HttpException"
-import { verify } from "@lib/jwt"
+import { verify, verifyStation } from "@lib/jwt"
 import { ModifiedRequest } from "@lib/types"
-import { getUser } from "@utils/"
+import { getUser } from "@utils"
 import { plainToClass } from "class-transformer"
 import { validate, ValidationError } from "class-validator"
 import { NextFunction, RequestHandler, Response } from "express"
@@ -42,6 +42,11 @@ export const validateJwt = () =>
         return Promise.resolve(true)
     })
 
+export const validateStation = () =>
+    buildValidationPolicy(async (req: ModifiedRequest, jwt: string) =>
+        Boolean((req.stationPayload = await verifyStation(jwt))),
+    )
+
 export const validateJwtPayload = () =>
     buildValidationPolicy(async (req: ModifiedRequest, jwt: string) =>
         Boolean((req.jwtPayload = await verify(jwt))),
@@ -57,7 +62,7 @@ function buildValidationPolicy(
 ) {
     return async function validationPolicy(
         req: ModifiedRequest,
-        _res: Response,
+        _res: any,
         next: NextFunction,
     ) {
         const sources = [

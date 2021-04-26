@@ -50,6 +50,11 @@
             "@lib/*": ["lib/*"]
         }
     },
-    "include": ["index.ts", "lib/**/*.ts", "lib/database/knexfile.ts"],
+    "include": [
+        "master.ts",
+        "lib/**/*.ts",
+        "lib/database/knexfile.ts",
+        "lib/lifecycle/bootstrap.js"
+    ],
     "exclude": ["node_modules", "config", "dist", ".vscode"]
 }

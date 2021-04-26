@@ -1,9 +1,10 @@
-const {knexSnakeCaseMappers} = require('objection');
-const { config } = require('dotenv');
+const { knexSnakeCaseMappers } = require("objection")
+const { config } = require("dotenv")
+const { resolve } = require("path")
 
 config({
-    path: '../../.env'
-});
+    path: resolve(process.cwd(), ".env"),
+})
 
 module.exports = {
     client: process.env.DB_CLIENT || "mysql",

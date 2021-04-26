@@ -1,10 +1,11 @@
-import { TokenPayload } from "@interfaces/jwt"
+import { StationTokenPayload, TokenPayload } from "@interfaces/jwt"
 import { ResponseUser } from "@interfaces/response"
 import User from "@models/user"
 import { Request } from "express"
 
 export type ModifiedRequest = Request & {
     user?: User
+    stationPayload?: StationTokenPayload
     jwtPayload?: TokenPayload
     jwt?: string
 }

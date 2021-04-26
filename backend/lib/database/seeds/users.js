@@ -1,8 +1,7 @@
-import { Knex } from "knex";
-import * as bcrypt from "bcrypt";
+const bcrypt = require("bcrypt")
 
-export async function seed(knex: Knex) {
-    await knex("user").del();
+exports.seed = async function seed(knex) {
+    await knex("user").del()
 
     await bcrypt.hash("asdfasdf", 10).then((password) => {
         return knex("user").insert({
@@ -10,6 +9,6 @@ export async function seed(knex: Knex) {
             password,
             firstName: "Георгий",
             lastName: "Бердников",
-        });
-    });
+        })
+    })
 }

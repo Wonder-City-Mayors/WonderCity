@@ -1,6 +1,6 @@
 import AuthController from "@controllers/auth"
 import Route from "@interfaces/route"
-import { createUserDto } from "@lib/dtos/auth.dto"
+import { createUserDto, signStationDto } from "@lib/dtos/auth.dto"
 import { validationMiddleware } from "@middlewares/validation"
 import { Router } from "express"
 
@@ -25,6 +25,12 @@ export default class AuthRoute implements Route {
             "/signIn",
             validationMiddleware(createUserDto, "body"),
             this.controller.signIn,
+        )
+
+        this.router.post(
+            "/signStation",
+            validationMiddleware(signStationDto, "body"),
+            this.controller.signStation,
         )
     }
 }

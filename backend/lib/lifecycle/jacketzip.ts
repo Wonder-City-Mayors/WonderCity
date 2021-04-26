@@ -75,7 +75,6 @@ export default function jacketzip(server: HttpServer) {
                     .offset(number)
                     .limit(1)
                     .orderBy("id", "asc")
-
                     .then((device) => {
                         currentId = device.id
 
@@ -106,7 +105,7 @@ export default function jacketzip(server: HttpServer) {
                                     if (userCache[key].has(device.id)) {
                                         io.to(key).emit("newReadouts", {
                                             deviceId: device.id,
-                                            lastRecord: value,
+                                            record: value,
                                         })
                                     }
                                 }
@@ -150,17 +149,19 @@ export default function jacketzip(server: HttpServer) {
 
                                     io.to(key).emit("newReadouts", {
                                         deviceId: device.id,
-                                        lastRecord: value,
+                                        record: value,
                                     })
                                 }
                             }
 
                             if (!process.env.DEV || isOnline) {
-                                Value.query().insert({
-                                    timestamp: new Date(),
-                                    deviceId: device.id,
-                                    record: value,
-                                })
+                                Value.query()
+                                    .insert({
+                                        timestamp: new Date(),
+                                        deviceId: device.id,
+                                        record: value,
+                                    })
+                                    .then(() => null)
                             }
                         }
                     }

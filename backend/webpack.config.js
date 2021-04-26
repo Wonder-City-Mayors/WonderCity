@@ -1,19 +1,24 @@
-const { resolve, join } = require("path")
+const { resolve } = require("path")
 const { spawn } = require("child_process")
 
 const nodeExternals = require("webpack-node-externals")
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
 const ESLintPlugin = require("eslint-webpack-plugin")
 
+const entry = {
+    master: resolve(process.cwd(), "master.ts"),
+}
+
 const output = {
+    filename: "[name].js",
     path: resolve(process.cwd(), "dist"),
-    filename: "bundle.js",
 }
 
 module.exports = (env, argv) => ({
-    entry: resolve(process.cwd(), "index.ts"),
+    entry,
     output,
 
+    target: "node",
     devtool: "eval-source-map",
 
     watch: true,
@@ -45,16 +50,13 @@ module.exports = (env, argv) => ({
                     let child
 
                     compiler.hooks.done.tap("DonePlugin", function () {
-                        child = spawn(
-                            "node",
-                            [join(output.path, output.filename)],
-                            {
-                                env: process.env,
-                            },
-                        )
+                        child = spawn("node", [output.path], {
+                            env: process.env,
+                        })
 
                         child.stdout.on("data", function (data) {
                             process.stdout.write(data)
+                            child.stdin.write("what do you mean?")
                         })
 
                         child.stderr.on("data", function (data) {
@@ -74,5 +76,5 @@ module.exports = (env, argv) => ({
         },
     ],
 
-    externals: [nodeExternals()],
+    externals: nodeExternals(),
 })

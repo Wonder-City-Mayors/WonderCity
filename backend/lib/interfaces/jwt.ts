@@ -1,5 +1,9 @@
 import { ResponseUser } from "./response"
 
+export interface StationTokenPayload {
+    stationId: number
+}
+
 export interface TokenPayload {
     id: number
 }
