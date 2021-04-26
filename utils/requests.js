@@ -1,6 +1,6 @@
 import { getCookie } from "./cookies"
 
-const createUrl = (path, query, auth) => {
+const createUrl = (path, query) => {
     let keys,
         queryString = ""
 

@@ -38,7 +38,7 @@
     };
 
     const updateStats = () => {
-        if ('Day' in stats) {
+        if ("Day" in stats) {
             if (device.date.getHours() !== lastDate.getHours()) {
                 shiftForward(stats.Day, {
                     value: 0,
@@ -49,7 +49,7 @@
             }
         }
 
-        if ('Month' in stats) {
+        if ("Month" in stats) {
             if (device.date.getDate() !== lastDate.getDate()) {
                 shiftForward(stats.Month, {
                     value: 0,
@@ -60,7 +60,7 @@
             }
         }
 
-        if ('Year' in stats) {
+        if ("Year" in stats) {
             if (device.date.getMonth() !== lastDate.getMonth()) {
                 shiftForward(stats.Year, {
                     value: 0,
@@ -71,11 +71,11 @@
             }
         }
 
-        if ('Prediction' in stats) {
+        if ("Prediction" in stats) {
             if (device.date.getDate() !== lastDate.getDate()) {
                 shiftForward(stats.Prediction, {
                     value: 0,
-                    timeStamp: device.date
+                    timeStamp: device.date,
                 });
             } else {
                 stats.Prediction[0].value += device.lastRecord;
@@ -85,9 +85,9 @@
 
     const checkStats = () => {
         stats[chosenStat] = getApiResponse(
-            `${$session.apiUrl}/values/stat${chosenStat}`,
+            `${$session.apiUrl}/value/stat${chosenStat}`,
             {
-                deviceId: device.id,
+                deviceId: device.deviceId,
                 timezoneOffset: device.date.getTimezoneOffset(),
             },
             true
@@ -126,17 +126,14 @@
         class="device {device.active ? 'active' : 'unactive'}"
         on:click={handleClick}
     >
-        <Window title="Идентификатор" value={device.id} />
+        <Window title="Идентификатор" value={device.deviceId} />
         {#if device.active}
-            <div class="divider" />
-            <Window title="Показания" value={device.lastRecord} />
-            <div class="divider" />
+            <Window title="Показания" value={device.record} />
             <Window title="Время" value={format(device.date, "ru")} />
             <div class="icon">
                 <Icon icon={mdiChevronDown} />
             </div>
         {:else}
-            <div class="divider" />
             <h3 class="device-unactive">Девайс неактивен</h3>
         {/if}
     </div>
@@ -188,6 +185,7 @@
         .device {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             padding: 0.5rem;
             border-width: 0.2rem;
             border-style: solid;
@@ -202,14 +200,14 @@
                 }
             }
 
-            &:not(.opened):hover {
-                transform: scale(1.025);
-            }
-
             &.active {
                 border-color: rgba($color-primary, 0.2);
                 background-color: rgba($color-primary, 0.1);
                 transition: transform 0.3s ease;
+
+                &:not(.opened):hover {
+                    transform: scale(1.025);
+                }
 
                 &:hover {
                     cursor: pointer;

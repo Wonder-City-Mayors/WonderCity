@@ -1,27 +1,25 @@
-import polka from "polka"
-import sirv from "sirv"
-import compression from "compression"
-import * as sapper from "@sapper/server"
-import colors from "colors/safe"
-import { config } from "dotenv"
-import fetch from "node-fetch"
+import * as sapper from "@sapper/server";
+import colors from "colors/safe";
+import compression from "compression";
+import "dotenv/config";
+import fetch from "node-fetch";
+import polka from "polka";
+import sirv from "sirv";
 
-config()
+const { PORT, NODE_ENV, API_URL = "localhost/api" } = process.env;
+const dev = NODE_ENV === "development";
 
-const { PORT, NODE_ENV, API_URL = "/api" } = process.env
-const dev = NODE_ENV === "development"
-
-const app = polka()
+const app = polka();
 
 if (dev) {
     app.use(async (req, res, next) => {
-        const start = new Date()
+        const start = new Date();
 
         res.on("finish", () => {
-            const ms = colors.underline.bold(
-                String(Date.now() - start.getTime()),
-            )
-            const url = colors.cyan(req.originalUrl)
+            const ms = colors.underline(
+                colors.bold(String(Date.now() - start.getTime()))
+            );
+            const url = colors.cyan(req.originalUrl);
             const code =
                 res.statusCode >= 200
                     ? res.statusCode >= 300
@@ -31,29 +29,29 @@ if (dev) {
                                 : colors.magenta(res.statusCode)
                             : colors.yellow(res.statusCode)
                         : colors.green(res.statusCode)
-                    : colors.gray(res.statusCode)
+                    : colors.gray(res.statusCode);
 
             console.log(
                 `${start.getHours()}:${start.getMinutes()}:${start.getSeconds()}` +
-                    ` • ${ms} ms ${code} with ${req.method} on ${url}`,
-            )
-        })
+                    ` • ${ms} ms ${code} with ${req.method} on ${url}`
+            );
+        });
 
-        next()
-    })
+        next();
+    });
 }
 
-app.use(compression({ threshold: 0 }), sirv("static", { dev }))
+app.use(compression({ threshold: 0 }), sirv("static", { dev }));
 
 app.use(async function (req, res, next) {
     const user = await fetch(API_URL + "/user/me", {
         headers: {
             Cookie: req.headers.cookie,
         },
-    }).then((response) => response.ok && response.json())
+    }).then((response) => response.ok && response.json());
 
     sapper.middleware({
-        session: () => ({
+        session: (req, res) => ({
             apiUrl: API_URL,
             user: user
                 ? Object.assign(user, {
@@ -63,19 +61,19 @@ app.use(async function (req, res, next) {
                       isAuthenticated: false,
                   },
         }),
-    })(req, res, next)
-})
+    })(req, res, next);
+});
 
 app.listen(PORT, (err) => {
     if (err) {
-        console.log(colors.red(`Ошибка!\n${err}`))
+        console.log(colors.red(`Ошибка!\n${err}`));
     } else {
         console.log(
             colors.green(
-                `Сервер запущен на порте ${colors.bold.underline(
-                    String(PORT),
-                )}.`,
-            ),
-        )
+                `Сервер запущен на порте ${colors.bold(
+                    colors.underline(String(PORT))
+                )}.`
+            )
+        );
     }
-})
+});

@@ -3,12 +3,14 @@
 
     export async function preload(page, session) {
         const devices = await getPreloadApiResponse(
-            `/api/devices/getReadouts`,
+            session.apiUrl + `/device/getReadouts`,
             {
                 page: page.params.page,
             },
             this
         );
+
+        console.log("Returning!");
 
         return {
             devices,
@@ -24,7 +26,7 @@
     export let devices = [];
 
     let socket;
-    let mutableDevices = [];
+    let mutableDevices = devices;
     const socketStore = getContext("socket");
     const singleDatesArray = [
         "только что",
@@ -137,8 +139,8 @@
 
             socket.on("newReadouts", (details) => {
                 for (const device of devices) {
-                    if (device.id === details.deviceId) {
-                        device.lastRecord = details.lastRecord;
+                    if (device.deviceId === details.deviceId) {
+                        device.record = details.record;
                         device.date = new Date();
                         device.active = true;
 
@@ -152,27 +154,28 @@
     $: {
         const devicesIds = [];
 
-        for (let i = 0; i < devices.length; i += 1) {
-            devicesIds.push(devices[i].id);
-            devices[i].active = devices[i].hasOwnProperty("lastRecord");
+        devices.forEach((device) => {
+            devicesIds.push(device.deviceId);
 
-            if (!devices[i].hasOwnProperty("date") && devices[i].active) {
-                devices[i].date = new Date(
-                    parseInt(devices[i].timeStamp.substring(0, 4), 10),
-                    parseInt(devices[i].timeStamp.substring(5, 7), 10) - 1,
-                    parseInt(devices[i].timeStamp.substring(8, 10), 10),
-                    parseInt(devices[i].timeStamp.substring(11, 13), 10),
-                    parseInt(devices[i].timeStamp.substring(14, 16), 10),
-                    parseInt(devices[i].timeStamp.substring(17, 19), 10),
-                    parseInt(devices[i].timeStamp.substring(20, 23), 10)
+            device.active = Boolean(device.record);
+
+            if (!("date" in device) && device.active) {
+                device.date = new Date(
+                    parseInt(device.timestamp.substring(0, 4), 10),
+                    parseInt(device.timestamp.substring(5, 7), 10) - 1,
+                    parseInt(device.timestamp.substring(8, 10), 10),
+                    parseInt(device.timestamp.substring(11, 13), 10),
+                    parseInt(device.timestamp.substring(14, 16), 10),
+                    parseInt(device.timestamp.substring(17, 19), 10),
+                    parseInt(device.timestamp.substring(20, 23), 10)
                 );
 
-                devices[i].date.setTime(
-                    devices[i].date.getTime() -
-                        devices[i].date.getTimezoneOffset() * 60000
+                device.date.setTime(
+                    device.date.getTime() -
+                        device.date.getTimezoneOffset() * 60000
                 );
             }
-        }
+        });
 
         if (socket) {
             socket.emit("newDevices", devicesIds);
@@ -183,7 +186,7 @@
 </script>
 
 {#if devices.length > 0}
-    {#each mutableDevices as device (device.id)}
+    {#each mutableDevices as device (device.deviceId)}
         <Device {device} {format} locale={ru_RU} />
     {/each}
 {:else}Произошла какая-то досадная оплошность. Агась.{/if}

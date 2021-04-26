@@ -1,7 +1,7 @@
 <script lang="ts">
     import { stores } from "@sapper/app";
     import Title from "components/Title.svelte";
-    import Input from "components/TextField.svelte";
+    import Input from "components/Input.svelte";
     import Btn from "components/Btn.svelte";
 
     import { postApi } from "utils/requests";

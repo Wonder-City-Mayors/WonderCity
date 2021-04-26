@@ -1,27 +1,27 @@
-import alias from "@rollup/plugin-alias"
-import resolve from "@rollup/plugin-node-resolve"
-import replace from "@rollup/plugin-replace"
-import commonjs from "@rollup/plugin-commonjs"
-import svelte from "rollup-plugin-svelte"
-import babel from "@rollup/plugin-babel"
-import { terser } from "rollup-plugin-terser"
-import config from "sapper/config/rollup.js"
-import pkg from "./package.json"
-import postcss from "rollup-plugin-postcss"
-import typescript from "@rollup/plugin-typescript"
+import alias from "@rollup/plugin-alias";
+import babel from "@rollup/plugin-babel";
+import commonjs from "@rollup/plugin-commonjs";
+import resolve from "@rollup/plugin-node-resolve";
+import replace from "@rollup/plugin-replace";
+import typescript from "@rollup/plugin-typescript";
+import path from "path";
+import postcss from "rollup-plugin-postcss";
+import svelte from "rollup-plugin-svelte";
+import { terser } from "rollup-plugin-terser";
+import config from "sapper/config/rollup.js";
+import externals from "./external-packages.json";
+import json from "@rollup/plugin-json";
 
-import path from "path"
-
-const mode = process.env.NODE_ENV
-const dev = mode === "development"
-const legacy = !!process.env.SAPPER_LEGACY_BUILD
-const { preprocess } = require("./svelte.config")
+const mode = process.env.NODE_ENV;
+const dev = mode === "development";
+const legacy = !!process.env.SAPPER_LEGACY_BUILD;
+const { preprocess } = require("./svelte.config");
 
 const onwarn = (warning, onwarn) =>
     (warning.code === "MISSING_EXPORT" && /'preload'/.test(warning.message)) ||
     (warning.code === "CIRCULAR_DEPENDENCY" &&
         /[/\\]@sapper[/\\]/.test(warning.message)) ||
-    onwarn(warning)
+    onwarn(warning);
 
 const aliases = () => ({
     resolve: [".svelte", ".js", ".scss", ".css"],
@@ -35,18 +35,16 @@ const aliases = () => ({
             replacement: path.resolve(process.cwd(), "src", "components", "$1"),
         },
     ],
-})
+});
 
-const external = Object.keys(pkg.dependencies).concat(
-    require("module").builtinModules,
-)
+const external = require("module").builtinModules.concat(externals);
 
 const watch = {
     exclude: ["./node_modules/**/*"],
     chokidar: {
         usePolling: true,
     },
-}
+};
 
 const postcssConfig = () => ({
     extensions: [".scss", ".sass"],
@@ -66,7 +64,7 @@ const postcssConfig = () => ({
             },
         ],
     ],
-})
+});
 
 export default {
     client: {
@@ -90,8 +88,8 @@ export default {
                 preprocess,
                 onwarn: (warning, handler) => {
                     if (warning.code === "a11y-label-has-associated-control")
-                        return
-                    handler(warning)
+                        return;
+                    handler(warning);
                 },
             }),
             resolve({
@@ -101,6 +99,7 @@ export default {
             commonjs(),
             typescript({}),
             postcss(postcssConfig()),
+            json(),
 
             legacy &&
                 babel({
@@ -158,8 +157,8 @@ export default {
                 preprocess,
                 onwarn: (warning, handler) => {
                     if (warning.code === "a11y-label-has-associated-control")
-                        return
-                    handler(warning)
+                        return;
+                    handler(warning);
                 },
             }),
             resolve({
@@ -168,6 +167,7 @@ export default {
             commonjs(),
             typescript({}),
             postcss(postcssConfig()),
+            json(),
         ],
         external,
         preserveEntrySignatures: "strict",
@@ -194,4 +194,4 @@ export default {
         preserveEntrySignatures: false,
         onwarn,
     },
-}
+};

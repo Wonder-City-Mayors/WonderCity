@@ -6,7 +6,6 @@
     import Textfield from "../Textfield.svelte";
     import SubmitButton from "./SubmitButton.svelte";
 
-
     export let element;
     export let active;
 
@@ -82,7 +81,6 @@
 
                 promise.then(
                     (json) => {
-                        console.log(json);
                         dispatch("signed", json);
                     },
                     (e) => {

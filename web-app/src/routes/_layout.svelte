@@ -86,7 +86,9 @@
         if (activeHref[0] !== "/") activeHref = "/" + activeHref;
 
         for (let i = 0; i < iconTabs.length; i++) {
-            if (iconTabs[i].path === activeHref) {
+            if (
+                iconTabs[i].path.substring(0, activeHref.length) === activeHref
+            ) {
                 activeIndex = i;
                 return;
             }

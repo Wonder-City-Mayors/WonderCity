@@ -1,5 +1,3 @@
-const get = require("lodash/get")
-
 module.exports = (permissions, required) => {
     if (permissions["*"]) return true
 
