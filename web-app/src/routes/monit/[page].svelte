@@ -10,8 +10,6 @@
             this
         );
 
-        console.log("Returning!");
-
         return {
             devices,
         };
@@ -186,10 +184,17 @@
 </script>
 
 {#if devices.length > 0}
-    {#each mutableDevices as device (device.deviceId)}
-        <Device {device} {format} locale={ru_RU} />
-    {/each}
+    <div class="devices">
+        {#each mutableDevices as device (device.deviceId)}
+            <Device {device} {format} />
+        {/each}
+    </div>
 {:else}Произошла какая-то досадная оплошность. Агась.{/if}
 
 <style lang="scss">
+    .devices {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 </style>

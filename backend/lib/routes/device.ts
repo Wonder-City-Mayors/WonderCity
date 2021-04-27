@@ -19,5 +19,10 @@ export default class DeviceRoute implements Route {
             validateJwtPayload(),
             this.controller.getReadouts,
         )
+        this.router.get(
+            "/isMine",
+            validateJwtPayload(),
+            this.controller.getReadouts,
+        )
     }
 }

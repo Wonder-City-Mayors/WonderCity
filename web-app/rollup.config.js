@@ -11,6 +11,7 @@ import { terser } from "rollup-plugin-terser";
 import config from "sapper/config/rollup.js";
 import externals from "./external-packages.json";
 import json from "@rollup/plugin-json";
+import autoprefixer from "autoprefixer";
 
 const mode = process.env.NODE_ENV;
 const dev = mode === "development";
@@ -28,7 +29,7 @@ const aliases = () => ({
     entries: [
         {
             find: /^utils\/(.+)$/,
-            replacement: path.resolve(process.cwd(), "..", "utils", "$1"),
+            replacement: path.resolve(process.cwd(), "utils", "$1"),
         },
         {
             find: /^components\/(.+)$/,
@@ -50,6 +51,7 @@ const postcssConfig = () => ({
     extensions: [".scss", ".sass"],
     extract: false,
     minimize: true,
+    plugins: [autoprefixer()],
     use: [
         [
             "sass",

@@ -21,6 +21,7 @@
         "d3-shape": "^2.1.0",
         "date-and-time": "^0.14.2",
         "dotenv": "^8.2.0",
+        "lodash": "^4.17.21",
         "node-fetch": "^2.6.1",
         "polka": "^0.5.2",
         "sirv": "^1.0.11",

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { stores } from "@sapper/app";
     import { cubicIn, quadInOut } from "svelte/easing";
+    import { fade } from "svelte/transition";
 
     import {
         mdiSchool,
@@ -12,7 +13,6 @@
         mdiArrowUp,
     } from "@mdi/js";
 
-    import Main from "components/TransitionedMain.svelte";
     import Icon from "components/Icon.svelte";
 
     export let segment: string | undefined;
@@ -63,12 +63,30 @@
     function translateSlide(node: Element, { duration = 300 }) {
         return {
             duration,
+            easing: quadInOut,
             css: (t: number) => {
-                const eased = quadInOut(t);
-
                 return `
-                    transform: translateY(${100 * (1 - eased)}%);
+                    transform: translateY(${100 * (1 - t)}%);
                 `;
+            },
+        };
+    }
+
+    function myFade(
+        node,
+        { duration = 300, easing = quadInOut, absolute = false }
+    ) {
+        if (absolute) {
+            node.style.position = "absolute";
+        }
+
+        return {
+            duration,
+            easing,
+            css: (t) => {
+                return `
+                    opacity: ${t};
+                    `;
             },
         };
     }
@@ -173,9 +191,9 @@
     </div>
 </nav>
 {#key segment}
-    <Main>
+    <main in:myFade out:myFade={{ absolute: true }}>
         <slot />
-    </Main>
+    </main>
 {/key}
 
 <style global lang="scss">
@@ -229,8 +247,9 @@
     }
 
     body {
-        height: 100%;
         overflow-x: hidden;
+        padding-bottom: $aside-side;
+        position: relative;
     }
 
     nav {
@@ -326,7 +345,8 @@
     }
 
     main {
-        padding-bottom: $aside-side;
+        width: 100%;
+        left: 0;
     }
 
     @media all and (min-aspect-ratio: 7 / 5) {

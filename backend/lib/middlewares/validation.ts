@@ -4,15 +4,17 @@ import { ModifiedRequest } from "@lib/types"
 import { getUser } from "@utils"
 import { plainToClass } from "class-transformer"
 import { validate, ValidationError } from "class-validator"
-import { NextFunction, RequestHandler, Response } from "express"
+import { NextFunction, RequestHandler } from "express"
 
 export function validationMiddleware(
     type: any,
     value: "body" | "query" | "params" = "body",
     skipMissingProperties: boolean = false,
 ): RequestHandler {
-    return function requestHandler(req, res, next) {
-        validate(plainToClass(type, req[value]), {
+    return function requestHandler(req, _res, next) {
+        req[value] = plainToClass(type, req[value])
+
+        validate(req[value], {
             skipMissingProperties,
         }).then(function (errors: ValidationError[]) {
             if (errors.length > 0) {

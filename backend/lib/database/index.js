@@ -10,4 +10,8 @@ function init() {
     Model.knex(db)
 }
 
-module.exports = { db, init }
+function getDb() {
+    return db
+}
+
+module.exports = { db, init, getDb }

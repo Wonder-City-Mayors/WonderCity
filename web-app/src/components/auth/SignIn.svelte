@@ -102,7 +102,6 @@
     bind:this={element}
     class="signin {active ? 'active' : 'unactive'}"
     on:submit|preventDefault={signin}
-    transition:fly={{ x: -300, duration: 300 }}
 >
     <div class="fields">
         <Textfield bind:value={username} error={usernameError} label="Логин" />

@@ -9,7 +9,7 @@
 <Title caption="Главная" />
 
 {#if $session.user.isAuthenticated}
-    <h1>Привет, {$session.user.first_name || $session.user.username}!</h1>
+    <h1>Привет, {$session.user.firstName || $session.user.username}!</h1>
 {:else}
     <h1>Слава Богу, ты пришёл!</h1>
 {/if}

@@ -7,7 +7,6 @@
     import Textfield from "../Textfield.svelte";
     import SubmitButton from "./SubmitButton.svelte";
 
-
     export let element;
     export let active;
 
@@ -123,7 +122,6 @@
     bind:this={element}
     class="signup {active ? 'active' : 'unactive'}"
     on:submit|preventDefault={signup}
-    transition:fly={{ x: 300, duration: 300 }}
 >
     <div class="fields">
         <Textfield bind:value={username} error={usernameError} label="Логин" />

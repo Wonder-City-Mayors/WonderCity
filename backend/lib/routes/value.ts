@@ -1,6 +1,10 @@
 import ValueController from "@controllers/value"
+import { getReadoutsDto } from "@dtos/value.dto"
 import Route from "@interfaces/route"
-import { validateJwtPayload } from "@middlewares/validation"
+import {
+    validateJwtPayload,
+    validationMiddleware,
+} from "@middlewares/validation"
 import { Router } from "express"
 
 export default class ValueRoute implements Route {
@@ -14,24 +18,10 @@ export default class ValueRoute implements Route {
 
     private initializeRoutes() {
         this.router.get(
-            "/statDay",
+            "/stats",
             validateJwtPayload(),
-            this.controller.statDay,
-        )
-        this.router.get(
-            "/statMonth",
-            validateJwtPayload(),
-            this.controller.statMonth,
-        )
-        this.router.get(
-            "/statYear",
-            validateJwtPayload(),
-            this.controller.statYear,
-        )
-        this.router.get(
-            "/statPrediction",
-            validateJwtPayload(),
-            this.controller.statPrediction,
+            validationMiddleware(getReadoutsDto, "query", true),
+            this.controller.getStat,
         )
     }
 }

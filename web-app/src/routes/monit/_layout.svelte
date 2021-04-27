@@ -118,52 +118,51 @@
 {/if}
 
 <style lang="sass">
-  @import "colors"
+    @import "colors"
 
-  .wrapper
-    padding-bottom: .5rem
-
-    .switcher,
-    .filler
-      display: none
-
-  .no-devices
-    color: $mdc-theme-secondary
-    margin: .25rem .5rem
-    text-align: center
-
-  @media (min-aspect-ratio: 23/18)
     .wrapper
-      .switcher,
-      .filler
-        position: fixed
-        top: 0
-        display: block
-        height: 100vh
-        font-size: 2.5rem
-        display: flex
-        justify-content: center
-        align-items: center
+        padding-bottom: .5rem
 
-      .switcher
-        padding: 0 .5rem
-        opacity: .4
-        transition: opacity .3s ease, background-color .3s ease
+        .switcher,
+        .filler
+            display: none
 
-        &:hover
-          opacity: 1
-          background-color: rgba($color-primary, .25)
+    .no-devices
+        color: $mdc-theme-secondary
+        margin: .25rem .5rem
+        text-align: center
 
-      .filler
-        --icon-component-color: #aaa
+    @media (min-aspect-ratio: 23/18)
+        .wrapper
+            .readouts
+                padding: 0 3.5rem
 
-      .left
-        left: 0
+            .switcher,
+            .filler
+                position: fixed
+                top: 0
+                display: block
+                height: 100vh
+                font-size: 2.5rem
+                display: flex
+                justify-content: center
+                align-items: center
 
-      .right
-        right: 0
+            .switcher
+                padding: 0 .5rem
+                opacity: .4
+                transition: opacity .3s ease, background-color .3s ease
 
-      .readouts
-        max-width: 36rem
-        margin: 0 auto
+                &:hover
+                    opacity: 1
+                    background-color: rgba($color-primary, .25)
+
+            .filler
+                --icon-component-color: #{$color-secondary}
+
+            .left
+                left: 0
+
+            .right
+                right: 0
 </style>

@@ -35,4 +35,20 @@ export default class DeviceController {
             }
         },
     )
+
+    isMine = baseController(async (req: ModifiedRequest, res: Response) => {
+        if (!req.jwtPayload || !req.query.deviceId) {
+            throw new HttpException(400, "Bad Request")
+        }
+
+        const device = await Device.query()
+            .first()
+            .where({ id: req.query.deviceId })
+
+        if (!device || device.userId !== req.jwtPayload.id) {
+            throw new HttpException(403, "Forbidden")
+        }
+
+        res.status(200).json({})
+    })
 }

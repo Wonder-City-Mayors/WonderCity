@@ -10,7 +10,7 @@ import {
 } from "@lib/types"
 import Role from "@models/role"
 import User from "@models/user"
-import { has, set } from "lodash"
+import { has, orderBy, set } from "lodash"
 
 export async function getAllRoles(): Promise<RoleWithPermissions[]> {
     const joined: PermissionRoleMerged[] = (await Role.query()
@@ -21,7 +21,8 @@ export async function getAllRoles(): Promise<RoleWithPermissions[]> {
             "permissions.operation",
             "permissions.target",
         )
-        .leftJoinRelated("permissions")) as any[]
+        .leftJoinRelated("permissions")
+        .orderBy("role.id")) as any[]
 
     const roles: RoleWithPermissions[] = []
     let previous: number | undefined
@@ -29,24 +30,28 @@ export async function getAllRoles(): Promise<RoleWithPermissions[]> {
 
     for (let i = 0; i < joined.length; i++) {
         if (joined[i].id !== previous) {
+            if (roles.length > 0) {
+                roles[roles.length - 1].permissions = parsePermissions(
+                    permissions,
+                )
+                permissions = []
+            }
+
             roles.push({
                 id: joined[i].id,
                 name: joined[i].name,
                 permissions: {},
             })
 
-            if (roles.length >= 2) {
-                roles[roles.length - 2].permissions = parsePermissions(
-                    permissions,
-                )
-                permissions = []
-            }
+            previous = joined[i].id
         }
 
         permissions.push(joined[i])
     }
 
-    roles[roles.length - 1].permissions = parsePermissions(permissions)
+    if (roles.length > 0) {
+        roles[roles.length - 1].permissions = parsePermissions(permissions)
+    }
 
     return roles
 }
