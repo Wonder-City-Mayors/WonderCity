@@ -22,30 +22,21 @@ let stations: {
 
 let newStationListener: NewStationListener | undefined
 
-async function baseStationCycle(stationId: number) {
-    while (true) {
-        const allDevices = await Device.query().where({
-            stationId,
-        })
-
-        for (let i = 0; i < allDevices.length; i++) {
-            await new Promise()
-        }
-    }
-}
-
-export async function setNewStationListener(listener: NewStationListener) {
+export function setNewStationListener(listener: NewStationListener) {
     newStationListener = listener
 }
 
-export async function checkReadOuts(device: Device) {
+export async function checkReadOuts(device: Device, resolve, reject) {
     if (device.stationId) {
-        let station = stations[device.stationId]
+        const station = stations[device.stationId]
 
         if (station) {
+            station.resolve = resolve
+            station.reject = reject
+
             station.socket.send(
                 JSON.stringify({
-                    type: "get",
+                    type: "readout",
                     deviceId: device.id,
                 }),
             )
@@ -64,6 +55,10 @@ export default async function bootstrap() {
         function connection(socket, request: ModifiedIncomingMessage) {
             if (request.stationPayload) {
                 const id = request.stationPayload.stationId
+
+                if (newStationListener) {
+                    newStationListener(id)
+                }
 
                 stations[id] = { socket }
 
