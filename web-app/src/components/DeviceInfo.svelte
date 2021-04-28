@@ -16,7 +16,7 @@
 </script>
 
 {#if device.active}
-    <a class="device active" href="/device/{device.deviceId}">
+    <a class="device active" href="/monit/device/{device.deviceId}">
         <h2>
             <span class="secondary"> # </span>
             {device.deviceId}

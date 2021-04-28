@@ -1,5 +1,5 @@
 exports.up = function (knex) {
-    return knex.transaction((trx) => {
+    return knex.transaction((trx) =>
         trx.schema
             .createTable("base_station", (t) => {
                 t.increments("id")
@@ -13,18 +13,18 @@ exports.up = function (knex) {
                     .onUpdate("cascade")
                     .onDelete("set null")
             })
-            .then(trx.commit)
-    })
+            .then(trx.commit),
+    )
 }
 
 exports.down = function (knex) {
-    return knex.transaction((trx) => {
+    return knex.transaction((trx) =>
         trx.schema
             .table("device", (t) => {
                 t.dropForeign("base_station_id")
                 t.dropColumn("base_station_id")
             })
             .dropTable("base_station")
-            .then(trx.commit)
-    })
+            .then(trx.commit),
+    )
 }

@@ -31,7 +31,7 @@ export default class ValueService {
 
         const arr: number[] = []
 
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < statData.parts; i++) {
             arr[i] = 0
         }
 

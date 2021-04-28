@@ -33,6 +33,7 @@
         "hpp": "^0.2.3",
         "jsonwebtoken": "^8.5.1",
         "knex": "^0.95.4",
+        "lodash": "^4.17.21",
         "mysql": "^2.18.1",
         "objection": "^2.2.15",
         "socket.io": "^4.0.0",
