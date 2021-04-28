@@ -10,13 +10,45 @@ type ModifiedIncomingMessage = IncomingMessage & {
     stationPayload: StationTokenPayload
 }
 
-let stations: { [key: number]: WebSocket } = {}
+type NewStationListener = (stationId: number) => void
+
+let stations: {
+    [key: number]: {
+        socket: WebSocket
+        reject?: () => void
+        resolve?: () => void
+    }
+} = {}
+
+let newStationListener: NewStationListener | undefined
+
+async function baseStationCycle(stationId: number) {
+    while (true) {
+        const allDevices = await Device.query().where({
+            stationId,
+        })
+
+        for (let i = 0; i < allDevices.length; i++) {
+            await new Promise()
+        }
+    }
+}
+
+export async function setNewStationListener(listener: NewStationListener) {
+    newStationListener = listener
+}
 
 export async function checkReadOuts(device: Device) {
     if (device.stationId) {
         let station = stations[device.stationId]
+
         if (station) {
-            station.emit("getReadOut", JSON.stringify({ deviceId: device.id }))
+            station.socket.send(
+                JSON.stringify({
+                    type: "get",
+                    deviceId: device.id,
+                }),
+            )
         }
     }
 }
@@ -31,18 +63,48 @@ export default async function bootstrap() {
         "connection",
         function connection(socket, request: ModifiedIncomingMessage) {
             if (request.stationPayload) {
-                stations[request.stationPayload.stationId] = socket
+                const id = request.stationPayload.stationId
 
-                socket.on("getReadOut", function (str) {
-                    let deviceInfo = JSON.parse(str)
-                    let tid = {
-                        timestamp: new Date().toISOString(),
-                        record: deviceInfo.record,
-                        deviceId: deviceInfo.deviceId,
+                stations[id] = { socket }
+
+                socket.on("message", function (data) {
+                    const message = JSON.parse(data.toString())
+
+                    if (message.type === "error") {
+                        const reject = stations[id].reject
+
+                        if (reject) {
+                            reject()
+                        }
+
+                        return
                     }
+
+                    if (message.type === "registration") {
+                        Device.query()
+                            .update({
+                                stationId: id,
+                            })
+                            .where({
+                                id: message.deviceId,
+                            })
+                            .then(function () {
+                                /* no-op */
+                            })
+                    }
+
                     Value.query()
-                        .insert(tid)
-                        .then(function () {})
+                        .insert({
+                            deviceId: message.deviceId,
+                            record: message.record,
+                        })
+                        .then(function () {
+                            const resolve = stations[id].resolve
+
+                            if (resolve) {
+                                resolve()
+                            }
+                        })
                 })
             }
         },

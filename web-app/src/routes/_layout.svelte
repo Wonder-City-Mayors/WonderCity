@@ -125,7 +125,7 @@
                 {
                     icon: mdiCast,
                     label: "Отслеживание",
-                    path: "/monit/1",
+                    path: "/monit/list/1",
                 },
                 {
                     icon: mdiAccountCircle,
