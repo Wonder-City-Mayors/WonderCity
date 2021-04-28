@@ -64,7 +64,7 @@ interface Device {
      */
     userId?: number
 
-    stationId?: number
+    baseStationId?: number
 }
 
 /**

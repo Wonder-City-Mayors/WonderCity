@@ -1,12 +1,11 @@
 import cache from "@lib/cache"
 import Device from "@models/device"
-import Value from "@models/value"
 import { getAllRoles, getUser } from "@utils"
 import * as cookie from "cookie"
 import { Server as HttpServer } from "http"
 import size from "lodash/size"
 import { Server, Socket } from "socket.io"
-import { setNewStationListener } from "./bootstrap"
+import { setNewStationListener, getReadout } from "./bootstrap"
 
 function randomInt(start: number, end: number) {
     return Math.trunc(Math.random() * (end - start) + start)
@@ -29,11 +28,37 @@ export default function jacketzip(server: HttpServer) {
         ;(async function () {
             while (true) {
                 const allDevices = await Device.query().where({
-                    stationId,
+                    baseStationId: stationId,
                 })
 
                 for (let i = 0; i < allDevices.length; i++) {
-                    await new Promise()
+                    await new Promise((resolve, reject) => {
+                        getReadout(allDevices[i], resolve, reject)
+                    }).then(
+                        (readout: number) => {
+                            const userId = allDevices[i].userId
+                            const userSockets =
+                                userId && cache.connectedUsers[userId]
+
+                            if (userSockets) {
+                                for (let socketId in userSockets) {
+                                    if (
+                                        userSockets[socketId].has(
+                                            allDevices[i].id,
+                                        )
+                                    ) {
+                                        io.to(socketId).emit("newReadouts", {
+                                            deviceId: allDevices[i].id,
+                                            record: readout,
+                                        })
+                                    }
+                                }
+                            }
+                        },
+                        () => {
+                            console.log("Couldn't get device readouts.")
+                        },
+                    )
                 }
             }
         })()

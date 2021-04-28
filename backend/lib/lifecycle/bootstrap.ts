@@ -12,12 +12,15 @@ type ModifiedIncomingMessage = IncomingMessage & {
 
 type NewStationListener = (stationId: number) => void
 
-let stations: {
+const stations: {
     [key: number]: {
         socket: WebSocket
         reject?: () => void
-        resolve?: () => void
+        resolve?: (readout: number) => void
     }
+} = {}
+const deviceIdToUserId: {
+    [key: number]: number
 } = {}
 
 let newStationListener: NewStationListener | undefined
@@ -26,9 +29,13 @@ export function setNewStationListener(listener: NewStationListener) {
     newStationListener = listener
 }
 
-export async function checkReadOuts(device: Device, resolve, reject) {
-    if (device.stationId) {
-        const station = stations[device.stationId]
+export function getReadout(
+    device: Device,
+    resolve: (readout: number) => void,
+    reject,
+) {
+    if (device.baseStationId) {
+        const station = stations[device.baseStationId]
 
         if (station) {
             station.resolve = resolve
@@ -41,6 +48,19 @@ export async function checkReadOuts(device: Device, resolve, reject) {
                 }),
             )
         }
+    }
+}
+
+export function addDevice(deviceId: number, userId: number) {
+    for (let stationId in stations) {
+        deviceIdToUserId[deviceId] = userId
+
+        stations[stationId].socket.send(
+            JSON.stringify({
+                type: "registration",
+                deviceId,
+            }),
+        )
     }
 }
 
@@ -78,13 +98,14 @@ export default async function bootstrap() {
                     if (message.type === "registration") {
                         Device.query()
                             .update({
-                                stationId: id,
+                                baseStationId: id,
+                                userId: deviceIdToUserId[message.deviceId],
                             })
                             .where({
                                 id: message.deviceId,
                             })
                             .then(function () {
-                                /* no-op */
+                                delete deviceIdToUserId[message.deviceId]
                             })
                     }
 
@@ -92,12 +113,13 @@ export default async function bootstrap() {
                         .insert({
                             deviceId: message.deviceId,
                             record: message.record,
+                            timestamp: new Date(),
                         })
                         .then(function () {
                             const resolve = stations[id].resolve
 
                             if (resolve) {
-                                resolve()
+                                resolve(message.record)
                             }
                         })
                 })

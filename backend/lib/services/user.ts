@@ -11,6 +11,7 @@ import Device from "@models/device"
 import User from "@models/user"
 import { getResponseUser, isEmpty } from "@utils"
 import { hash } from "bcrypt"
+import { addDevice } from "@lifecycle/bootstrap"
 
 export default class UserService {
     async me(userData: jwtDto) {
@@ -38,11 +39,7 @@ export default class UserService {
             throw new HttpException(409, "Этот датчик уже занят.")
         }
 
-        await Device.query()
-            .update({
-                userId: user.id,
-            })
-            .where("id", device.id)
+        addDevice(device.id, user.id)
     }
 
     async changeFirstName(user: User, nameData: nameDto) {
