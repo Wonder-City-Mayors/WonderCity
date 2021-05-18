@@ -23,20 +23,6 @@
 <Title caption="О WCM" />
 
 <div class="diva">
-    <span class="d">
-        <a href="https://vk.com/wondercitymayors"
-            ><img src="http://91.146.16.157:3010/images/vk2.png" class="im" />
-        </a>
-    </span>
-
-    <span class="d">
-        <a href="https://vk.com/app6471849_-202307354"
-            ><img
-                src="http://91.146.16.157:3010/images/don.png"
-                class="im"
-            /></a
-        >
-    </span>
     <span class="w">Волшебная водичка</span>
 </div>
 
@@ -47,9 +33,14 @@
     является сис. анал. Георгий. a что?
 </h1>
 
-<h2><img src="http://91.146.16.157:3010/images/counter.jpg" class="im1" /></h2>
 <!-- VK Widget -->
 <div id="vk" />
+<form
+    action="https://vk.com/wondercitymayors?w=app6471849_-202307354"
+    target="_blank"
+>
+    <button />
+</form>
 
 <style lang="scss">
     @import "global.scss";
@@ -79,5 +70,14 @@
 
     .d {
         display: inline;
+    }
+    button {
+        border-radius: 10px;
+        width: 300px;
+        height: 150px;
+        display: block;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-image: url(http://localhost:3002/images/moneta.jpg);
     }
 </style>

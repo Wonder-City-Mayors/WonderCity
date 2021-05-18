@@ -1,54 +1,54 @@
 <script>
-    import { goto, stores } from "@sapper/app"
-    import Tab, { Label } from "@smui/tab"
-    import TabBar from "@smui/tab-bar"
-    import SignIn from "components/auth/SignIn.svelte"
-    import SignUp from "components/auth/SignUp.svelte"
-    import Button from "components/Button.svelte"
-    import Title from "components/Title.svelte"
-    import { setCookie } from "utils/cookies"
+    import { goto, stores } from "@sapper/app";
+    import Tab, { Label } from "@smui/tab";
+    import TabBar from "@smui/tab-bar";
+    import SignIn from "components/auth/SignIn.svelte";
+    import SignUp from "components/auth/SignUp.svelte";
+    import Button from "components/Button.svelte";
+    import Title from "components/Title.svelte";
+    import { setCookie } from "utils/cookies";
 
-    const { page, session } = stores()
-    const user = $session.user
-    const tabs = ["Вход", "Регистрация"]
+    const { page, session } = stores();
+    const user = $session.user;
+    const tabs = ["Вход", "Регистрация"];
 
-    let signInForm, signUpForm
+    let signInForm, signUpForm;
 
-    let activeIndex = 0
+    let activeIndex = 0;
 
     $: {
         const [active, passive] = activeIndex
             ? [signUpForm, signInForm]
-            : [signInForm, signUpForm]
+            : [signInForm, signUpForm];
 
         if (active) {
-            active.classList.add("active")
+            active.classList.add("active");
         }
 
         if (passive) {
-            passive.classList.remove("active")
+            passive.classList.remove("active");
         }
     }
 
-    const logout = () => goto("/logout")
-    const redirect = () => goto($page.query.redirectTo || "/")
+    const logout = () => goto("/logout");
+    const redirect = () => goto($page.query.redirectTo || "/");
 
     const signed = (e) => {
         setCookie("jwt", e.detail.jwt, {
             sameSite: "Strict",
             maxAge: 1296000,
-        })
+        });
 
         session.update((oldSession) => {
             oldSession.user = Object.assign(e.detail.data, {
                 isAuthenticated: true,
-            })
-            return oldSession
-        })
+            });
+            return oldSession;
+        });
 
-        console.log($page.query.redirectTo)
-        redirect()
-    }
+        console.log($page.query.redirectTo);
+        redirect();
+    };
 </script>
 
 <Title caption="Авторизация" />
@@ -66,13 +66,15 @@
             color="secondary"
             on:click={logout}
             icon="person_remove"
-            label="Выйти" />
+            label="Выйти"
+        />
         <Button
             class="continue"
             variant="raised"
             on:click={redirect}
             icon="check_circle"
-            label="Продолжить" />
+            label="Продолжить"
+        />
     </div>
 {:else}
     <TabBar {tabs} let:tab bind:activeIndex>
@@ -81,7 +83,8 @@
                 style="
               font-family: defaultFont, sans-serif;
               font-weight: 700;
-            ">
+            "
+            >
                 {tab}
             </Label>
         </Tab>
@@ -90,11 +93,13 @@
         <SignIn
             on:signed={signed}
             bind:element={signInForm}
-            active={activeIndex === 0} />
+            active={activeIndex === 0}
+        />
         <SignUp
             on:signed={signed}
             bind:element={signUpForm}
-            active={activeIndex === 1} />
+            active={activeIndex === 1}
+        />
     </div>
 {/if}
 
@@ -120,7 +125,7 @@
           flex-wrap: wrap
           width: 100%
 
-          .textfield-container
+          .input-container
             flex: 1 0 15rem
 
         .submit

@@ -30,15 +30,9 @@
 
 <Title caption="Датчики" />
 
-<div id="d">
-    <Input bind:value={deviceId} placeholder="Идентификатор датчика" />
+<Input bind:value={deviceId} placeholder="Идентификатор датчика" />
 
-    <Btn on:click={addDevice}>Нажми меня</Btn>
-</div>
+<Btn on:click={addDevice}>Нажми меня</Btn>
 
 <style>
-    #d {
-        margin: auto;
-        width: 10rem;
-    }
 </style>

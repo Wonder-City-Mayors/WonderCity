@@ -1,9 +1,8 @@
 <script>
     import { stores } from "@sapper/app";
     import { createEventDispatcher } from "svelte";
-    import { fly } from "svelte/transition";
     import { postApi } from "utils/requests";
-    import Textfield from "../Textfield.svelte";
+    import Textfield from "../Input.svelte";
     import SubmitButton from "./SubmitButton.svelte";
 
     export let element;
@@ -33,45 +32,36 @@
         }
     };
 
-    const checkWrongPassword = () => {
+    $: disabled = passwordError || usernameError || wrongPassword;
+
+    function checkWrongPassword() {
         if (wrongPassword) {
             wrongPassword = false;
         }
-    };
+    }
 
-    $: {
-        checkUsernameEntered();
-        checkWrongPassword();
-
-        if (usernameEntered) {
-            if (username.length === 0) usernameError = "Заполните это поле.";
-            else if (/[^0-9a-zA-Z#$*_]/.test(username))
-                usernameError =
-                    "Логин может состоять только из английских букв, " +
-                    "цифр и знаков #, $, *, _.";
-            else usernameError = "";
+    function validateUsername(username) {
+        if (username.length === 0) {
+            return "Заполните это поле.";
+        } else if (/[^0-9a-zA-Z#$*_]/.test(username)) {
+            return (
+                "Логин может состоять только из английских букв, " +
+                "цифр и знаков #, $, *, _."
+            );
         }
     }
 
-    $: {
-        checkPasswordEntered();
+    function validatePassword(password) {
         checkWrongPassword();
 
-        if (passwordEntered) {
-            if (password.length === 0) {
-                passwordError = "Заполните это поле.";
-            } else if (password.length < 8) {
-                passwordError =
-                    "Пароль должен состоять как минимум из 8 символов.";
-            } else {
-                passwordError = "";
-            }
+        if (password.length === 0) {
+            return "Заполните это поле.";
+        } else if (password.length < 8) {
+            return "Пароль должен состоять как минимум из 8 символов.";
         }
     }
 
-    $: disabled = passwordError || usernameError || wrongPassword;
-
-    const signin = (e) => {
+    function logIn(e) {
         if (passwordEntered && usernameEntered) {
             if (!disabled) {
                 promise = postApi($session.apiUrl + "/auth/signIn", {
@@ -95,21 +85,29 @@
             usernameEntered = true;
             passwordEntered = true;
         }
-    };
+    }
 </script>
 
 <form
     bind:this={element}
     class="signin {active ? 'active' : 'unactive'}"
-    on:submit|preventDefault={signin}
+    on:submit|preventDefault={logIn}
 >
     <div class="fields">
-        <Textfield bind:value={username} error={usernameError} label="Логин" />
+        <Textfield
+            placeholder="Логин"
+            validation={validateUsername}
+            bind:value={username}
+            bind:error={usernameError}
+            bind:interacted={usernameEntered}
+        />
         <Textfield
             type="password"
+            placeholder="Пароль"
+            validation={validatePassword}
             bind:value={password}
-            error={passwordError}
-            label="Пароль"
+            bind:error={passwordError}
+            bind:interacted={passwordEntered}
         />
     </div>
     {#if promise}
