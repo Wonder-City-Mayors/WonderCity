@@ -4,18 +4,29 @@
 
 <style lang="scss">
     @import "colors";
+    div {
+        width: 100%;
+        height: 3%;
+        background-color: #54a474;
+        font-size: 70px;
+        text-align: center;
+        color: white;
+    }
 
     h1 {
+        text-align: center;
         color: $mdc-theme-primary;
         margin: 0.25em 0.5em;
     }
     h2 {
         color: $mdc-theme-primary;
-        margin: 0.1em 0.25em;
+        margin-left: 10%;
+        margin-right: 10%;
     }
 </style>
 
 <Title caption="FAQ" />
+<div>FAQ</div>
 
 <h1>В чём суть нашего проекта?</h1>
 <h2>
