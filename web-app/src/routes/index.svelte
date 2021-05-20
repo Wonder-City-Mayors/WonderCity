@@ -5,12 +5,10 @@
 
     const { session } = stores();
     let GoodMorning = [
-        "おはようございます, ",
         "Good morning, ",
         "Guten Morgen, ",
         "Доброе утро, ",
         "C началом нового дня, ",
-        "Қайырлы таң, ",
         "С добрым утром! ",
         "Buenos días, ",
         "Доброго ранку, ",
@@ -22,8 +20,6 @@
         "Добрый день, ",
         "Guten <Tag>! ",
         "Good afternoon, ",
-        "良い一日, ",
-        "Қайырлы күн, ",
         "Buenas tardes, ",
         "Доброго дня, ",
         "Слава Богу, ты пришёл, ",
@@ -33,8 +29,6 @@
         "Добрий вечір, ",
         "Guten Abend, ",
         "Buonasera, ",
-        "Қайырлы кеш, ",
-        "こんばんは, ",
         "Buena tarde, ",
         "Слава Богу, ты пришёл, ",
     ]; // Buonasera Итальянский Buenos días, Buenas tardes, Buena tarde Испанский Еще немецкий и Украинский
