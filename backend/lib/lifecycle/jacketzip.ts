@@ -25,7 +25,7 @@ export default function jacketzip(server: HttpServer) {
     const io = new Server(server)
 
     setNewStationListener((stationId: number) => {
-        ;(async function () {
+        ; (async function () {
             while (true) {
                 const allDevices = await Device.query().where({
                     baseStationId: stationId,
@@ -60,6 +60,10 @@ export default function jacketzip(server: HttpServer) {
                         },
                     )
                 }
+
+                await new Promise((resolve, reject) => {
+                    setTimeout(resolve, 5000)
+                })
             }
         })()
     })

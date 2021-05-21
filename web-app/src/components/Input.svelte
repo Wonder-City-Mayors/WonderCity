@@ -38,25 +38,33 @@
 
     .input-container {
         margin: 0.25rem 0.5rem;
+        --color: #{$color-primary};
 
         &-error {
             font-size: 0.8rem;
-            color: $color-error-red;
+            --color: #{$color-error-red};
+            color: var(--color);
             padding: 0.25rem;
         }
 
         input {
             width: 100%;
-            color: $color-primary;
-            background-color: rgba($color-secondary, 0.25);
+            color: var(--color);
             padding: 0.25rem 0.5rem;
             border-radius: 0.3rem;
-            transition: color 0.3s ease;
+            transition: box-shadow 0.3s;
             font-family: defaultFont;
             font-size: 1rem;
+            border-width: 0.1rem;
+            border-style: solid;
+            border-color: var(--color);
 
             &::placeholder {
-                color: rgba($color-primary, 0.75);
+                color: $color-secondary;
+            }
+
+            &:focus {
+                box-shadow: 0 0 0.1rem 0.1rem var(--color);
             }
 
             &.error {

@@ -2,9 +2,8 @@
     import { mdiLogin } from "@mdi/js";
     import { stores } from "@sapper/app";
     import { createEventDispatcher } from "svelte";
-    import { fly } from "svelte/transition";
     import { postApi } from "utils/requests";
-    import Textfield from "../Textfield.svelte";
+    import Textfield from "../Input.svelte";
     import SubmitButton from "./SubmitButton.svelte";
 
     export let element;
@@ -25,71 +24,46 @@
     let passwordRepeatError;
     let promise;
 
-    const checkUsernameEntered = () => {
-        if (username.length > 0 && !usernameEntered) {
-            usernameEntered = true;
-        }
-    };
-    const checkPasswordEntered = () => {
-        if (password.length > 0 && !passwordEntered) {
-            passwordEntered = true;
-        }
-    };
-    const checkPasswordRepeatEntered = () => {
-        if (passwordRepeat.length > 0 && !passwordRepeatEntered) {
-            passwordRepeatEntered = true;
-        }
-    };
     const checkWrongUsername = () => {
         if (wrongUsername) {
             wrongUsername = false;
         }
     };
 
-    $: {
-        checkUsernameEntered();
+    $: disabled = usernameError || passwordError || passwordRepeatError;
+
+    const checkUsername = (username) => {
         checkWrongUsername();
 
-        if (usernameEntered) {
-            if (username.length === 0) {
-                usernameError = "Заполните это поле.";
-            } else if (/[^0-9a-zA-Z#$*_]/.test(username)) {
-                usernameError =
-                    "Логин может состоять только из английских букв, цифр и знаков" +
-                    " #, $, *, _.";
-            } else {
-                usernameError = "";
-            }
+        if (username.length === 0) {
+            return "Заполните это поле.";
+        } else if (/[^0-9a-zA-Z#$*_]/.test(username)) {
+            return (
+                "Логин может состоять только из английских букв, цифр и знаков" +
+                " #, $, *, _."
+            );
         }
-    }
-    $: {
-        checkPasswordEntered();
+    };
 
-        if (passwordEntered) {
-            if (password.length === 0) {
-                passwordError = "Заполните это поле.";
-            } else if (password.length < 8) {
-                passwordError =
-                    "Пароль должен состоять как минимум из 8 символов.";
-            } else {
-                passwordError = "";
-            }
-        }
-    }
-    $: {
-        checkPasswordRepeatEntered();
+    const checkPassword = (password) => {
+        checkPasswordRepeat(passwordRepeat);
 
-        if (passwordRepeatEntered) {
-            if (passwordRepeat.length === 0) {
-                passwordRepeatError = "Заполните это поле.";
-            } else if (passwordRepeat !== password) {
-                passwordRepeatError = "Пароли не совпадают.";
-            } else {
-                passwordRepeatError = "";
-            }
+        if (password.length === 0) {
+            return "Заполните это поле.";
+        } else if (password.length < 8) {
+            return "Пароль должен состоять как минимум из 8 символов.";
         }
-    }
-    $: disabled = usernameError || passwordError || passwordRepeatError;
+    };
+
+    const checkPasswordRepeat = (passwordRepeat) => {
+        if (passwordRepeat.length === 0) {
+            return "Заполните это поле.";
+        } else if (passwordRepeat !== password) {
+            return "Пароли не совпадают.";
+        }
+
+        passwordRepeatError = false;
+    };
 
     const signup = () => {
         if (usernameEntered && passwordEntered && passwordRepeatEntered) {
@@ -124,20 +98,29 @@
     on:submit|preventDefault={signup}
 >
     <div class="fields">
-        <Textfield bind:value={username} error={usernameError} label="Логин" />
+        <Textfield
+            placeholder="Логин"
+            validation={checkUsername}
+            bind:value={username}
+            bind:error={usernameError}
+        />
     </div>
     <div class="fields">
         <Textfield
             type="password"
+            validation={checkPassword}
+            placeholder="Пароль"
             bind:value={password}
-            error={passwordError}
-            label="Пароль"
+            bind:interacted={passwordEntered}
+            bind:error={passwordError}
         />
         <Textfield
             type="password"
+            validation={checkPasswordRepeat}
+            placeholder="Повтор пароля"
             bind:value={passwordRepeat}
-            error={passwordRepeatError}
-            label="Повтор пароля"
+            bind:interacted={passwordRepeatEntered}
+            bind:error={passwordRepeatError}
         />
     </div>
     {#if promise}

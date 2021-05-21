@@ -66,12 +66,12 @@
         padding: 0.5rem;
         margin: 0.5rem;
 
-        &:hover {
-            cursor: pointer;
-        }
-
         &.active {
             --main-color: #{$color-primary};
+
+            &:hover {
+                cursor: pointer;
+            }
         }
 
         &.unactive {

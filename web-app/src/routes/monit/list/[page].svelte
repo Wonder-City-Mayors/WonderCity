@@ -10,6 +10,8 @@
             this
         );
 
+        console.log(devices);
+
         return {
             devices,
         };
@@ -107,7 +109,7 @@
         devices.forEach((device) => {
             devicesIds.push(device.deviceId);
 
-            device.active = Boolean(device.record);
+            device.active = "record" in device;
 
             if (!("date" in device) && device.active) {
                 device.date = new Date(
